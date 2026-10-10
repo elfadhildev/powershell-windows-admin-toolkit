@@ -1,0 +1,25 @@
+# PowerShell / editor
+.vscode/
+.idea/
+*.user
+*.suo
+
+# PowerShell artifacts
+*.log
+*.tmp
+
+# Backup output
+Backup_*/
+Backup_PC/
+Backups/
+*.bak
+
+# Local secrets
+.env
+*.secret.json
+secrets.json
+
+# Test / generated artifacts
+TestResults/
+coverage/
+reports/

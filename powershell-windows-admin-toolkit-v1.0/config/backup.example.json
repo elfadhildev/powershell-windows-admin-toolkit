@@ -1,0 +1,14 @@
+{
+  "BackupTargetDrive": "D:\\Backup_PC",
+  "Schedule": "Weekly",
+  "Folders": [
+    "Documents",
+    "Pictures",
+    "Desktop",
+    "Downloads",
+    "Music",
+    "Videos",
+    "AppData\\Roaming",
+    "AppData\\Local\\Packages"
+  ]
+}
