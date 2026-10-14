@@ -90,7 +90,7 @@ winget --version
 Clone repository:
 
 ```powershell
-git clone https://github.com/<elfadhildev>/powershell-windows-admin-toolkit.git
+git clone https://github.com/elfadhildev/powershell-windows-admin-toolkit.git
 Set-Location .\powershell-windows-admin-toolkit
 ```
 
