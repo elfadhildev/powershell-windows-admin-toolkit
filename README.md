@@ -100,6 +100,48 @@ Untuk development, gunakan PowerShell 7 bila tersedia:
 pwsh
 ```
 
+\## 🚀 Cara Menjalankan Script (Panduan Lengkap)
+
+
+
+Karena script ini diunduh dari internet, Windows secara default akan memblokir eksekusinya. Ikuti langkah-langkah berikut secara berurutan untuk menjalankannya dengan aman:
+
+
+
+\### 1. Clone Repository \& Masuk ke Folder
+
+```powershell
+
+git clone https://github.com/elfadhildev/powershell-windows-admin-toolkit.git
+
+cd powershell-windows-admin-toolkit
+
+```
+
+
+
+\### 2. Buka Blokir File (Unblock)
+
+Windows menandai file yang diunduh dari internet. Jalankan perintah ini untuk menghapus tanda tersebut:
+
+```powershell
+
+Get-ChildItem -Recurse | Unblock-File
+
+```
+
+
+
+\### 3. Atur Kebijakan Eksekusi (Execution Policy)
+
+Agar script dapat berjalan tanpa mengubah pengaturan keamanan sistem secara permanen, kita akan melakukan bypass khusus untuk sesi PowerShell ini saja:
+
+```powershell
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
+```
+
 ## Quick Start
 
 Audit sistem:
