@@ -108,19 +108,8 @@ Karena script ini diunduh dari internet, Windows secara default akan memblokir e
 
 
 
-\### 1. Clone Repository \& Masuk ke Folder
 
-```powershell
-
-git clone https://github.com/elfadhildev/powershell-windows-admin-toolkit.git
-
-cd powershell-windows-admin-toolkit
-
-```
-
-
-
-\### 2. Buka Blokir File (Unblock)
+\### 1. Buka Blokir File (Unblock)
 
 Windows menandai file yang diunduh dari internet. Jalankan perintah ini untuk menghapus tanda tersebut:
 
@@ -132,7 +121,7 @@ Get-ChildItem -Recurse | Unblock-File
 
 
 
-\### 3. Atur Kebijakan Eksekusi (Execution Policy)
+\### 2. Atur Kebijakan Eksekusi (Execution Policy)
 
 Agar script dapat berjalan tanpa mengubah pengaturan keamanan sistem secara permanen, kita akan melakukan bypass khusus untuk sesi PowerShell ini saja:
 
