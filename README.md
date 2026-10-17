@@ -110,9 +110,6 @@ Jika Anda ingin langsung menjalankan toolkit tanpa mengunduh file, buka PowerShe
 irm https://raw.githubusercontent.com/elfadhildev/powershell-windows-admin-toolkit/main/setup.ps1 | iex
 
 
-(Catatan: Karena dieksekusi langsung di memori, Anda tidak perlu mengubah Execution Policy atau melakukan Unblock-File)
-
-
 ```
 
 ## Quick Start
