@@ -2,38 +2,62 @@
 title Toolkit Installer - Elfadhidev
 color 0A
 
-:: 1. Minta izin Administrator
+:: 1. Cek Izin Administrator
 net session >nul 2>&1
 if %errorLevel% == 0 (
-    goto :run_script
+    goto :menu
 ) else (
     echo Meminta izin Administrator...
     powershell -Command "Start-Process '%~f0' -Verb RunAs"
     exit /b
 )
 
-:run_script
-:: 2. Pindah ke direktori tempat file .bat berada
+:menu
+:: 2. Paksa masuk ke folder script
 cd /d "%~dp0"
 
+:: 3. Buka blokir file (hanya berjalan sekali di awal)
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem -Path '%~dp0scripts' -Filter *.ps1 -Recurse | Unblock-File" >nul 2>&1
+
+:MENU_UTAMA
+cls
 echo ====================================================
-echo   Memulai Proses Persiapan Toolkit
+echo         WINDOWS ADMIN TOOLKIT - ELFADHIDEV
 echo ====================================================
 echo.
-
-:: 3. Buka blokir HANYA untuk file .ps1 di dalam folder scripts
-echo [1/2] Menyiapkan izin akses untuk modul PowerShell...
-powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-ChildItem -Path '%~dp0scripts' -Filter *.ps1 -Recurse | Unblock-File"
-echo       Selesai!
+echo  [1] Maintenance (Perawatan Sistem)
+echo  [2] Network Diagnostics (Cek Jaringan)
+echo  [3] System Audit (Audit Keamanan)
+echo  [4] Backup User Profile (Backup Data)
+echo  [5] Keluar
 echo.
+echo ====================================================
+set /p pilihan="Pilih menu (1-5) lalu tekan Enter: "
 
-:: 4. Buka PowerShell di folder scripts agar user bisa memilih script
-echo [2/2] Membuka Terminal Toolkit...
-echo.
-echo Silakan ketik nama script yang ingin dijalankan. Contoh:
-echo   .\Maintenance.ps1
-echo   .\Network-Diagnostics.ps1
-echo.
-powershell -NoExit -ExecutionPolicy Bypass -Command "cd '%~dp0scripts'; Write-Host 'Toolkit Siap Digunakan!' -ForegroundColor Green"
+if "%pilihan%"=="1" set "SCRIPT_NAME=Maintenance.ps1"
+if "%pilihan%"=="2" set "SCRIPT_NAME=Network-Diagnostics.ps1"
+if "%pilihan%"=="3" set "SCRIPT_NAME=System-Audit.ps1"
+if "%pilihan%"=="4" set "SCRIPT_NAME=Backup-UserProfile.ps1"
+if "%pilihan%"=="5" exit
 
+if not defined SCRIPT_NAME (
+    echo.
+    echo [ERROR] Pilihan tidak valid! Silakan coba lagi.
+    timeout /t 2 >nul
+    goto MENU_UTAMA
+)
+
+:: 4. Jalankan skrip yang dipilih
+cls
+echo ====================================================
+echo   Menjalankan: %SCRIPT_NAME%
+echo ====================================================
+echo.
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\%SCRIPT_NAME%"
+
+echo.
+echo ====================================================
+echo   Skrip Selesai Dijalankan.
+echo ====================================================
 pause
+goto MENU_UTAMA
