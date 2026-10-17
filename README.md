@@ -61,8 +61,10 @@ powershell-windows-admin-toolkit/
 ├── .gitignore
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
+├── Install.bat
 ├── LICENSE
-└── README.md
+├── README.md
+└── Setup.ps1
 ```
 
 ## Prerequisites
