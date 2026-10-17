@@ -103,7 +103,7 @@ pwsh
 
 Terdapat dua metode untuk menjalankan toolkit ini. Pilih salah satu yang paling nyaman bagi Anda.
 
-### Metode 1: Instalasi Cepat (Satu Perintah / One-Liner)
+## Metode 1: Instalasi Cepat (Satu Perintah / One-Liner)
 Jika Anda ingin langsung menjalankan toolkit tanpa mengunduh file, buka PowerShell dan jalankan perintah berikut:
 
 ```powershell
@@ -113,7 +113,7 @@ irm https://raw.githubusercontent.com/elfadhildev/powershell-windows-admin-toolk
 (Catatan: Karena dieksekusi langsung di memori, Anda tidak perlu mengubah Execution Policy atau melakukan Unblock-File)
 
 
-### Metode 2: Instalasi Manual (Clone / Download ZIP)
+## Metode 2: Instalasi Manual (Clone / Download ZIP)
 Jika Anda ingin menyimpan file script secara lokal (misalnya untuk dimodifikasi), ikuti langkah berikut:
 
 1. Unduh & Ekstrak
