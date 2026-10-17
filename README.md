@@ -99,34 +99,41 @@ Untuk development, gunakan PowerShell 7 bila tersedia:
 pwsh
 ```
 
-## 🚀 Cara Menjalankan Script (Panduan Lengkap)
+## Cara Instalasi & Menjalankan
 
+Terdapat dua metode untuk menjalankan toolkit ini. Pilih salah satu yang paling nyaman bagi Anda.
 
-
-Untuk memastikan keamanan sistem, Windows memerlukan konfirmasi tambahan saat menjalankan modul otomatis. Ikuti langkah-langkah berikut untuk memberikan izin akses yang diperlukan agar aplikasi dapat berjalan dengan lancar:
-
-
-
-
-## 1. Buka Blokir File (Unblock)
-
-Persiapan File Lokal - Sistem memerlukan otorisasi untuk mengenali file ini sebagai bagian dari sistem lokal Anda. Jalankan perintah berikut untuk menyinkronkan izin file:
+### Metode 1: Instalasi Cepat (Satu Perintah / One-Liner)
+Jika Anda ingin langsung menjalankan toolkit tanpa mengunduh file, buka PowerShell dan jalankan perintah berikut:
 
 ```powershell
+irm https://raw.githubusercontent.com/elfadhildev/powershell-windows-admin-toolkit/main/setup.ps1 | iex
 
+
+(Catatan: Karena dieksekusi langsung di memori, Anda tidak perlu mengubah Execution Policy atau melakukan Unblock-File)
+
+
+### Metode 2: Instalasi Manual (Clone / Download ZIP)
+Jika Anda ingin menyimpan file script secara lokal (misalnya untuk dimodifikasi), ikuti langkah berikut:
+
+1. Unduh & Ekstrak
+Clone repo ini atau unduh sebagai ZIP, lalu ekstrak foldernya.
+
+2. Buka Blokir File (Wajib untuk file lokal)
+Buka PowerShell, arahkan ke folder proyek, dan jalankan:
+
+powershell
 Get-ChildItem -Recurse | Unblock-File
+3. Atur Kebijakan Eksekusi (Sementara)
+Izinkan script berjalan di sesi terminal saat ini:
 
-```
-
-
-
-## 2. Atur Kebijakan Eksekusi (Execution Policy)
-
-Konfigurasi Lingkungan Sementara (Temporary Environment) - Jalankan perintah berikut untuk mengaktifkan lingkungan eksekusi sementara. Pengaturan ini hanya berlaku selama proses instalasi berjalan dan tidak akan mengubah kebijakan keamanan utama komputer Anda.
-
-```powershell
-
+powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+4. Jalankan Script
+
+powershell
+.\setup.ps1
+
 
 ```
 
