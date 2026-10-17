@@ -108,8 +108,29 @@ Jika Anda ingin langsung menjalankan toolkit tanpa mengunduh file, buka PowerShe
 
 ```powershell
 irm https://raw.githubusercontent.com/elfadhildev/powershell-windows-admin-toolkit/main/setup.ps1 | iex
+```
+## Metode 2: Instalasi Manual (Clone / Download ZIP)
+Jika Anda ingin menyimpan file script secara lokal (misalnya untuk dimodifikasi), ikuti langkah berikut:
 
+1. Unduh & Ekstrak
+Clone repo ini atau unduh sebagai ZIP, lalu ekstrak foldernya.
 
+2. Buka Blokir File (Wajib untuk file lokal)
+Buka PowerShell, arahkan ke folder proyek, dan jalankan:
+
+```powershell
+Get-ChildItem -Recurse | Unblock-File
+```
+3. Atur Kebijakan Eksekusi (Sementara)
+Izinkan script berjalan di sesi terminal saat ini:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+```
+4. Jalankan Script
+
+```powershell
+.\setup.ps1
 ```
 
 ## Quick Start
