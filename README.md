@@ -100,7 +100,7 @@ Untuk development, gunakan PowerShell 7 bila tersedia:
 pwsh
 ```
 
-\🚀 Cara Menjalankan Script (Panduan Lengkap)
+🚀 Cara Menjalankan Script (Panduan Lengkap)
 
 
 
@@ -109,7 +109,7 @@ Karena script ini diunduh dari internet, Windows secara default akan memblokir e
 
 
 
-\ 1. Buka Blokir File (Unblock)
+## 1. Buka Blokir File (Unblock)
 
 Windows menandai file yang diunduh dari internet. Jalankan perintah ini untuk menghapus tanda tersebut:
 
@@ -121,7 +121,7 @@ Get-ChildItem -Recurse | Unblock-File
 
 
 
-\ 2. Atur Kebijakan Eksekusi (Execution Policy)
+## 2. Atur Kebijakan Eksekusi (Execution Policy)
 
 Agar script dapat berjalan tanpa mengubah pengaturan keamanan sistem secara permanen, kita akan melakukan bypass khusus untuk sesi PowerShell ini saja:
 
