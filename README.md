@@ -90,8 +90,7 @@ winget --version
 Clone repository:
 
 ```powershell
-git clone https://github.com/<username>/powershell-windows-admin-toolkit.git
-Set-Location .\powershell-windows-admin-toolkit
+irm https://raw.githubusercontent.com/elfadhildev/powershell-windows-admin-toolkit/main/install.ps1 | iex
 ```
 
 Untuk development, gunakan PowerShell 7 bila tersedia:
