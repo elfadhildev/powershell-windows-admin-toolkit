@@ -1,36 +1,26 @@
-[CmdletBinding()]
-param(
-    [string]$TraceHost = '1.1.1.1'
-)
-
-<##
-.SYNOPSIS
-    Diagnosis dasar koneksi jaringan Windows.
-.DESCRIPTION
-    Menampilkan IP configuration, TCP connections, route trace,
-    dan pemetaan koneksi established ke process ID.
+<#
+ NETWORK DIAGNOSTICS SCRIPT (Gabungan Terbaik)
 #>
-
 $ErrorActionPreference = 'SilentlyContinue'
+Clear-Host
 
-Write-Host '=== NETWORK DIAGNOSTICS ===' -ForegroundColor Cyan
-Write-Host ''
+Write-Host "===================================================" -ForegroundColor Cyan
+Write-Host "               DIAGNOSTIK JARINGAN                 " -ForegroundColor Cyan
+Write-Host "===================================================" -ForegroundColor Cyan
 
-Write-Host '[IP CONFIGURATION]' -ForegroundColor Yellow
-Get-NetIPConfiguration |
+Write-Host "`n[+] IP CONFIGURATION" -ForegroundColor Yellow
+Get-NetIPConfiguration | Where-Object { $_.IPv4Address } |
     Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway, DNSServer |
     Format-List
 
-Write-Host '[ACTIVE TCP CONNECTIONS]' -ForegroundColor Yellow
+Write-Host "`n[+] ACTIVE TCP CONNECTIONS" -ForegroundColor Yellow
 Get-NetTCPConnection |
     Select-Object LocalAddress, LocalPort, RemoteAddress, RemotePort, State, OwningProcess |
-    Sort-Object State, LocalPort |
-    Format-Table -AutoSize
+    Sort-Object State, LocalPort | Format-Table -AutoSize
 
-Write-Host '[ESTABLISHED CONNECTION -> PROCESS]' -ForegroundColor Yellow
+Write-Host "`n[+] ESTABLISHED CONNECTION -> PROCESS" -ForegroundColor Yellow
 Get-NetTCPConnection -State Established | ForEach-Object {
     $Process = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue
-
     [PSCustomObject]@{
         LocalPort  = $_.LocalPort
         RemoteAddr = $_.RemoteAddress
@@ -38,11 +28,17 @@ Get-NetTCPConnection -State Established | ForEach-Object {
         Process    = if ($Process) { $Process.ProcessName } else { '<unknown>' }
         PID        = $_.OwningProcess
     }
-} | Format-Table -AutoSize
+} | Sort-Object Process | Format-Table -AutoSize
 
-Write-Host "[TRACE ROUTE: $TraceHost]" -ForegroundColor Yellow
-Test-NetConnection -ComputerName $TraceHost -TraceRoute |
-    Format-List
+Write-Host "`n[+] TES RESOLUSI DNS (google.com)" -ForegroundColor Yellow
+$dns = Resolve-DnsName -Name "google.com" -Type A -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($dns) { Write-Host " -> Berhasil: google.com -> $($dns.IPAddress)" -ForegroundColor Green } 
+else { Write-Host " -> Gagal melakukan resolusi DNS!" -ForegroundColor Red }
 
-Write-Host ''
-Write-Host 'Network diagnostics selesai. Script ini tidak mengubah konfigurasi jaringan.' -ForegroundColor Green
+Write-Host "`n[+] TRACE ROUTE (1.1.1.1)" -ForegroundColor Yellow
+Test-NetConnection -ComputerName 1.1.1.1 -TraceRoute |
+    Select-Object ComputerName, RemoteAddress, TraceRoute | Format-List
+
+Write-Host "===================================================" -ForegroundColor Cyan
+Write-Host " Network diagnostics selesai. Tekan apa saja..."
+pause >nul
