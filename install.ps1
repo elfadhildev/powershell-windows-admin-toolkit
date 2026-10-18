@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Panduan PowerShell - Control Panel Installer (v1.1.0)
+  Panduan PowerShell - Control Panel Installer (v1.1.0 - Fixed)
 #>
 
 $RepoUrl = "https://github.com/elfadhildev/powershell-windows-admin-toolkit.git"
@@ -41,30 +41,62 @@ do {
                 git clone $RepoUrl $InstallDir
             }
             Write-Host "[+] Selesai! Repositori siap digunakan." -ForegroundColor Green
-            Start-Sleep -Seconds 2
+            Read-Host "`nTekan Enter untuk kembali ke menu utama..."
         }
         '2' {
             $target = Join-Path $InstallDir "Maintenance-1Klik.bat"
-            if (Test-Path $target) { Start-Process $target -Verb RunAs } else { Write-Host "[!] Silakan pilih opsi 1 dulu." -ForegroundColor Red; Start-Sleep -Seconds 2 }
+            if (Test-Path $target) { 
+                Start-Process $target -Verb RunAs 
+            } else { 
+                Write-Host "[!] Folder belum ada. Silakan pilih opsi 1 dulu." -ForegroundColor Red
+                Read-Host "Tekan Enter untuk kembali..."
+            }
         }
         '3' {
             $target = Join-Path $InstallDir "Backup-1Klik.bat"
-            if (Test-Path $target) { Start-Process $target } else { Write-Host "[!] Silakan pilih opsi 1 dulu." -ForegroundColor Red; Start-Sleep -Seconds 2 }
+            if (Test-Path $target) { 
+                Start-Process $target 
+            } else { 
+                Write-Host "[!] Folder belum ada. Silakan pilih opsi 1 dulu." -ForegroundColor Red
+                Read-Host "Tekan Enter untuk kembali..."
+            }
         }
         '4' {
             $target = Join-Path $InstallDir "Build-PDF-1Klik.bat"
-            if (Test-Path $target) { Start-Process $target } else { Write-Host "[!] Silakan pilih opsi 1 dulu." -ForegroundColor Red; Start-Sleep -Seconds 2 }
+            if (Test-Path $target) { 
+                Start-Process $target 
+            } else { 
+                Write-Host "[!] Folder belum ada. Silakan pilih opsi 1 dulu." -ForegroundColor Red
+                Read-Host "Tekan Enter untuk kembali..."
+            }
         }
         '5' {
             $target = Join-Path $InstallDir "scripts\System-Audit.ps1"
-            if (Test-Path $target) { & $target } else { Write-Host "[!] File System-Audit.ps1 belum ada. Jalankan opsi 1." -ForegroundColor Red; Start-Sleep -Seconds 2 }
+            if (Test-Path $target) { 
+                # Buka di jendela baru agar menu utama tidak tertimpa
+                Start-Process powershell -ArgumentList "-NoProfile", "-ExecutionPolicy", "Bypass", "-NoExit", "-File", "`"$target`""
+            } else { 
+                Write-Host "[!] Folder belum ada. Silakan pilih opsi 1 dulu." -ForegroundColor Red
+                Read-Host "Tekan Enter untuk kembali..."
+            }
         }
         '6' {
             $target = Join-Path $InstallDir "scripts\Network-Diagnostics.ps1"
-            if (Test-Path $target) { & $target } else { Write-Host "[!] File Network-Diagnostics.ps1 belum ada. Jalankan opsi 1." -ForegroundColor Red; Start-Sleep -Seconds 2 }
+            if (Test-Path $target) { 
+                # Buka di jendela baru agar menu utama tidak tertimpa
+                Start-Process powershell -ArgumentList "-NoProfile", "-ExecutionPolicy", "Bypass", "-NoExit", "-File", "`"$target`""
+            } else { 
+                Write-Host "[!] Folder belum ada. Silakan pilih opsi 1 dulu." -ForegroundColor Red
+                Read-Host "Tekan Enter untuk kembali..."
+            }
         }
         '7' {
-            if (Test-Path $InstallDir) { Start-Process explorer.exe $InstallDir } else { Write-Host "[!] Folder belum ada." -ForegroundColor Red; Start-Sleep -Seconds 2 }
+            if (Test-Path $InstallDir) { 
+                Start-Process explorer.exe $InstallDir 
+            } else { 
+                Write-Host "[!] Folder belum ada." -ForegroundColor Red
+                Read-Host "Tekan Enter untuk kembali..." 
+            }
         }
         '8' { Write-Host "Keluar..." -ForegroundColor Cyan }
         default { Write-Host "[!] Pilihan tidak valid." -ForegroundColor Red; Start-Sleep -Seconds 1 }
