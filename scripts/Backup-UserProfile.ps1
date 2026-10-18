@@ -88,3 +88,5 @@ Write-Host '==========================================' -ForegroundColor Cyan
 Write-Host ' PROSES BACKUP PROFIL SELESAI! ' -ForegroundColor Green
 Write-Host '==========================================' -ForegroundColor Cyan
 Write-Host "Detail log tersimpan di: $LogFile" -ForegroundColor Gray
+
+Read-Host " Tekan Enter untuk menutup jendela ini..."

@@ -1,22 +1,18 @@
 <#
- NETWORK DIAGNOSTICS SCRIPT (Gabungan Terbaik)
+ NETWORK DIAGNOSTICS SCRIPT
 #>
 $ErrorActionPreference = 'SilentlyContinue'
 Clear-Host
-
 Write-Host "===================================================" -ForegroundColor Cyan
 Write-Host "               DIAGNOSTIK JARINGAN                 " -ForegroundColor Cyan
 Write-Host "===================================================" -ForegroundColor Cyan
 
 Write-Host "`n[+] IP CONFIGURATION" -ForegroundColor Yellow
 Get-NetIPConfiguration | Where-Object { $_.IPv4Address } |
-    Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway, DNSServer |
-    Format-List
+    Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway, DNSServer | Format-List
 
 Write-Host "`n[+] ACTIVE TCP CONNECTIONS" -ForegroundColor Yellow
-Get-NetTCPConnection |
-    Select-Object LocalAddress, LocalPort, RemoteAddress, RemotePort, State, OwningProcess |
-    Sort-Object State, LocalPort | Format-Table -AutoSize
+Get-NetTCPConnection | Select-Object LocalAddress, LocalPort, RemoteAddress, RemotePort, State, OwningProcess | Sort-Object State, LocalPort | Format-Table -AutoSize
 
 Write-Host "`n[+] ESTABLISHED CONNECTION -> PROCESS" -ForegroundColor Yellow
 Get-NetTCPConnection -State Established | ForEach-Object {
@@ -35,10 +31,6 @@ $dns = Resolve-DnsName -Name "google.com" -Type A -ErrorAction SilentlyContinue 
 if ($dns) { Write-Host " -> Berhasil: google.com -> $($dns.IPAddress)" -ForegroundColor Green } 
 else { Write-Host " -> Gagal melakukan resolusi DNS!" -ForegroundColor Red }
 
-Write-Host "`n[+] TRACE ROUTE (1.1.1.1)" -ForegroundColor Yellow
-Test-NetConnection -ComputerName 1.1.1.1 -TraceRoute |
-    Select-Object ComputerName, RemoteAddress, TraceRoute | Format-List
-
 Write-Host "===================================================" -ForegroundColor Cyan
-Write-Host " Network diagnostics selesai. Tekan apa saja..."
-pause >nul
+# PERBAIKAN: Gunakan Read-Host
+Read-Host " Diagnostik selesai. Tekan Enter untuk menutup jendela ini..."

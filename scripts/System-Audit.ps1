@@ -1,9 +1,8 @@
 <#
- SYSTEM AUDIT SCRIPT (Gabungan Terbaik)
+ SYSTEM AUDIT SCRIPT
 #>
 $ErrorActionPreference = 'SilentlyContinue'
 Clear-Host
-
 Write-Host "===================================================" -ForegroundColor Cyan
 Write-Host "             SISTEM AUDIT & HARDWARE               " -ForegroundColor Cyan
 Write-Host "===================================================" -ForegroundColor Cyan
@@ -29,10 +28,6 @@ $badDrivers = Get-PnpDevice -PresentOnly | Where-Object { $_.Status -ne "OK" }
 if ($badDrivers) { $badDrivers | Select-Object Class, FriendlyName, Status | Format-Table -AutoSize } 
 else { Write-Host " -> Semua driver berstatus OK." -ForegroundColor Green }
 
-Write-Host "`n[+] SERVICE LOCAL SYSTEM YANG BERJALAN" -ForegroundColor Yellow
-Get-CimInstance Win32_Service | Where-Object { $_.StartName -eq "LocalSystem" -and $_.State -eq "Running" } |
-    Select-Object Name, DisplayName | Format-Table -AutoSize
-
 Write-Host "===================================================" -ForegroundColor Cyan
-Write-Host " Audit selesai. Tekan apa saja untuk kembali..."
-pause >nul
+# PERBAIKAN: Gunakan Read-Host, bukan pause >nul
+Read-Host " Audit selesai. Tekan Enter untuk menutup jendela ini..."
