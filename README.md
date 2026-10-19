@@ -108,29 +108,9 @@ pwsh
 
 ## Quick Start
 
-Audit sistem:
+Setelah instalasi, jalankan Control Panel untuk mengakses semua fitur melalui menu interaktif:
 
-```powershell
-.\scripts\System-Audit.ps1
-```
-
-Diagnosis jaringan:
-
-```powershell
-.\scripts\Network-Diagnostics.ps1
-```
-
-Maintenance:
-
-```powershell
-.\scripts\Maintenance.ps1
-```
-
-Backup user profile:
-
-```powershell
-.\scripts\Backup-UserProfile.ps1 -BackupTargetDrive "D:\Backup_PC"
-```
+<img width="526" height="298" alt="Cuplikan layar 2026-10-19 224832" src="https://github.com/user-attachments/assets/365ea185-77c8-4df0-93b8-3e1d2195d872" />
 
 > Jalankan PowerShell sebagai Administrator untuk script yang membutuhkan hak elevated.
 
