@@ -42,11 +42,13 @@ Project ini mendemonstrasikan kemampuan pada:
 ```text
 powershell-windows-admin-toolkit/
 ├── .github/
+│   └── ISSUE_TEMPLATE/
 │   └── workflows/
 │       └── powershell-lint.yml
 ├── config/
 │   └── backup.example.json
 ├── docs/
+│   ├── advanced/
 │   ├── installation.md
 │   ├── usage.md
 │   ├── troubleshooting.md
@@ -60,8 +62,13 @@ powershell-windows-admin-toolkit/
 │   └── Scripts.Tests.ps1
 ├── .gitignore
 ├── CHANGELOG.md
+├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── LICENSE
+├── SECURITY.md
+├── install.ps1
+├── Build-PDF-1klik.bat
+├── Publish-Github-1klik.bat
 └── README.md
 ```
 
@@ -87,7 +94,7 @@ winget --version
 
 ## Instalasi
 
-Clone repository:
+Cara tercepat adalah menjalankan installer interaktif langsung dari PowerShell:
 
 ```powershell
 irm https://raw.githubusercontent.com/elfadhildev/powershell-windows-admin-toolkit/main/install.ps1 | iex
