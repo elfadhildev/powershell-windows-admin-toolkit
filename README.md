@@ -2,14 +2,14 @@
 
 ![PowerShell](https://img.shields.io/badge/PowerShell-7%2B-5391FE?logo=powershell&logoColor=white)
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%2F11-0078D4?logo=windows&logoColor=white)
-![Version](https://img.shields.io/badge/Version-1.0.0-2ea44f)
+![Version](https://img.shields.io/badge/Version-1.3.1-2ea44f)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 Toolkit PowerShell untuk administrasi Windows, system audit, diagnosis jaringan, maintenance dasar, backup user profile, dan automation melalui Task Scheduler.
 
 Repository ini disusun sebagai portfolio teknis. Fokusnya bukan sekadar mengumpulkan command, tetapi menunjukkan bagaimana command Windows dapat dikemas menjadi workflow yang terdokumentasi, dapat diulang, dan mudah dipelihara.
 
-> Status: `v1.0.0` · Portfolio / Learning Project
+> Status: `v1.3.1` · Portfolio / Learning Project
 
 ## Tujuan
 
