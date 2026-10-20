@@ -66,7 +66,8 @@ powershell-windows-admin-toolkit/
 ├── CONTRIBUTING.md
 ├── LICENSE
 ├── SECURITY.md
-├── install.ps1
+├── Compile.ps1        
+├── toolkit.ps1        
 ├── Build-PDF-1klik.bat
 ├── Publish-Github-1klik.bat
 └── README.md
@@ -108,9 +109,10 @@ pwsh
 
 ## Quick Start
 
-Setelah instalasi, jalankan Control Panel untuk mengakses semua fitur melalui menu interaktif:
+Setelah menjalankan perintah di atas, menu interaktif akan muncul secara otomatis.
 
-<img width="526" height="298" alt="Cuplikan layar 2026-10-19 224832" src="https://github.com/user-attachments/assets/365ea185-77c8-4df0-93b8-3e1d2195d872" />
+<img width="498" height="208" alt="Cuplikan layar 2026-10-20 231037" src="https://github.com/user-attachments/assets/f42cd855-57d8-4058-92de-b407f7cfba09" />
+
 
 > Jalankan PowerShell sebagai Administrator untuk script yang membutuhkan hak elevated.
 
@@ -306,7 +308,7 @@ Repository ini mengutamakan command Windows dan script administrasi yang dapat d
 
 Beberapa prinsip yang digunakan:
 
-- Jangan pipe source internet langsung ke `iex` tanpa memeriksa source.
+- Selalu periksa URL source sebelum menjalankan `irm | iex`.
 - Jalankan command Administrator hanya ketika memang diperlukan.
 - Review perubahan Registry dan konfigurasi boot sebelum menerapkannya.
 - Gunakan backup sebelum perubahan sistem besar.
@@ -359,7 +361,7 @@ CI tidak mengeksekusi maintenance atau backup pada runner.
 - Exit code dan error handling yang lebih konsisten.
 
 ### v1.3.1 (Rilis saat ini)
-- **Control Panel interaktif** (`install.ps1`) dengan 8 menu.
+- **Control Panel interaktif** (`toolkit.ps1`) dengan 5 menu.
 - Dukungan eksekusi *one-liner* via `irm | iex`.
 - Restrukturisasi folder `docs/advanced` untuk skrip berisiko.
 - Penambahan `SECURITY.md`, `CODE_OF_CONDUCT.md`, dan Issue Templates.
