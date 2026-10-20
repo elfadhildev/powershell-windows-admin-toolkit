@@ -32,5 +32,3 @@ if ($dns) { Write-Host " -> Berhasil: google.com -> $($dns.IPAddress)" -Foregrou
 else { Write-Host " -> Gagal melakukan resolusi DNS!" -ForegroundColor Red }
 
 Write-Host "===================================================" -ForegroundColor Cyan
-# PERBAIKAN: Gunakan Read-Host
-Read-Host " Diagnostik selesai. Tekan Enter untuk menutup jendela ini..."
