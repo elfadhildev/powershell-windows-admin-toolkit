@@ -113,9 +113,9 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     Exit
 }
 
-Write-Host "===============================" -ForegroundColor Cyan
+Write-Host "=======================================" -ForegroundColor Cyan
 Write-Host "  MEMULAI PROSES MAINTENANCE PC KLIEN  " -ForegroundColor Cyan
-Write-Host "===============================" -ForegroundColor Cyan
+Write-Host "=======================================" -ForegroundColor Cyan
 Write-Host ""
 
 # 1. OPTIMASI JARINGAN
@@ -135,13 +135,31 @@ $TempFolders = @(
     "C:\Windows\Prefetch",
     "C:\Windows\SoftwareDistribution\Download"
 )
-foreach ($Folder in $TempFolders) {
-    if (Test-Path $Folder) {
-        Write-Host " -> Membersihkan: $Folder" -ForegroundColor Gray
-        Get-ChildItem -Path $Folder -Recurse -Force -ErrorAction SilentlyContinue |
-            Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+# Hentikan layanan Windows Update & BITS sementara agar folder tidak terkunci
+Write-Host " -> Menghentikan layanan Windows Update sementara..." -ForegroundColor Gray
+Stop-Service -Name wuauserv, bits -Force -ErrorAction SilentlyContinue
+
+foreach ($folder in $TempFolders) {
+    if (Test-Path $folder) {
+        Write-Host " -> Membersihkan: $folder" -ForegroundColor Gray
+        
+        # Khusus folder SoftwareDistribution, gunakan metode rmdir yang jauh lebih cepat
+        if ($folder -like "*SoftwareDistribution*") {
+            cmd /c "rmdir /s /q `"$folder`" 2>nul"
+            # Buat ulang foldernya agar Windows Update tidak error di masa depan
+            New-Item -ItemType Directory -Path $folder -Force | Out-Null
+        } else {
+            # Metode standar (aman) untuk folder Temp, Prefetch, dll
+            Get-ChildItem -Path $folder -Recurse -Force -ErrorAction SilentlyContinue |
+                Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+        }
     }
 }
+
+# Nyalakan kembali layanan Windows Update setelah selesai
+Write-Host " -> Menyalakan kembali layanan Windows Update..." -ForegroundColor Gray
+Start-Service -Name wuauserv, bits -ErrorAction SilentlyContinue
+
 Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -NoNewWindow -Wait
 Write-Host " -> Membersihkan File Temporary Selesai." -ForegroundColor Green
 Write-Host ""
