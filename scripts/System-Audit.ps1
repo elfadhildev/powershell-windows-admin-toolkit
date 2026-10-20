@@ -29,5 +29,3 @@ if ($badDrivers) { $badDrivers | Select-Object Class, FriendlyName, Status | For
 else { Write-Host " -> Semua driver berstatus OK." -ForegroundColor Green }
 
 Write-Host "===================================================" -ForegroundColor Cyan
-# PERBAIKAN: Gunakan Read-Host, bukan pause >nul
-Read-Host " Audit selesai. Tekan Enter untuk menutup jendela ini..."
