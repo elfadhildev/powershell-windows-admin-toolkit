@@ -96,8 +96,6 @@ Write-Host ' PROSES BACKUP PROFIL SELESAI! ' -ForegroundColor Green
 Write-Host '==========================================' -ForegroundColor Cyan
 Write-Host "Detail log tersimpan di: $LogFile" -ForegroundColor Gray
 
-Read-Host " Tekan Enter untuk menutup jendela ini..."
-
 }
 
 function Invoke-Maintenance {
@@ -205,8 +203,7 @@ if ($badDrivers) { $badDrivers | Select-Object Class, FriendlyName, Status | For
 else { Write-Host " -> Semua driver berstatus OK." -ForegroundColor Green }
 
 Write-Host "===================================================" -ForegroundColor Cyan
-# PERBAIKAN: Gunakan Read-Host, bukan pause >nul
-Read-Host " Audit selesai. Tekan Enter untuk menutup jendela ini..."
+
 }
 
 function Invoke-NetworkDiagnostics {
@@ -244,8 +241,7 @@ if ($dns) { Write-Host " -> Berhasil: google.com -> $($dns.IPAddress)" -Foregrou
 else { Write-Host " -> Gagal melakukan resolusi DNS!" -ForegroundColor Red }
 
 Write-Host "===================================================" -ForegroundColor Cyan
-# PERBAIKAN: Gunakan Read-Host
-Read-Host " Diagnostik selesai. Tekan Enter untuk menutup jendela ini..."
+
 }
 function Show-Menu {
     Clear-Host
