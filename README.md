@@ -97,7 +97,7 @@ winget --version
 Cara tercepat adalah menjalankan installer interaktif langsung dari PowerShell:
 
 ```powershell
-irm https://raw.githubusercontent.com/elfadhildev/powershell-windows-admin-toolkit/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/elfadhildev/powershell-windows-admin-toolkit/main/toolkit.ps1 | iex
 ```
 
 Untuk development, gunakan PowerShell 7 bila tersedia:
