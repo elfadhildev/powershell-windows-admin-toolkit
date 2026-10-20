@@ -16,12 +16,6 @@ Periksa Winget:
 winget --version
 ```
 
-## Clone
-
-```powershell
-git clone https://github.com/<username>/powershell-windows-admin-toolkit.git
-Set-Location .\powershell-windows-admin-toolkit
-```
 
 ## Execution Policy
 
