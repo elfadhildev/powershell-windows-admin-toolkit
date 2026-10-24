@@ -4,18 +4,14 @@
 }
 
 # ==========================================
-# FUNGSI BANTUAN: BACKUP REGISTRY (UX)
+# FUNGSI BANTUAN
 # ==========================================
 function Backup-RegistryTweaks {
     $backupDir = "$env:USERPROFILE\Desktop\ToolkitRegistryBackup"
     if (-not (Test-Path $backupDir)) { New-Item -Path $backupDir -ItemType Directory -Force | Out-Null }
     $time = Get-Date -Format "yyyyMMdd_HHmmss"
     $regFile = Join-Path $backupDir "Explorer_Advanced_$time.reg"
-    
-    Write-Host "`n[🛡️] Membuat Backup Registry (Safety First)..." -ForegroundColor Cyan
-    # Ekspor key HKCU Explorer Advanced sebelum diubah
     Start-Process cmd -ArgumentList "/c reg export `"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced`" `"$regFile`" /y" -Wait -NoNewWindow
-    Write-Host " -> Backup disimpan di: $regFile" -ForegroundColor Green
 }
 
 # ==========================================
@@ -102,10 +98,7 @@ function Invoke-CreateRestorePoint {
 # ==========================================
 function Invoke-SystemTweaks {
     Clear-Host; Write-Host "========== SYSTEM TWEAKS ==========" -ForegroundColor Cyan
-    
-    # UX UPDATE: Backup dulu sebelum tweak!
     Backup-RegistryTweaks
-
     Write-Host "`n1. Disable Telemetry`n2. Optimize Visual Effects`n3. Show File Extensions`n4. Disable Game Bar`n5. Apply ALL`n6. Kembali" -ForegroundColor Yellow
     $choice = Read-Host "`nPilih (1-6)"
     switch ($choice) {
@@ -187,50 +180,137 @@ function Invoke-AppBackup {
 }
 
 # ==========================================
-# 13-14. FUNGSI BARU v1.7.0: EVENT LOG & STARTUP
+# 13-14. FUNGSI v1.8.0: EVENT LOG & INTERACTIVE STARTUP
 # ==========================================
 function Invoke-EventLogAnalyzer {
     Clear-Host
     Write-Host "========== EVENT LOG ANALYZER (7 HARI TERAKHIR) ==========" -ForegroundColor Cyan
     Write-Host "[+] Menganalisis System & Application Logs..." -ForegroundColor Yellow
-    
-    # Ambil error level 1 (Critical) dan 2 (Error)
     $events = Get-WinEvent -FilterHashtable @{LogName='System','Application'; Level=1,2; StartTime=(Get-Date).AddDays(-7)} -ErrorAction SilentlyContinue
-    
     if ($events) {
         $summary = $events | Group-Object ProviderName | Sort-Object Count -Descending | Select-Object -First 10
         Write-Host "`n[!] Ditemukan $($events.Count) error minggu ini. Top 10 Penyebab:" -ForegroundColor Red
-        $summary | ForEach-Object {
-            Write-Host " -> $($_.Name) ($($_.Count) kali)" -ForegroundColor Gray
-        }
-    } else {
-        Write-Host "`n[+] Luar biasa! Tidak ada Error/Critical di log sistem minggu ini." -ForegroundColor Green
-    }
+        $summary | ForEach-Object { Write-Host " -> $($_.Name) ($($_.Count) kali)" -ForegroundColor Gray }
+    } else { Write-Host "`n[+] Luar biasa! Tidak ada Error/Critical di log sistem minggu ini." -ForegroundColor Green }
     Read-Host "`nTekan Enter untuk kembali..."
 }
 
 function Invoke-StartupManager {
-    Clear-Host
-    Write-Host "========== STARTUP MANAGER ==========" -ForegroundColor Cyan
-    Write-Host "[+] Aplikasi yang berjalan otomatis saat startup:" -ForegroundColor Yellow
-    
-    $startups = Get-CimInstance Win32_StartupCommand | Select-Object Name, Command, Location
-    if ($startups) {
-        $startups | Format-Table -AutoSize
-        Write-Host "`n[!] Tips: Anda bisa menonaktifkan ini via Task Manager (Startup tab) atau Autoruns (Sysinternals)." -ForegroundColor Gray
-    } else {
-        Write-Host " -> Tidak ada item startup yang terdeteksi."
-    }
-    Read-Host "`nTekan Enter untuk kembali..."
+    do {
+        Clear-Host
+        Write-Host "========== STARTUP MANAGER (INTERAKTIF) ==========" -ForegroundColor Cyan
+        Write-Host "[+] Mendeteksi aplikasi startup..." -ForegroundColor Yellow
+
+        # Ambil data registry Run dan folder Startup
+        $startupItems = @()
+        $regPaths = @(
+            "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run",
+            "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run"
+        )
+        foreach ($path in $regPaths) {
+            if (Test-Path $path) {
+                $props = Get-ItemProperty -Path $path
+                $props.PSObject.Properties | Where-Object { $_.Name -notmatch '^PS' } | ForEach-Object {
+                    $startupItems += [PSCustomObject]@{
+                        Name = $_.Name
+                        Command = $_.Value
+                        Location = $path
+                    }
+                }
+            }
+        }
+
+        # Tampilkan dalam bentuk list bernomor
+        $i = 0
+        $startupItems | ForEach-Object {
+            $i++
+            Write-Host "[$i] $($_.Name)" -ForegroundColor Green
+            Write-Host "    Path : $($_.Command)" -ForegroundColor Gray
+            Write-Host "    Loc  : $($_.Location)" -ForegroundColor DarkGray
+        }
+
+        if ($startupItems.Count -eq 0) {
+            Write-Host " -> Tidak ada item startup yang terdeteksi." -ForegroundColor Yellow
+            Read-Host "`nTekan Enter untuk kembali..."
+            return
+        }
+
+        Write-Host "===================================================" -ForegroundColor Cyan
+        Write-Host "Ketik nomor untuk mengelola, atau 'x' untuk kembali." -ForegroundColor Yellow
+        $choice = Read-Host "Pilih"
+
+        if ($choice -eq 'x' -or $choice -eq '') { return }
+
+        $selectedItem = $startupItems[$choice - 1]
+        if ($selectedItem) {
+            Clear-Host
+            Write-Host "========== MENGELOLA: $($selectedItem.Name) ==========" -ForegroundColor Cyan
+            Write-Host "Path: $($selectedItem.Command)" -ForegroundColor Gray
+            Write-Host "`nOpsi:" -ForegroundColor Yellow
+            Write-Host "1. Hapus dari Startup (Disable)"
+            Write-Host "2. Cek Digital Signature File .exe"
+            Write-Host "3. Buka lokasi file (jika ada)"
+            Write-Host "4. Batal"
+            $action = Read-Host "`nPilih aksi (1-4)"
+
+            switch ($action) {
+                '1' {
+                    try {
+                        Remove-ItemProperty -Path $selectedItem.Location -Name $selectedItem.Name -ErrorAction Stop
+                        Write-Host "`n[+] Berhasil menghapus '$($selectedItem.Name)' dari startup." -ForegroundColor Green
+                        Write-Host "    (Aplikasi tidak akan berjalan otomatis saat PC dinyalakan)." -ForegroundColor Gray
+                    } catch {
+                        Write-Host "`n[!] Gagal menghapus. Anda mungkin butuh hak Admin atau item ini dilindungi." -ForegroundColor Red
+                    }
+                    Read-Host "`nTekan Enter..."
+                }
+                '2' {
+                    # Ekstrak path .exe dari string command (jika ada tanda kutip)
+                    $exePath = $selectedItem.Command
+                    if ($exePath -match '^"([^"]+)"') { $exePath = $matches[1] }
+                    elseif ($exePath -match '^(\S+\.exe)') { $exePath = $matches[1] }
+                    
+                    if (Test-Path $exePath) {
+                        $sig = Get-AuthenticodeSignature -FilePath $exePath
+                        Write-Host "`n[+] Status Signature: $($sig.Status)" -ForegroundColor $(if ($sig.Status -eq 'Valid') { 'Green' } else { 'Red' })
+                        if ($sig.SignerCertificate) {
+                            Write-Host "    Publisher: $($sig.SignerCertificate.Subject)" -ForegroundColor Gray
+                        } else {
+                            Write-Host "    Publisher: Tidak ada signature (Tidak Dikenal)" -ForegroundColor Red
+                        }
+                    } else {
+                        Write-Host "`n[!] File .exe tidak ditemukan di path tersebut." -ForegroundColor Red
+                    }
+                    Read-Host "`nTekan Enter..."
+                }
+                '3' {
+                    $exePath = $selectedItem.Command
+                    if ($exePath -match '^"([^"]+)"') { $exePath = $matches[1] }
+                    elseif ($exePath -match '^(\S+\.exe)') { $exePath = $matches[1] }
+                    
+                    if (Test-Path $exePath) {
+                        Start-Process explorer.exe -ArgumentList "/select,`"$exePath`""
+                    } else {
+                        Write-Host "`n[!] File tidak ditemukan." -ForegroundColor Red
+                        Read-Host "Tekan Enter..."
+                    }
+                }
+                '4' { }
+            }
+        } else {
+            Write-Host "`n[!] Nomor tidak valid." -ForegroundColor Red
+            Start-Sleep -Seconds 1
+        }
+    } while ($true)
 }
 
 # ==========================================
-# MENU UTAMA (v1.7.0)
+# MENU UTAMA (v1.8.0)
 # ==========================================
 function Show-Menu {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.7.0      " -ForegroundColor Cyan
+    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.8.0      " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host " 1. Maintenance PC (Bersihkan & Optimasi)" -ForegroundColor Green
     Write-Host " 2. System Audit (Cek Hardware & OS)" -ForegroundColor Magenta
@@ -245,7 +325,7 @@ function Show-Menu {
     Write-Host "11. AUTOMATION PRESETS (Setup Cepat)" -ForegroundColor Magenta
     Write-Host "12. App Backup Manager (Export/Import)" -ForegroundColor Yellow
     Write-Host "13. Event Log Analyzer (Cek Error Sistem)" -ForegroundColor Red
-    Write-Host "14. Startup Manager (Cek Autostart)" -ForegroundColor Red
+    Write-Host "14. Startup Manager (Kelola Autostart)" -ForegroundColor Red
     Write-Host "15. Keluar" -ForegroundColor Red
     Write-Host "===================================================" -ForegroundColor Cyan
 }
