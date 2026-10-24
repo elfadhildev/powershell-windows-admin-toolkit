@@ -16,3 +16,7 @@
 
 ## [1.0.0] - 2026-07-01
 - Rilis awal Panduan PowerShell.
+## [1.9.2] - 2026-07-15
+### Added
+- **Pester Testing:** Menambahkan file tes otomatis (`tests/Toolkit.Tests.ps1`) untuk mengecek kualitas kode.
+- **GitHub Actions CI:** Menambahkan workflow `pester.yml` agar GitHub otomatis mengetes kode setiap kali ada Push/Pull Request.
