@@ -4,6 +4,9 @@ if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
     exit
 }
 
+# ==========================================
+# 1. FUNGSI MAINTENANCE
+# ==========================================
 function Invoke-Maintenance {
     Write-Host "`n[+] Memulai Maintenance..." -ForegroundColor Cyan
     Write-Host "[1/3] Membersihkan Cache DNS..." -ForegroundColor Yellow
@@ -27,6 +30,9 @@ function Invoke-Maintenance {
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
+# ==========================================
+# 2. FUNGSI SYSTEM AUDIT
+# ==========================================
 function Invoke-SystemAudit {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
@@ -50,6 +56,9 @@ function Invoke-SystemAudit {
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
+# ==========================================
+# 3. FUNGSI NETWORK DIAGNOSTICS
+# ==========================================
 function Invoke-NetworkDiagnostics {
     $ErrorActionPreference = 'SilentlyContinue'
     Clear-Host
@@ -77,6 +86,9 @@ function Invoke-NetworkDiagnostics {
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
+# ==========================================
+# 4. FUNGSI BACKUP PROFILE
+# ==========================================
 function Invoke-BackupUserProfile {
     param([string]$BackupTargetDrive = 'D:\Backup_PC')
     $SourceProfile = $env:USERPROFILE
@@ -110,6 +122,9 @@ function Invoke-BackupUserProfile {
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
+# ==========================================
+# 5. FUNGSI WINGET APP INSTALLER
+# ==========================================
 function Invoke-WingetAppInstaller {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
@@ -151,31 +166,76 @@ function Invoke-WingetAppInstaller {
     Read-Host "`n[+] Proses instalasi selesai. Tekan Enter untuk kembali..."
 }
 
+# ==========================================
+# 6. FUNGSI WINDOWS DEBLOATER (INTERAKTIF)
+# ==========================================
 function Invoke-WindowsDebloater {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host "               WINDOWS DEBLOATER                   " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "[!] PERINGATAN: Ini akan menghapus aplikasi bawaan Windows." -ForegroundColor Red
-    Write-Host "    Aplikasi seperti Xbox, Cortana, Bing News, dan lain-lain akan dihapus." -ForegroundColor Gray
-    Write-Host "    Tindakan ini tidak dapat dibatalkan." -ForegroundColor Gray
-    $confirm = Read-Host "`nLanjutkan? (y/n)"
-    if ($confirm -eq 'y') {
-        $bloatware = @("Microsoft.549981C3F5F10", "Microsoft.BingNews", "Microsoft.BingWeather", "Microsoft.GetHelp", "Microsoft.Getstarted", "Microsoft.MicrosoftOfficeHub", "Microsoft.MicrosoftSolitaireCollection", "Microsoft.People", "Microsoft.SkypeApp", "Microsoft.WindowsFeedbackHub", "Microsoft.Xbox.TCUI", "Microsoft.XboxApp", "Microsoft.XboxGameOverlay", "Microsoft.XboxGamingOverlay", "Microsoft.XboxIdentityProvider", "Microsoft.XboxSpeechToTextOverlay", "Microsoft.YourPhone", "Microsoft.ZuneMusic", "Microsoft.ZuneVideo")
-        foreach ($app in $bloatware) {
-            $pkg = Get-AppxPackage -Name $app -AllUsers -ErrorAction SilentlyContinue
-            if ($pkg) {
-                Write-Host " -> Menghapus $app..." -ForegroundColor Yellow
-                Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction SilentlyContinue
-            }
-        }
-        Write-Host "`n[+] Proses debloating selesai." -ForegroundColor Green
-    } else {
+    Write-Host "Pilih aplikasi bawaan (bloatware) yang ingin dihapus:"
+    
+    $debloatList = @(
+        [PSCustomObject]@{ No='1';  App='Cortana';           Pkg='Microsoft.549981C3F5F10' },
+        [PSCustomObject]@{ No='2';  App='Bing News';         Pkg='Microsoft.BingNews' },
+        [PSCustomObject]@{ No='3';  App='Bing Weather';      Pkg='Microsoft.BingWeather' },
+        [PSCustomObject]@{ No='4';  App='Get Help';          Pkg='Microsoft.GetHelp' },
+        [PSCustomObject]@{ No='5';  App='Tips (Get Started)';Pkg='Microsoft.Getstarted' },
+        [PSCustomObject]@{ No='6';  App='Office Hub';        Pkg='Microsoft.MicrosoftOfficeHub' },
+        [PSCustomObject]@{ No='7';  App='Solitaire';         Pkg='Microsoft.MicrosoftSolitaireCollection' },
+        [PSCustomObject]@{ No='8';  App='People';            Pkg='Microsoft.People' },
+        [PSCustomObject]@{ No='9';  App='Skype';             Pkg='Microsoft.SkypeApp' },
+        [PSCustomObject]@{ No='10'; App='Feedback Hub';      Pkg='Microsoft.WindowsFeedbackHub' },
+        [PSCustomObject]@{ No='11'; App='Xbox App';          Pkg='Microsoft.XboxApp' },
+        [PSCustomObject]@{ No='12'; App='Xbox Game Overlay'; Pkg='Microsoft.XboxGamingOverlay' },
+        [PSCustomObject]@{ No='13'; App='Your Phone';        Pkg='Microsoft.YourPhone' },
+        [PSCustomObject]@{ No='14'; App='Groove Music';      Pkg='Microsoft.ZuneMusic' },
+        [PSCustomObject]@{ No='15'; App='Movies & TV';       Pkg='Microsoft.ZuneVideo' }
+    )
+
+    $debloatList | Format-Table -AutoSize
+    
+    Write-Host "Ketik nomor yang ingin dihapus (pisahkan dengan koma, contoh: 1,2,11)." -ForegroundColor Yellow
+    Write-Host "Ketik 'all' untuk menghapus semuanya, atau 'x' untuk batal." -ForegroundColor Yellow
+    $inputApps = Read-Host "`nPilihan Anda"
+
+    if ($inputApps -eq 'x' -or $inputApps -eq '') {
         Write-Host "`n[!] Dibatalkan." -ForegroundColor Red
+        Start-Sleep -Seconds 1
+        return
     }
+
+    if ($inputApps -eq 'all') {
+        $toRemove = $debloatList
+    } else {
+        $selectedNums = $inputApps -split ',' | ForEach-Object { $_.Trim() }
+        $toRemove = $debloatList | Where-Object { $selectedNums -contains $_.No }
+    }
+
+    if ($toRemove.Count -eq 0) {
+        Write-Host "`n[!] Nomor tidak valid. Dibatalkan." -ForegroundColor Red
+        Start-Sleep -Seconds 2
+        return
+    }
+
+    foreach ($item in $toRemove) {
+        $pkg = Get-AppxPackage -Name $item.Pkg -AllUsers -ErrorAction SilentlyContinue
+        if ($pkg) {
+            Write-Host " -> Menghapus $($item.App)..." -ForegroundColor Yellow
+            Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction SilentlyContinue
+        } else {
+            Write-Host " -> $($item.App) tidak ditemukan (mungkin sudah terhapus)." -ForegroundColor DarkGray
+        }
+    }
+    
+    Write-Host "`n[+] Proses debloating selesai." -ForegroundColor Green
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
+# ==========================================
+# 7. FUNGSI SYSTEM RESTORE POINT
+# ==========================================
 function Invoke-CreateRestorePoint {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
@@ -195,6 +255,9 @@ function Invoke-CreateRestorePoint {
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
+# ==========================================
+# 8. MENU UTAMA
+# ==========================================
 function Show-Menu {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
