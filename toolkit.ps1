@@ -32,10 +32,24 @@ function Invoke-Maintenance {
 function Invoke-SystemAudit {
     Clear-Host; Write-Host "========== SISTEM AUDIT ==========" -ForegroundColor Cyan
     $os = Get-CimInstance Win32_OperatingSystem; $cpu = Get-CimInstance Win32_Processor; $ram = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 2)
-    Write-Host " OS: $($os.Caption) | CPU: $($cpu.Name) | RAM: $ram GB"
+    
+    $report = "OS: $($os.Caption) | CPU: $($cpu.Name) | RAM: $ram GB"
+    Write-Host $report
+
     $lic = Get-CimInstance SoftwareLicensingProduct | Where-Object { $_.PartialProductKey }
-    if ($lic.LicenseStatus -eq 1) { Write-Host " Lisensi: Windows Teraktivasi" -ForegroundColor Green } else { Write-Host " Lisensi: Belum Teraktivasi" -ForegroundColor Red }
-    Get-PhysicalDisk | Select-Object DeviceId, FriendlyName, MediaType, HealthStatus, @{N='Size(GB)';E={[math]::Round($_.Size/1GB,2)}} | Format-Table -AutoSize
+    if ($lic.LicenseStatus -eq 1) { $report += "`nLisensi: Windows Teraktivasi"; Write-Host " Lisensi: Windows Teraktivasi" -ForegroundColor Green } else { $report += "`nLisensi: Windows Belum Teraktivasi"; Write-Host " Lisensi: Belum Teraktivasi" -ForegroundColor Red }
+    
+    $disks = Get-PhysicalDisk | Select-Object DeviceId, FriendlyName, MediaType, HealthStatus, @{N='Size(GB)';E={[math]::Round($_.Size/1GB,2)}}
+    $disks | Format-Table -AutoSize
+    $report += "`n`n[Storage]`n" + ($disks | Out-String)
+
+    Write-Host "`n[🛡️] Anda bisa menyimpan laporan ini ke dalam file teks." -ForegroundColor Yellow
+    $save = Read-Host "Simpan laporan ke Desktop? (y/n)"
+    if ($save -eq 'y') {
+        $file = "$env:USERPROFILE\Desktop\System_Audit_$(Get-Date -Format 'yyyyMMdd_HHmmss').txt"
+        $report | Out-File -FilePath $file -Encoding UTF8
+        Write-Host "[+] Laporan disimpan di: $file" -ForegroundColor Green
+    }
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
@@ -180,7 +194,7 @@ function Invoke-AppBackup {
 }
 
 # ==========================================
-# 13. FUNGSI BARU: SMART EVENT LOG ANALYZER (v1.9.0)
+# 13. SMART EVENT LOG ANALYZER (v1.9.2)
 # ==========================================
 function Invoke-EventLogAnalyzer {
     do {
@@ -216,7 +230,6 @@ function Invoke-EventLogAnalyzer {
             Clear-Host
             Write-Host "========== DETAIL ERROR: $provider ==========" -ForegroundColor Cyan
             
-            # Ambil 3 error terakhir dari provider ini
             $details = $events | Where-Object { $_.ProviderName -eq $provider } | Select-Object -First 3
             foreach ($d in $details) {
                 Write-Host "Waktu  : $($d.TimeCreated)" -ForegroundColor DarkGray
@@ -231,7 +244,6 @@ function Invoke-EventLogAnalyzer {
             switch -Wildcard ($provider) {
                 "*DistributedCOM*" {
                     Write-Host "Error ini (Event ID 10016) SANGAT UMUM di Windows dan biasanya aman untuk diabaikan." -ForegroundColor Green
-                    Write-Host "Ini terjadi karena aplikasi pihak ketiga meminta izin akses yang tidak diberikan secara default." -ForegroundColor Gray
                 }
                 "*Service Control Manager*" {
                     Write-Host "Ada layanan (Service) yang gagal berjalan. Ini bisa disebabkan oleh file sistem yang korup." -ForegroundColor Red
@@ -262,7 +274,7 @@ function Invoke-EventLogAnalyzer {
                     Write-Host "`n[+] Menjalankan SFC & DISM (Mohon tunggu)..." -ForegroundColor Yellow
                     Start-Process cmd -ArgumentList "/c sfc /scannow" -Wait -NoNewWindow
                     Start-Process cmd -ArgumentList "/c DISM /Online /Cleanup-Image /RestoreHealth" -Wait -NoNewWindow
-                    Write-Host "`n[+] Proses selesai. Silakan cek kembali error minggu depan." -ForegroundColor Green
+                    Write-Host "`n[+] Proses selesai." -ForegroundColor Green
                 }
             } elseif ($fixAction -eq "Update") {
                 Write-Host "1. Reset Update Cache sekarang" -ForegroundColor Green
@@ -283,7 +295,7 @@ function Invoke-EventLogAnalyzer {
 }
 
 # ==========================================
-# 14. FUNGSI INTERACTIVE STARTUP MANAGER
+# 14. INTERACTIVE STARTUP MANAGER
 # ==========================================
 function Invoke-StartupManager {
     do {
@@ -373,12 +385,45 @@ function Invoke-StartupManager {
 }
 
 # ==========================================
-# MENU UTAMA (v1.9.0)
+# 15. FUNGSI BARU v1.9.4: DNS SWITCHER
+# ==========================================
+function Invoke-DnsSwitcher {
+    Clear-Host
+    Write-Host "========== DNS & NETWORK SWITCHER ==========" -ForegroundColor Cyan
+    Write-Host "Mengubah DNS dapat mempercepat internet dan memblokir iklan." -ForegroundColor Gray
+    Write-Host "`nPilih DNS yang ingin digunakan:" -ForegroundColor Yellow
+    Write-Host "1. Cloudflare (1.1.1.1) - Tercepat & Privasi"
+    Write-Host "2. Google (8.8.8.8) - Paling Stabil"
+    Write-Host "3. Quad9 (9.9.9.9) - Blokir Malware"
+    Write-Host "4. Reset ke Otomatis (DHCP)"
+    Write-Host "5. Batal"
+    $choice = Read-Host "`nPilih (1-5)"
+
+    $adapters = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
+    if (-not $adapters) {
+        Write-Host "`n[!] Tidak ada koneksi internet aktif." -ForegroundColor Red
+        Read-Host "Tekan Enter..."; return
+    }
+
+    switch ($choice) {
+        '1' { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("1.1.1.1","1.0.0.1") }; Write-Host "`n[+] DNS diubah ke Cloudflare." -ForegroundColor Green }
+        '2' { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("8.8.8.8","8.8.4.4") }; Write-Host "`n[+] DNS diubah ke Google." -ForegroundColor Green }
+        '3' { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("9.9.9.9","149.112.112.112") }; Write-Host "`n[+] DNS diubah ke Quad9." -ForegroundColor Green }
+        '4' { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ResetServerAddresses }; Write-Host "`n[+] DNS dikembalikan ke Otomatis (DHCP)." -ForegroundColor Green }
+        '5' { return }
+    }
+    Clear-DnsClientCache
+    Write-Host "[+] Cache DNS berhasil dibersihkan." -ForegroundColor Green
+    Read-Host "`nTekan Enter untuk kembali..."
+}
+
+# ==========================================
+# MENU UTAMA (v1.9.4)
 # ==========================================
 function Show-Menu {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.0      " -ForegroundColor Cyan
+    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.4      " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host " 1. Maintenance PC (Bersihkan & Optimasi)" -ForegroundColor Green
     Write-Host " 2. System Audit (Cek Hardware & OS)" -ForegroundColor Magenta
@@ -394,13 +439,14 @@ function Show-Menu {
     Write-Host "12. App Backup Manager (Export/Import)" -ForegroundColor Yellow
     Write-Host "13. SMART EVENT ANALYZER (Deteksi & Fix)" -ForegroundColor Red
     Write-Host "14. Startup Manager (Kelola Autostart)" -ForegroundColor Red
-    Write-Host "15. Keluar" -ForegroundColor Red
+    Write-Host "15. DNS Switcher (Percepat Internet)" -ForegroundColor Blue
+    Write-Host "16. Keluar" -ForegroundColor Red
     Write-Host "===================================================" -ForegroundColor Cyan
 }
 
 do {
     Show-Menu
-    $choice = Read-Host "Pilih opsi (1-15)"
+    $choice = Read-Host "Pilih opsi (1-16)"
     switch ($choice) {
         '1' { Invoke-Maintenance }
         '2' { Invoke-SystemAudit }
@@ -416,7 +462,8 @@ do {
         '12' { Invoke-AppBackup }
         '13' { Invoke-EventLogAnalyzer }
         '14' { Invoke-StartupManager }
-        '15' { Write-Host "Keluar..." -ForegroundColor Cyan }
+        '15' { Invoke-DnsSwitcher }
+        '16' { Write-Host "Keluar..." -ForegroundColor Cyan }
         default { Write-Host "[!] Pilihan tidak valid." -ForegroundColor Red; Start-Sleep -Seconds 1 }
     }
-} while ($choice -ne '15')
+} while ($choice -ne '16')

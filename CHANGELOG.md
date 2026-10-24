@@ -20,3 +20,7 @@
 ### Added
 - **Pester Testing:** Menambahkan file tes otomatis (`tests/Toolkit.Tests.ps1`) untuk mengecek kualitas kode.
 - **GitHub Actions CI:** Menambahkan workflow `pester.yml` agar GitHub otomatis mengetes kode setiap kali ada Push/Pull Request.
+## [1.9.4] - 2026-07-16
+### Added
+- **DNS Switcher:** Fitur untuk mengganti DNS ke Cloudflare/Google/Quad9 atau kembali ke Otomatis (DHCP).
+- **Save Report to TXT:** Opsi untuk menyimpan hasil System Audit ke file teks di Desktop.
