@@ -4,22 +4,15 @@ if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]:
     exit
 }
 
-# ==========================================
-# 1. FUNGSI MAINTENANCE
-# ==========================================
 function Invoke-Maintenance {
     Write-Host "`n[+] Memulai Maintenance..." -ForegroundColor Cyan
     Write-Host "[1/3] Membersihkan Cache DNS..." -ForegroundColor Yellow
-    Clear-DnsClientCache
-    ipconfig /release | Out-Null
-    ipconfig /renew | Out-Null
+    Clear-DnsClientCache; ipconfig /release | Out-Null; ipconfig /renew | Out-Null
     Write-Host " -> Cache DNS & IP berhasil diperbarui." -ForegroundColor Green
     Write-Host "[2/3] Membersihkan File Sementara..." -ForegroundColor Yellow
     $TempFolders = @("$env:TEMP", "C:\Windows\Temp", "C:\Windows\Prefetch", "C:\Windows\SoftwareDistribution\Download")
     foreach ($Folder in $TempFolders) {
-        if (Test-Path $Folder) {
-            Get-ChildItem -Path $Folder -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-        }
+        if (Test-Path $Folder) { Get-ChildItem -Path $Folder -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue }
     }
     Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -NoNewWindow -Wait
     Write-Host " -> File sementara dibersihkan." -ForegroundColor Green
@@ -30,18 +23,13 @@ function Invoke-Maintenance {
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
-# ==========================================
-# 2. FUNGSI SYSTEM AUDIT
-# ==========================================
 function Invoke-SystemAudit {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host "             SISTEM AUDIT & HARDWARE               " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host "`n[+] INFORMASI SISTEM" -ForegroundColor Yellow
-    $os = Get-CimInstance Win32_OperatingSystem
-    $cpu = Get-CimInstance Win32_Processor
-    $ram = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 2)
+    $os = Get-CimInstance Win32_OperatingSystem; $cpu = Get-CimInstance Win32_Processor; $ram = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 2)
     Write-Host " OS     : $($os.Caption) ($($os.Version))"
     Write-Host " CPU    : $($cpu.Name)"
     Write-Host " RAM    : $ram GB"
@@ -56,9 +44,6 @@ function Invoke-SystemAudit {
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
-# ==========================================
-# 3. FUNGSI NETWORK DIAGNOSTICS
-# ==========================================
 function Invoke-NetworkDiagnostics {
     $ErrorActionPreference = 'SilentlyContinue'
     Clear-Host
@@ -72,110 +57,103 @@ function Invoke-NetworkDiagnostics {
     Write-Host "`n[+] ESTABLISHED CONNECTION -> PROCESS" -ForegroundColor Yellow
     Get-NetTCPConnection -State Established | ForEach-Object {
         $Process = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue
-        [PSCustomObject]@{
-            LocalPort  = $_.LocalPort
-            RemoteAddr = $_.RemoteAddress
-            RemotePort = $_.RemotePort
-            Process    = if ($Process) { $Process.ProcessName } else { '<unknown>' }
-            PID        = $_.OwningProcess
-        }
+        [PSCustomObject]@{ LocalPort=$_.LocalPort; RemoteAddr=$_.RemoteAddress; RemotePort=$_.RemotePort; Process=if($Process){$Process.ProcessName}else{'<unknown>'}; PID=$_.OwningProcess }
     } | Sort-Object Process | Format-Table -AutoSize
-    Write-Host "`n[+] TES RESOLUSI DNS (google.com)" -ForegroundColor Yellow
-    $dns = Resolve-DnsName -Name "google.com" -Type A -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($dns) { Write-Host " -> Berhasil: google.com -> $($dns.IPAddress)" -ForegroundColor Green } else { Write-Host " -> Gagal melakukan resolusi DNS!" -ForegroundColor Red }
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
-# ==========================================
-# 4. FUNGSI BACKUP PROFILE
-# ==========================================
 function Invoke-BackupUserProfile {
     param([string]$BackupTargetDrive = 'D:\Backup_PC')
-    $SourceProfile = $env:USERPROFILE
-    $DateStamp = Get-Date -Format 'yyyy-MM-dd'
+    $SourceProfile = $env:USERPROFILE; $DateStamp = Get-Date -Format 'yyyy-MM-dd'
     $DestinationFolder = Join-Path -Path $BackupTargetDrive -ChildPath "Backup_$DateStamp"
     $FoldersToBackup = @('Documents', 'Pictures', 'Desktop', 'Downloads', 'Music', 'Videos', 'AppData\Roaming', 'AppData\Local\Packages')
     $ExcludeFolders = @('Cache', 'Temp', 'CrashDumps', 'GPUCache', 'Microsoft\Windows\INetCache')
     Write-Host "==========================================" -ForegroundColor Cyan
     Write-Host " MEMULAI PROSES BACKUP PROFIL USER " -ForegroundColor Cyan
     Write-Host "==========================================" -ForegroundColor Cyan
-    Write-Host "Sumber Profil : $SourceProfile" -ForegroundColor Gray
-    Write-Host "Tujuan Backup : $DestinationFolder" -ForegroundColor Gray
-    Write-Host ''
     if (-not (Test-Path $DestinationFolder)) { New-Item -Path $DestinationFolder -ItemType Directory -Force | Out-Null }
     $LogFile = Join-Path -Path $DestinationFolder -ChildPath 'Backup_Log.txt'
     foreach ($Folder in $FoldersToBackup) {
-        $SourcePath = Join-Path -Path $SourceProfile -ChildPath $Folder
-        $TargetPath = Join-Path -Path $DestinationFolder -ChildPath $Folder
+        $SourcePath = Join-Path -Path $SourceProfile -ChildPath $Folder; $TargetPath = Join-Path -Path $DestinationFolder -ChildPath $Folder
         if (Test-Path $SourcePath) {
             Write-Host "[+] Processing: $Folder ..." -ForegroundColor Yellow
             robocopy $SourcePath $TargetPath /MIR /R:1 /W:1 /XD $ExcludeFolders /LOG+:$LogFile /NP /NJH /NJS
-            if ($LASTEXITCODE -lt 8) { Write-Host " -> $Folder berhasil di-backup." -ForegroundColor Green } else { Write-Host " [!] $Folder selesai dengan beberapa peringatan." -ForegroundColor Red }
-        } else {
-            Write-Host "[~] Skipping: $Folder (Folder tidak ditemukan)." -ForegroundColor DarkGray
         }
     }
-    Write-Host "`n===============================" -ForegroundColor Cyan
-    Write-Host " PROSES BACKUP PROFIL SELESAI! " -ForegroundColor Green
-    Write-Host "===============================" -ForegroundColor Cyan
-    Write-Host "Detail log tersimpan di: $LogFile" -ForegroundColor Gray
+    Write-Host "`n[+] PROSES BACKUP PROFIL SELESAI! Detail log di: $LogFile" -ForegroundColor Green
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
 # ==========================================
-# 5. FUNGSI WINGET APP INSTALLER
+# 5. FUNGSI WINGET APP INSTALLER (EXPANDED)
 # ==========================================
 function Invoke-WingetAppInstaller {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "               WINGET APP INSTALLER                " -ForegroundColor Cyan
+    Write-Host "          WINGET APP INSTALLER (EXPANDED)          " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "Pilih aplikasi yang ingin diinstal (ketik nomor, pisahkan dengan koma):"
-    Write-Host " 1. Google Chrome"
-    Write-Host " 2. Mozilla Firefox"
-    Write-Host " 3. VLC Media Player"
-    Write-Host " 4. 7-Zip"
-    Write-Host " 5. Notepad++"
-    Write-Host " 6. Visual Studio Code"
-    Write-Host " 7. Discord"
-    Write-Host " 8. Spotify"
-    Write-Host " 9. Steam"
-    Write-Host " 10. Zoom"
+    
+    Write-Host "--- BROWSER ---" -ForegroundColor Magenta
+    Write-Host " 1. Google Chrome      2. Mozilla Firefox    3. Brave Browser      4. Opera GX"
+    Write-Host "--- MEDIA & ENTERTAINMENT ---" -ForegroundColor Magenta
+    Write-Host " 5. VLC Media Player   6. Spotify            7. iTunes             8. OBS Studio"
+    Write-Host "--- KOMUNIKASI ---" -ForegroundColor Magenta
+    Write-Host " 9. Discord           10. Zoom               11. Telegram Desktop  12. WhatsApp"
+    Write-Host "--- UTILITAS ---" -ForegroundColor Magenta
+    Write-Host "13. 7-Zip             14. WinRAR             15. PowerToys         16. Everything"
+    Write-Host "--- DEVELOPER & TOOLS ---" -ForegroundColor Magenta
+    Write-Host "17. Visual Studio Code 18. Git               19. Notepad++         20. Python 3"
+    Write-Host "--- GAMING ---" -ForegroundColor Magenta
+    Write-Host "21. Steam             22. Epic Games        23. Playnite"
+    
     Write-Host "===================================================" -ForegroundColor Cyan
-    $inputApps = Read-Host "Masukkan nomor (contoh: 1,3,5)"
+    $inputApps = Read-Host "Masukkan nomor yang ingin diinstal (pisahkan koma, misal: 1,5,17)"
+    
     $apps = @{
-        '1' = 'Google.Chrome'
-        '2' = 'Mozilla.Firefox'
-        '3' = 'VideoLAN.VLC'
-        '4' = '7zip.7zip'
-        '5' = 'Notepad++.Notepad++'
-        '6' = 'Microsoft.VisualStudioCode'
-        '7' = 'Discord.Discord'
-        '8' = 'Spotify.Spotify'
-        '9' = 'Valve.Steam'
-        '10' = 'Zoom.Zoom'
+        '1'  = @{ Name='Google Chrome';     Id='Google.Chrome' }
+        '2'  = @{ Name='Mozilla Firefox';   Id='Mozilla.Firefox' }
+        '3'  = @{ Name='Brave Browser';     Id='Brave.Brave' }
+        '4'  = @{ Name='Opera GX';          Id='Opera.OperaGX' }
+        '5'  = @{ Name='VLC Media Player';  Id='VideoLAN.VLC' }
+        '6'  = @{ Name='Spotify';           Id='Spotify.Spotify' }
+        '7'  = @{ Name='iTunes';            Id='Apple.iTunes' }
+        '8'  = @{ Name='OBS Studio';        Id='OBSProject.OBSStudio' }
+        '9'  = @{ Name='Discord';           Id='Discord.Discord' }
+        '10' = @{ Name='Zoom';              Id='Zoom.Zoom' }
+        '11' = @{ Name='Telegram Desktop';  Id='Telegram.TelegramDesktop' }
+        '12' = @{ Name='WhatsApp';          Id='WhatsApp.WhatsApp' }
+        '13' = @{ Name='7-Zip';             Id='7zip.7zip' }
+        '14' = @{ Name='WinRAR';            Id='RARLab.WinRAR' }
+        '15' = @{ Name='PowerToys';         Id='Microsoft.PowerToys' }
+        '16' = @{ Name='Everything';        Id='voidtools.Everything' }
+        '17' = @{ Name='VS Code';           Id='Microsoft.VisualStudioCode' }
+        '18' = @{ Name='Git';               Id='Git.Git' }
+        '19' = @{ Name='Notepad++';         Id='Notepad++.Notepad++' }
+        '20' = @{ Name='Python 3';          Id='Python.Python.3.12' }
+        '21' = @{ Name='Steam';             Id='Valve.Steam' }
+        '22' = @{ Name='Epic Games';        Id='EpicGames.EpicGamesLauncher' }
+        '23' = @{ Name='Playnite';          Id='Playnite.Playnite' }
     }
+
     $selected = $inputApps -split ',' | ForEach-Object { $_.Trim() }
     foreach ($s in $selected) {
         if ($apps.ContainsKey($s)) {
-            $appId = $apps[$s]
-            Write-Host "`n[+] Menginstal $appId..." -ForegroundColor Yellow
+            $appId = $apps[$s].Id
+            $appName = $apps[$s].Name
+            Write-Host "`n[+] Menginstal $appName ($appId)..." -ForegroundColor Yellow
             winget install --id $appId --accept-source-agreements --accept-package-agreements --silent
+        } elseif ($s -ne '') {
+            Write-Host "`n[!] Nomor $s tidak valid. Dilewati." -ForegroundColor Red
         }
     }
     Read-Host "`n[+] Proses instalasi selesai. Tekan Enter untuk kembali..."
 }
 
-# ==========================================
-# 6. FUNGSI WINDOWS DEBLOATER (INTERAKTIF)
-# ==========================================
 function Invoke-WindowsDebloater {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host "               WINDOWS DEBLOATER                   " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "Pilih aplikasi bawaan (bloatware) yang ingin dihapus:"
-    
     $debloatList = @(
         [PSCustomObject]@{ No='1';  App='Cortana';           Pkg='Microsoft.549981C3F5F10' },
         [PSCustomObject]@{ No='2';  App='Bing News';         Pkg='Microsoft.BingNews' },
@@ -193,71 +171,38 @@ function Invoke-WindowsDebloater {
         [PSCustomObject]@{ No='14'; App='Groove Music';      Pkg='Microsoft.ZuneMusic' },
         [PSCustomObject]@{ No='15'; App='Movies & TV';       Pkg='Microsoft.ZuneVideo' }
     )
-
     $debloatList | Format-Table -AutoSize
-    
-    Write-Host "Ketik nomor yang ingin dihapus (pisahkan dengan koma, contoh: 1,2,11)." -ForegroundColor Yellow
-    Write-Host "Ketik 'all' untuk menghapus semuanya, atau 'x' untuk batal." -ForegroundColor Yellow
+    Write-Host "Ketik nomor (misal: 1,2). Ketik 'all' untuk semua, atau 'x' untuk batal." -ForegroundColor Yellow
     $inputApps = Read-Host "`nPilihan Anda"
-
-    if ($inputApps -eq 'x' -or $inputApps -eq '') {
-        Write-Host "`n[!] Dibatalkan." -ForegroundColor Red
-        Start-Sleep -Seconds 1
-        return
-    }
-
-    if ($inputApps -eq 'all') {
-        $toRemove = $debloatList
-    } else {
+    if ($inputApps -eq 'x' -or $inputApps -eq '') { Write-Host "`n[!] Dibatalkan." -ForegroundColor Red; Start-Sleep 1; return }
+    if ($inputApps -eq 'all') { $toRemove = $debloatList } else {
         $selectedNums = $inputApps -split ',' | ForEach-Object { $_.Trim() }
         $toRemove = $debloatList | Where-Object { $selectedNums -contains $_.No }
     }
-
-    if ($toRemove.Count -eq 0) {
-        Write-Host "`n[!] Nomor tidak valid. Dibatalkan." -ForegroundColor Red
-        Start-Sleep -Seconds 2
-        return
-    }
-
+    if ($toRemove.Count -eq 0) { Write-Host "`n[!] Nomor tidak valid." -ForegroundColor Red; Start-Sleep 2; return }
     foreach ($item in $toRemove) {
         $pkg = Get-AppxPackage -Name $item.Pkg -AllUsers -ErrorAction SilentlyContinue
-        if ($pkg) {
-            Write-Host " -> Menghapus $($item.App)..." -ForegroundColor Yellow
-            Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction SilentlyContinue
-        } else {
-            Write-Host " -> $($item.App) tidak ditemukan (mungkin sudah terhapus)." -ForegroundColor DarkGray
-        }
+        if ($pkg) { Write-Host " -> Menghapus $($item.App)..." -ForegroundColor Yellow; Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction SilentlyContinue } 
+        else { Write-Host " -> $($item.App) tidak ditemukan." -ForegroundColor DarkGray }
     }
-    
     Write-Host "`n[+] Proses debloating selesai." -ForegroundColor Green
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
-# ==========================================
-# 7. FUNGSI SYSTEM RESTORE POINT
-# ==========================================
 function Invoke-CreateRestorePoint {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host "               SYSTEM RESTORE POINT                " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "`n[+] Memeriksa status System Restore..." -ForegroundColor Yellow
     $srStatus = (Get-ComputerRestorePoint).Count
-    if ($null -eq $srStatus) {
-        Write-Host " -> System Restore belum diaktifkan di drive C:." -ForegroundColor Red
-        Write-Host " -> Mengaktifkan System Restore..." -ForegroundColor Yellow
-        Enable-ComputerRestore -Drive "C:\"
-    }
+    if ($null -eq $srStatus) { Write-Host " -> Mengaktifkan System Restore..." -ForegroundColor Yellow; Enable-ComputerRestore -Drive "C:\" }
     $desc = "Auto Restore Point - " + (Get-Date -Format "yyyy-MM-dd HH:mm")
-    Write-Host "`n[+] Membuat Restore Point: $desc" -ForegroundColor Yellow
+    Write-Host "`n[+] Membuat Restore Point..." -ForegroundColor Yellow
     Checkpoint-Computer -Description $desc -RestorePointType "MODIFY_SETTINGS"
     if ($?) { Write-Host " -> Restore Point berhasil dibuat!" -ForegroundColor Green } else { Write-Host " -> Gagal membuat Restore Point." -ForegroundColor Red }
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
-# ==========================================
-# 8. MENU UTAMA
-# ==========================================
 function Show-Menu {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
