@@ -19,12 +19,27 @@ function Backup-RegistryTweaks {
 # ==========================================
 function Invoke-Maintenance {
     Write-Host "`n[+] Memulai Maintenance..." -ForegroundColor Cyan
+    
+    Write-Host "[1/3] Membersihkan Cache DNS..." -ForegroundColor Yellow
     Clear-DnsClientCache; ipconfig /release | Out-Null; ipconfig /renew | Out-Null
+    Write-Host " -> Cache DNS & IP berhasil diperbarui." -ForegroundColor Green
+
+    Write-Host "[2/3] Membersihkan File Sementara..." -ForegroundColor Yellow
     $TempFolders = @("$env:TEMP", "C:\Windows\Temp", "C:\Windows\Prefetch", "C:\Windows\SoftwareDistribution\Download")
     foreach ($Folder in $TempFolders) { if (Test-Path $Folder) { Get-ChildItem -Path $Folder -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue } }
     Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -NoNewWindow -Wait
+    Write-Host " -> File sementara dibersihkan." -ForegroundColor Green
+
+    Write-Host "[3/3] Optimasi Drive C..." -ForegroundColor Yellow
+    Write-Host " -> Mendeteksi jenis drive..." -ForegroundColor Gray
     $DriveType = (Get-PhysicalDisk | Where-Object { $_.DeviceID -eq (Get-Partition -DriveLetter C).DiskNumber }).MediaType
-    if ($DriveType -eq "SSD") { Optimize-Volume -DriveLetter C -ReTrim -Verbose } else { Optimize-Volume -DriveLetter C -Defrag -Verbose }
+    if ($DriveType -eq "SSD") { 
+        Write-Host " -> SSD Terdeteksi. Menjalankan ReTrim (Mohon tunggu)..." -ForegroundColor Gray
+        Optimize-Volume -DriveLetter C -ReTrim | Out-Null 
+    } else { 
+        Write-Host " -> HDD Terdeteksi. Menjalankan Defrag (Mohon tunggu)..." -ForegroundColor Gray
+        Optimize-Volume -DriveLetter C -Defrag | Out-Null
+    }
     Write-Host " -> Optimasi selesai." -ForegroundColor Green
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
@@ -431,12 +446,12 @@ function Invoke-DnsSwitcher {
 }
 
 # ==========================================
-# MENU UTAMA (v1.9.5)
+# MENU UTAMA (v1.9.6)
 # ==========================================
 function Show-Menu {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.5      " -ForegroundColor Cyan
+    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.6      " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host " 1. Maintenance PC (Bersihkan & Optimasi)" -ForegroundColor Green
     Write-Host " 2. System Audit (Cek Hardware & OS)" -ForegroundColor Magenta

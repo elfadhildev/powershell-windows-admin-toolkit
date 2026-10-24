@@ -28,3 +28,6 @@
 ### Fixed
 - **System Audit:** Mengembalikan bagian "Driver Bermasalah" yang tidak sengaja terhapus di v1.9.4.
 - **Network Diagnostics:** Memperbaiki tampilan IP dan DNS agar tidak terpotong (format list yang lebih rapi).
+## [1.9.6] - 2026-07-17
+### Fixed
+- **Maintenance:** Menghapus parameter `-Verbose` pada proses Optimize-Volume agar tampilan tidak penuh dengan teks proses. Menambahkan indikator progress yang lebih ramah pengguna.
