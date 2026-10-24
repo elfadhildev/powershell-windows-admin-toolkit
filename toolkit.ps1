@@ -18,7 +18,9 @@ function Backup-RegistryTweaks {
 # FUNGSI 1-4: MAINTENANCE & DIAGNOSTICS
 # ==========================================
 function Invoke-Maintenance {
-    Write-Host "`n[+] Memulai Maintenance..." -ForegroundColor Cyan
+    Clear-Host
+    Write-Host "========== MAINTENANCE PC ==========" -ForegroundColor Cyan
+    Write-Host "[+] Memulai Maintenance..." -ForegroundColor Cyan
     
     Write-Host "[1/3] Membersihkan Cache DNS..." -ForegroundColor Yellow
     Clear-DnsClientCache; ipconfig /release | Out-Null; ipconfig /renew | Out-Null
@@ -106,6 +108,8 @@ function Invoke-NetworkDiagnostics {
 }
 
 function Invoke-BackupUserProfile {
+    Clear-Host
+    Write-Host "========== BACKUP PROFIL USER ==========" -ForegroundColor Cyan
     $DestinationFolder = Join-Path -Path 'D:\Backup_PC' -ChildPath "Backup_$(Get-Date -Format 'yyyy-MM-dd')"
     $FoldersToBackup = @('Documents', 'Pictures', 'Desktop', 'Downloads', 'Music', 'Videos', 'AppData\Roaming', 'AppData\Local\Packages')
     $ExcludeFolders = @('Cache', 'Temp', 'CrashDumps', 'GPUCache', 'Microsoft\Windows\INetCache')
@@ -446,12 +450,12 @@ function Invoke-DnsSwitcher {
 }
 
 # ==========================================
-# MENU UTAMA (v1.9.6)
+# MENU UTAMA (v1.9.7)
 # ==========================================
 function Show-Menu {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.6      " -ForegroundColor Cyan
+    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.7      " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host " 1. Maintenance PC (Bersihkan & Optimasi)" -ForegroundColor Green
     Write-Host " 2. System Audit (Cek Hardware & OS)" -ForegroundColor Magenta

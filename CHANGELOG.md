@@ -31,3 +31,6 @@
 ## [1.9.6] - 2026-07-17
 ### Fixed
 - **Maintenance:** Menghapus parameter `-Verbose` pada proses Optimize-Volume agar tampilan tidak penuh dengan teks proses. Menambahkan indikator progress yang lebih ramah pengguna.
+## [1.9.7] - 2026-07-18
+### Fixed
+- **UI/UX:** Menambahkan perintah `Clear-Host` pada fungsi Opsi 1 (Maintenance) dan Opsi 4 (Backup) agar layar menu sebelumnya bersih dan proses terlihat seperti berada di "halaman baru".
