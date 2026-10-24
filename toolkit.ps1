@@ -180,47 +180,128 @@ function Invoke-AppBackup {
 }
 
 # ==========================================
-# 13-14. FUNGSI v1.8.0: EVENT LOG & INTERACTIVE STARTUP
+# 13. FUNGSI BARU: SMART EVENT LOG ANALYZER (v1.9.0)
 # ==========================================
 function Invoke-EventLogAnalyzer {
-    Clear-Host
-    Write-Host "========== EVENT LOG ANALYZER (7 HARI TERAKHIR) ==========" -ForegroundColor Cyan
-    Write-Host "[+] Menganalisis System & Application Logs..." -ForegroundColor Yellow
-    $events = Get-WinEvent -FilterHashtable @{LogName='System','Application'; Level=1,2; StartTime=(Get-Date).AddDays(-7)} -ErrorAction SilentlyContinue
-    if ($events) {
+    do {
+        Clear-Host
+        Write-Host "========== SMART EVENT LOG ANALYZER ==========" -ForegroundColor Cyan
+        Write-Host "[+] Memindai Event Log (7 Hari Terakhir)..." -ForegroundColor Yellow
+        $events = Get-WinEvent -FilterHashtable @{LogName='System','Application'; Level=1,2; StartTime=(Get-Date).AddDays(-7)} -ErrorAction SilentlyContinue
+        
+        if (-not $events) { 
+            Write-Host "`n[+] Luar biasa! Tidak ada Error/Critical di log sistem minggu ini." -ForegroundColor Green 
+            Read-Host "`nTekan Enter untuk kembali..."
+            return
+        }
+
         $summary = $events | Group-Object ProviderName | Sort-Object Count -Descending | Select-Object -First 10
-        Write-Host "`n[!] Ditemukan $($events.Count) error minggu ini. Top 10 Penyebab:" -ForegroundColor Red
-        $summary | ForEach-Object { Write-Host " -> $($_.Name) ($($_.Count) kali)" -ForegroundColor Gray }
-    } else { Write-Host "`n[+] Luar biasa! Tidak ada Error/Critical di log sistem minggu ini." -ForegroundColor Green }
-    Read-Host "`nTekan Enter untuk kembali..."
+        Write-Host "`n[!] Ditemukan $($events.Count) error. Berikut Top 10 Penyebab:" -ForegroundColor Red
+        
+        $i = 0
+        $summary | ForEach-Object {
+            $i++
+            Write-Host "[$i] $($_.Name) ($($_.Count) kali)" -ForegroundColor Gray
+        }
+        
+        Write-Host "===================================================" -ForegroundColor Cyan
+        Write-Host "Ketik nomor untuk melihat detail & saran perbaikan, atau 'x' untuk kembali." -ForegroundColor Yellow
+        $choice = Read-Host "Pilih"
+        
+        if ($choice -eq 'x' -or $choice -eq '') { return }
+
+        $selectedItem = $summary[$choice - 1]
+        if ($selectedItem) {
+            $provider = $selectedItem.Name
+            Clear-Host
+            Write-Host "========== DETAIL ERROR: $provider ==========" -ForegroundColor Cyan
+            
+            # Ambil 3 error terakhir dari provider ini
+            $details = $events | Where-Object { $_.ProviderName -eq $provider } | Select-Object -First 3
+            foreach ($d in $details) {
+                Write-Host "Waktu  : $($d.TimeCreated)" -ForegroundColor DarkGray
+                Write-Host "ID     : $($d.Id)"
+                Write-Host "Pesan  : $($d.Message -replace "`r`n", ' ')" -ForegroundColor White
+                Write-Host "---------------------------------------------------"
+            }
+            
+            Write-Host "`n[💡] SARAN PERBAIKAN:" -ForegroundColor Yellow
+            
+            $fixAction = $null
+            switch -Wildcard ($provider) {
+                "*DistributedCOM*" {
+                    Write-Host "Error ini (Event ID 10016) SANGAT UMUM di Windows dan biasanya aman untuk diabaikan." -ForegroundColor Green
+                    Write-Host "Ini terjadi karena aplikasi pihak ketiga meminta izin akses yang tidak diberikan secara default." -ForegroundColor Gray
+                }
+                "*Service Control Manager*" {
+                    Write-Host "Ada layanan (Service) yang gagal berjalan. Ini bisa disebabkan oleh file sistem yang korup." -ForegroundColor Red
+                    Write-Host "Disarankan: Jalankan Repair System (SFC & DISM)." -ForegroundColor Yellow
+                    $fixAction = "SFC"
+                }
+                "*VSS*" {
+                    Write-Host "Volume Shadow Copy (VSS) gagal membuat Restore Point. Bisa karena disk penuh atau layanan VSS mati." -ForegroundColor Red
+                    Write-Host "Disarankan: Reset layanan VSS atau Repair System." -ForegroundColor Yellow
+                    $fixAction = "SFC"
+                }
+                "*CAPI2*" {
+                    Write-Host "Cryptographic API (CAPI2) gagal memvalidasi pembaruan. Biasanya karena koneksi internet terputus saat update." -ForegroundColor Red
+                    Write-Host "Disarankan: Reset Windows Update Cache." -ForegroundColor Yellow
+                    $fixAction = "Update"
+                }
+                Default {
+                    Write-Host "Error ini belum memiliki panduan spesifik. Jika PC berjalan normal, Anda bisa mengabaikannya." -ForegroundColor Gray
+                }
+            }
+
+            Write-Host "`n===================================================" -ForegroundColor Cyan
+            if ($fixAction -eq "SFC") {
+                Write-Host "1. Jalankan Repair System (SFC & DISM) sekarang" -ForegroundColor Green
+                Write-Host "2. Kembali ke daftar error"
+                $action = Read-Host "`nPilih (1-2)"
+                if ($action -eq '1') {
+                    Write-Host "`n[+] Menjalankan SFC & DISM (Mohon tunggu)..." -ForegroundColor Yellow
+                    Start-Process cmd -ArgumentList "/c sfc /scannow" -Wait -NoNewWindow
+                    Start-Process cmd -ArgumentList "/c DISM /Online /Cleanup-Image /RestoreHealth" -Wait -NoNewWindow
+                    Write-Host "`n[+] Proses selesai. Silakan cek kembali error minggu depan." -ForegroundColor Green
+                }
+            } elseif ($fixAction -eq "Update") {
+                Write-Host "1. Reset Update Cache sekarang" -ForegroundColor Green
+                Write-Host "2. Kembali ke daftar error"
+                $action = Read-Host "`nPilih (1-2)"
+                if ($action -eq '1') {
+                    Write-Host "`n[+] Mereset Windows Update..." -ForegroundColor Yellow
+                    Stop-Service -Name wuauserv, cryptSvc, bits, msiserver -Force -ErrorAction SilentlyContinue
+                    Remove-Item -Path "C:\Windows\SoftwareDistribution\*" -Recurse -Force -ErrorAction SilentlyContinue
+                    Start-Service -Name wuauserv, cryptSvc, bits, msiserver -ErrorAction SilentlyContinue
+                    Write-Host "[+] Cache Update berhasil di-reset." -ForegroundColor Green
+                }
+            } else {
+                Read-Host "`nTekan Enter untuk kembali ke daftar..."
+            }
+        }
+    } while ($true)
 }
 
+# ==========================================
+# 14. FUNGSI INTERACTIVE STARTUP MANAGER
+# ==========================================
 function Invoke-StartupManager {
     do {
         Clear-Host
         Write-Host "========== STARTUP MANAGER (INTERAKTIF) ==========" -ForegroundColor Cyan
         Write-Host "[+] Mendeteksi aplikasi startup..." -ForegroundColor Yellow
 
-        # Ambil data registry Run dan folder Startup
         $startupItems = @()
-        $regPaths = @(
-            "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run",
-            "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run"
-        )
+        $regPaths = @("HKCU:\Software\Microsoft\Windows\CurrentVersion\Run", "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run")
         foreach ($path in $regPaths) {
             if (Test-Path $path) {
                 $props = Get-ItemProperty -Path $path
                 $props.PSObject.Properties | Where-Object { $_.Name -notmatch '^PS' } | ForEach-Object {
-                    $startupItems += [PSCustomObject]@{
-                        Name = $_.Name
-                        Command = $_.Value
-                        Location = $path
-                    }
+                    $startupItems += [PSCustomObject]@{ Name = $_.Name; Command = $_.Value; Location = $path }
                 }
             }
         }
 
-        # Tampilkan dalam bentuk list bernomor
         $i = 0
         $startupItems | ForEach-Object {
             $i++
@@ -258,14 +339,12 @@ function Invoke-StartupManager {
                     try {
                         Remove-ItemProperty -Path $selectedItem.Location -Name $selectedItem.Name -ErrorAction Stop
                         Write-Host "`n[+] Berhasil menghapus '$($selectedItem.Name)' dari startup." -ForegroundColor Green
-                        Write-Host "    (Aplikasi tidak akan berjalan otomatis saat PC dinyalakan)." -ForegroundColor Gray
                     } catch {
-                        Write-Host "`n[!] Gagal menghapus. Anda mungkin butuh hak Admin atau item ini dilindungi." -ForegroundColor Red
+                        Write-Host "`n[!] Gagal menghapus. Anda mungkin butuh hak Admin." -ForegroundColor Red
                     }
                     Read-Host "`nTekan Enter..."
                 }
                 '2' {
-                    # Ekstrak path .exe dari string command (jika ada tanda kutip)
                     $exePath = $selectedItem.Command
                     if ($exePath -match '^"([^"]+)"') { $exePath = $matches[1] }
                     elseif ($exePath -match '^(\S+\.exe)') { $exePath = $matches[1] }
@@ -273,14 +352,8 @@ function Invoke-StartupManager {
                     if (Test-Path $exePath) {
                         $sig = Get-AuthenticodeSignature -FilePath $exePath
                         Write-Host "`n[+] Status Signature: $($sig.Status)" -ForegroundColor $(if ($sig.Status -eq 'Valid') { 'Green' } else { 'Red' })
-                        if ($sig.SignerCertificate) {
-                            Write-Host "    Publisher: $($sig.SignerCertificate.Subject)" -ForegroundColor Gray
-                        } else {
-                            Write-Host "    Publisher: Tidak ada signature (Tidak Dikenal)" -ForegroundColor Red
-                        }
-                    } else {
-                        Write-Host "`n[!] File .exe tidak ditemukan di path tersebut." -ForegroundColor Red
-                    }
+                        if ($sig.SignerCertificate) { Write-Host "    Publisher: $($sig.SignerCertificate.Subject)" -ForegroundColor Gray } else { Write-Host "    Publisher: Tidak ada signature (Tidak Dikenal)" -ForegroundColor Red }
+                    } else { Write-Host "`n[!] File .exe tidak ditemukan." -ForegroundColor Red }
                     Read-Host "`nTekan Enter..."
                 }
                 '3' {
@@ -288,12 +361,7 @@ function Invoke-StartupManager {
                     if ($exePath -match '^"([^"]+)"') { $exePath = $matches[1] }
                     elseif ($exePath -match '^(\S+\.exe)') { $exePath = $matches[1] }
                     
-                    if (Test-Path $exePath) {
-                        Start-Process explorer.exe -ArgumentList "/select,`"$exePath`""
-                    } else {
-                        Write-Host "`n[!] File tidak ditemukan." -ForegroundColor Red
-                        Read-Host "Tekan Enter..."
-                    }
+                    if (Test-Path $exePath) { Start-Process explorer.exe -ArgumentList "/select,`"$exePath`"" } else { Write-Host "`n[!] File tidak ditemukan." -ForegroundColor Red; Read-Host "Tekan Enter..." }
                 }
                 '4' { }
             }
@@ -305,12 +373,12 @@ function Invoke-StartupManager {
 }
 
 # ==========================================
-# MENU UTAMA (v1.8.0)
+# MENU UTAMA (v1.9.0)
 # ==========================================
 function Show-Menu {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.8.0      " -ForegroundColor Cyan
+    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.0      " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host " 1. Maintenance PC (Bersihkan & Optimasi)" -ForegroundColor Green
     Write-Host " 2. System Audit (Cek Hardware & OS)" -ForegroundColor Magenta
@@ -324,7 +392,7 @@ function Show-Menu {
     Write-Host "10. Windows Update Manager" -ForegroundColor Cyan
     Write-Host "11. AUTOMATION PRESETS (Setup Cepat)" -ForegroundColor Magenta
     Write-Host "12. App Backup Manager (Export/Import)" -ForegroundColor Yellow
-    Write-Host "13. Event Log Analyzer (Cek Error Sistem)" -ForegroundColor Red
+    Write-Host "13. SMART EVENT ANALYZER (Deteksi & Fix)" -ForegroundColor Red
     Write-Host "14. Startup Manager (Kelola Autostart)" -ForegroundColor Red
     Write-Host "15. Keluar" -ForegroundColor Red
     Write-Host "===================================================" -ForegroundColor Cyan
