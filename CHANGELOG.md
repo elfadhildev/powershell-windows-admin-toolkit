@@ -24,3 +24,7 @@
 ### Added
 - **DNS Switcher:** Fitur untuk mengganti DNS ke Cloudflare/Google/Quad9 atau kembali ke Otomatis (DHCP).
 - **Save Report to TXT:** Opsi untuk menyimpan hasil System Audit ke file teks di Desktop.
+## [1.9.5] - 2026-07-17
+### Fixed
+- **System Audit:** Mengembalikan bagian "Driver Bermasalah" yang tidak sengaja terhapus di v1.9.4.
+- **Network Diagnostics:** Memperbaiki tampilan IP dan DNS agar tidak terpotong (format list yang lebih rapi).

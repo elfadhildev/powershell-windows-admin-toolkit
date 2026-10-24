@@ -33,15 +33,26 @@ function Invoke-SystemAudit {
     Clear-Host; Write-Host "========== SISTEM AUDIT ==========" -ForegroundColor Cyan
     $os = Get-CimInstance Win32_OperatingSystem; $cpu = Get-CimInstance Win32_Processor; $ram = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 2)
     
-    $report = "OS: $($os.Caption) | CPU: $($cpu.Name) | RAM: $ram GB"
-    Write-Host $report
+    $report = "=== SYSTEM AUDIT ===`nOS: $($os.Caption) | CPU: $($cpu.Name) | RAM: $ram GB`n"
+    Write-Host " OS: $($os.Caption) | CPU: $($cpu.Name) | RAM: $ram GB"
 
     $lic = Get-CimInstance SoftwareLicensingProduct | Where-Object { $_.PartialProductKey }
-    if ($lic.LicenseStatus -eq 1) { $report += "`nLisensi: Windows Teraktivasi"; Write-Host " Lisensi: Windows Teraktivasi" -ForegroundColor Green } else { $report += "`nLisensi: Windows Belum Teraktivasi"; Write-Host " Lisensi: Belum Teraktivasi" -ForegroundColor Red }
+    if ($lic.LicenseStatus -eq 1) { $report += "Lisensi: Windows Teraktivasi`n"; Write-Host " Lisensi: Windows Teraktivasi" -ForegroundColor Green } else { $report += "Lisensi: Belum Teraktivasi`n"; Write-Host " Lisensi: Belum Teraktivasi" -ForegroundColor Red }
     
+    Write-Host "`n[+] Storage:" -ForegroundColor Yellow
     $disks = Get-PhysicalDisk | Select-Object DeviceId, FriendlyName, MediaType, HealthStatus, @{N='Size(GB)';E={[math]::Round($_.Size/1GB,2)}}
     $disks | Format-Table -AutoSize
-    $report += "`n`n[Storage]`n" + ($disks | Out-String)
+    $report += "`n[Storage]`n" + ($disks | Out-String)
+
+    Write-Host "[+] Driver Bermasalah:" -ForegroundColor Yellow
+    $badDrivers = Get-PnpDevice -PresentOnly | Where-Object { $_.Status -ne "OK" }
+    if ($badDrivers) {
+        $badDrivers | Select-Object Class, FriendlyName, Status | Format-Table -AutoSize
+        $report += "`n[Driver Bermasalah]`n" + ($badDrivers | Select-Object Class, FriendlyName, Status | Out-String)
+    } else {
+        Write-Host " -> Semua driver berstatus OK." -ForegroundColor Green
+        $report += "`n[Driver Bermasalah] Semua driver berstatus OK.`n"
+    }
 
     Write-Host "`n[🛡️] Anda bisa menyimpan laporan ini ke dalam file teks." -ForegroundColor Yellow
     $save = Read-Host "Simpan laporan ke Desktop? (y/n)"
@@ -56,8 +67,26 @@ function Invoke-SystemAudit {
 function Invoke-NetworkDiagnostics {
     $ErrorActionPreference = 'SilentlyContinue'; Clear-Host
     Write-Host "========== DIAGNOSTIK JARINGAN ==========" -ForegroundColor Cyan
-    Get-NetIPConfiguration | Where-Object { $_.IPv4Address } | Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway, DNSServer | Format-List
-    Get-NetTCPConnection -State Established | ForEach-Object { $Process = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue; [PSCustomObject]@{ LocalPort=$_.LocalPort; RemoteAddr=$_.RemoteAddress; Process=if($Process){$Process.ProcessName}else{'<unknown>'}; PID=$_.OwningProcess } } | Format-Table -AutoSize
+    
+    Write-Host "`n[+] Konfigurasi IP & DNS:" -ForegroundColor Yellow
+    Get-NetIPConfiguration | Where-Object { $_.IPv4Address } | Select-Object InterfaceAlias, IPv4Address, @{N='Gateway';E={$_.IPv4DefaultGateway.NextHop}}, @{N='DNS';E={$_.DNSServer.ServerAddresses -join ', '}} | Format-List
+
+    Write-Host "[+] Koneksi Internet Aktif (Established):" -ForegroundColor Yellow
+    Get-NetTCPConnection -State Established | ForEach-Object {
+        $Process = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue
+        [PSCustomObject]@{
+            LocalPort  = $_.LocalPort
+            RemoteAddr = $_.RemoteAddress
+            RemotePort = $_.RemotePort
+            Process    = if($Process){$Process.ProcessName}else{'<unknown>'}
+            PID        = $_.OwningProcess
+        }
+    } | Sort-Object Process | Format-Table -AutoSize
+
+    Write-Host "[+] Tes Resolusi DNS (google.com):" -ForegroundColor Yellow
+    $dns = Resolve-DnsName -Name "google.com" -Type A -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($dns) { Write-Host " -> Berhasil: google.com -> $($dns.IPAddress)" -ForegroundColor Green } else { Write-Host " -> Gagal melakukan resolusi DNS!" -ForegroundColor Red }
+
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
@@ -194,7 +223,7 @@ function Invoke-AppBackup {
 }
 
 # ==========================================
-# 13. SMART EVENT LOG ANALYZER (v1.9.2)
+# 13. SMART EVENT LOG ANALYZER
 # ==========================================
 function Invoke-EventLogAnalyzer {
     do {
@@ -242,27 +271,11 @@ function Invoke-EventLogAnalyzer {
             
             $fixAction = $null
             switch -Wildcard ($provider) {
-                "*DistributedCOM*" {
-                    Write-Host "Error ini (Event ID 10016) SANGAT UMUM di Windows dan biasanya aman untuk diabaikan." -ForegroundColor Green
-                }
-                "*Service Control Manager*" {
-                    Write-Host "Ada layanan (Service) yang gagal berjalan. Ini bisa disebabkan oleh file sistem yang korup." -ForegroundColor Red
-                    Write-Host "Disarankan: Jalankan Repair System (SFC & DISM)." -ForegroundColor Yellow
-                    $fixAction = "SFC"
-                }
-                "*VSS*" {
-                    Write-Host "Volume Shadow Copy (VSS) gagal membuat Restore Point. Bisa karena disk penuh atau layanan VSS mati." -ForegroundColor Red
-                    Write-Host "Disarankan: Reset layanan VSS atau Repair System." -ForegroundColor Yellow
-                    $fixAction = "SFC"
-                }
-                "*CAPI2*" {
-                    Write-Host "Cryptographic API (CAPI2) gagal memvalidasi pembaruan. Biasanya karena koneksi internet terputus saat update." -ForegroundColor Red
-                    Write-Host "Disarankan: Reset Windows Update Cache." -ForegroundColor Yellow
-                    $fixAction = "Update"
-                }
-                Default {
-                    Write-Host "Error ini belum memiliki panduan spesifik. Jika PC berjalan normal, Anda bisa mengabaikannya." -ForegroundColor Gray
-                }
+                "*DistributedCOM*" { Write-Host "Error ini (Event ID 10016) SANGAT UMUM di Windows dan biasanya aman untuk diabaikan." -ForegroundColor Green }
+                "*Service Control Manager*" { Write-Host "Ada layanan (Service) yang gagal berjalan. Ini bisa disebabkan oleh file sistem yang korup." -ForegroundColor Red; Write-Host "Disarankan: Jalankan Repair System (SFC & DISM)." -ForegroundColor Yellow; $fixAction = "SFC" }
+                "*VSS*" { Write-Host "Volume Shadow Copy (VSS) gagal membuat Restore Point. Bisa karena disk penuh atau layanan VSS mati." -ForegroundColor Red; Write-Host "Disarankan: Reset layanan VSS atau Repair System." -ForegroundColor Yellow; $fixAction = "SFC" }
+                "*CAPI2*" { Write-Host "Cryptographic API (CAPI2) gagal memvalidasi pembaruan. Biasanya karena koneksi internet terputus saat update." -ForegroundColor Red; Write-Host "Disarankan: Reset Windows Update Cache." -ForegroundColor Yellow; $fixAction = "Update" }
+                Default { Write-Host "Error ini belum memiliki panduan spesifik. Jika PC berjalan normal, Anda bisa mengabaikannya." -ForegroundColor Gray }
             }
 
             Write-Host "`n===================================================" -ForegroundColor Cyan
@@ -385,7 +398,7 @@ function Invoke-StartupManager {
 }
 
 # ==========================================
-# 15. FUNGSI BARU v1.9.4: DNS SWITCHER
+# 15. DNS SWITCHER
 # ==========================================
 function Invoke-DnsSwitcher {
     Clear-Host
@@ -418,12 +431,12 @@ function Invoke-DnsSwitcher {
 }
 
 # ==========================================
-# MENU UTAMA (v1.9.4)
+# MENU UTAMA (v1.9.5)
 # ==========================================
 function Show-Menu {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.4      " -ForegroundColor Cyan
+    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.5      " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host " 1. Maintenance PC (Bersihkan & Optimasi)" -ForegroundColor Green
     Write-Host " 2. System Audit (Cek Hardware & OS)" -ForegroundColor Magenta
