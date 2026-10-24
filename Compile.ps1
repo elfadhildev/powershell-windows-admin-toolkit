@@ -37,9 +37,9 @@ function Show-Menu {
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host " PANDUAN POWERSHELL - CONTROL PANEL (Single File) " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host " 1. Maintenance PC (Butuh Admin)" -ForegroundColor Green
-    Write-Host " 2. System Audit (Cek Hardware & OS)" -ForegroundColor Magenta
-    Write-Host " 3. Network Diagnostics (Cek Jaringan)" -ForegroundColor Magenta
+    Write-Host " 1. Maintenance PC" -ForegroundColor Green
+    Write-Host " 2. System Audit" -ForegroundColor Magenta
+    Write-Host " 3. Network Diagnostics" -ForegroundColor Magenta
     Write-Host " 4. Backup Profil User" -ForegroundColor Green
     Write-Host " 5. Keluar" -ForegroundColor Red
     Write-Host "===================================================" -ForegroundColor Cyan
