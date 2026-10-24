@@ -341,39 +341,6 @@ Workflow GitHub Actions di `.github/workflows/powershell-lint.yml` melakukan pem
 
 CI tidak mengeksekusi maintenance atau backup pada runner.
 
-## Roadmap
-
-### v1.0.0 (Versi sebelumnya)
-
-- Dokumentasi repository.
-- Maintenance script.
-- User profile backup.
-- System audit.
-- Network diagnostics.
-- Basic tests.
-- GitHub CI.
-
-### v1.1.0 (Versi sebelumnya)
-
-- Logging terstruktur JSON/CSV.
-- Parameter untuk dry-run pada maintenance.
-- Konfigurasi backup melalui JSON.
-- Exit code dan error handling yang lebih konsisten.
-
-### v1.3.1 (Rilis saat ini)
-- **Control Panel interaktif** (`toolkit.ps1`) dengan 5 menu.
-- Dukungan eksekusi *one-liner* via `irm | iex`.
-- Restrukturisasi folder `docs/advanced` untuk skrip berisiko.
-- Penambahan `SECURITY.md`, `CODE_OF_CONDUCT.md`, dan Issue Templates.
-- Skrip helper `Build-PDF-1Klik.bat` dan `Publish-GitHub-1Klik.bat`.
-
-### v2.0.0 (Rencana)
-
-- PowerShell module.
-- Pester test coverage yang lebih luas.
-- Scheduled automation installer.
-- Report HTML untuk system audit.
-- Packaging dan release workflow GitHub.
 
 ## Referensi Sumber
 
