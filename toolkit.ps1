@@ -6,11 +6,9 @@ if (-not $isAdmin) {
 }
 
 # ==========================================
-# FUNGSI CLI (Wajib ada untuk Pester & Jendela Baru)
+# FUNGSI CLI
 # ==========================================
-function Invoke-Maintenance {
-    Write-Host "Maintenance CLI berjalan (Untuk Pester Test)..."
-}
+function Invoke-Maintenance { Write-Host "Maintenance CLI berjalan..." }
 
 function Invoke-SystemAudit {
     Clear-Host; Write-Host "========== SISTEM AUDIT ==========" -ForegroundColor Cyan
@@ -58,82 +56,50 @@ function Invoke-EventLogAnalyzer {
 }
 
 # ==========================================
-# DATA GLOBAL
+# DATA TWEAKS MEGA LIST
 # ==========================================
 $Global:TweakList = @(
-    [PSCustomObject]@{ Id=1; Cat='Privacy'; Name='Disable Telemetry'; Action='Telemetry' },
-    [PSCustomObject]@{ Id=2; Cat='Privacy'; Name='Disable Activity History'; Action='Activity' },
-    [PSCustomObject]@{ Id=3; Cat='Privacy'; Name='Disable Consumer Features'; Action='Consumer' },
-    [PSCustomObject]@{ Id=4; Cat='Privacy'; Name='Disable Location Tracking'; Action='Location' },
-    [PSCustomObject]@{ Id=5; Cat='Performance'; Name='Disable Hibernation (Hemat Disk)'; Action='Hibernate' },
-    [PSCustomObject]@{ Id=6; Cat='UIUX'; Name='Enable End Task With Right Click'; Action='EndTask' },
-    [PSCustomObject]@{ Id=7; Cat='UIUX'; Name='Show File Extensions'; Action='FileExt' },
-    [PSCustomObject]@{ Id=8; Cat='UIUX'; Name='Show Hidden Files'; Action='Hidden' },
-    [PSCustomObject]@{ Id=9; Cat='System'; Name='Create System Restore Point'; Action='Restore' },
-    [PSCustomObject]@{ Id=10; Cat='System'; Name='Run Disk Cleanup'; Action='Cleanup' },
-    [PSCustomObject]@{ Id=11; Cat='Performance'; Name='Set Services to Manual'; Action='ServicesManual' },
-    [PSCustomObject]@{ Id=12; Cat='Performance'; Name='Disable GameDVR'; Action='GameDVR' },
-    [PSCustomObject]@{ Id=13; Cat='Privacy'; Name='Disable Wi-Fi Sense'; Action='WifiSense' },
-    [PSCustomObject]@{ Id=14; Cat='Privacy'; Name='Disable HomeGroup'; Action='HomeGroup' },
-    [PSCustomObject]@{ Id=15; Cat='Performance'; Name='Disable Background Apps'; Action='BgApps' },
-    [PSCustomObject]@{ Id=16; Cat='System'; Name='Disable Storage Sense'; Action='Storage' },
-    [PSCustomObject]@{ Id=17; Cat='UIUX'; Name='Disable Bing Search in Start'; Action='Bing' },
-    [PSCustomObject]@{ Id=18; Cat='Performance'; Name='Disable Game Bar'; Action='GameBar' },
-    [PSCustomObject]@{ Id=19; Cat='Performance'; Name='Enable Ultimate Performance'; Action='UltimatePerf' },
-    [PSCustomObject]@{ Id=20; Cat='UIUX'; Name='Disable Notification Tray'; Action='Notifications' },
-    [PSCustomObject]@{ Id=21; Cat='Performance'; Name='Disable Fullscreen Optimizations'; Action='FSO' },
-    [PSCustomObject]@{ Id=22; Cat='Network'; Name='Disable IPv6'; Action='IPv6' },
-    [PSCustomObject]@{ Id=23; Cat='System'; Name='Disable Edge Debloat'; Action='EdgeDebloat' },
-    [PSCustomObject]@{ Id=24; Cat='System'; Name='Disable OneDrive'; Action='OneDrive' },
-    [PSCustomObject]@{ Id=25; Cat='System'; Name='Disable Reserved Storage'; Action='Reserved' }
-)
+    # Essential Tweaks (18)
+    [PSCustomObject]@{ Id=1; Cat='Essential'; Name='Activity History - Disable'; Action='Activity' },
+    [PSCustomObject]@{ Id=2; Cat='Essential'; Name='BitLocker - Disable'; Action='BitLocker' },
+    [PSCustomObject]@{ Id=3; Cat='Essential'; Name='ConsumerFeatures - Disable'; Action='Consumer' },
+    [PSCustomObject]@{ Id=4; Cat='Essential'; Name='Delivery Optimization - Disable'; Action='DeliveryOpt' },
+    [PSCustomObject]@{ Id=5; Cat='Essential'; Name='Disk Cleanup - Run'; Action='DiskCleanup' },
+    [PSCustomObject]@{ Id=6; Cat='Essential'; Name='End Task With Right Click - Enable'; Action='EndTask' },
+    [PSCustomObject]@{ Id=7; Cat='Essential'; Name='File Explorer Automatic Folder Discovery - Disable'; Action='AutoFolder' },
+    [PSCustomObject]@{ Id=8; Cat='Essential'; Name='Hibernation - Disable'; Action='Hibernation' },
+    [PSCustomObject]@{ Id=9; Cat='Essential'; Name='Location Tracking - Disable'; Action='Location' },
+    [PSCustomObject]@{ Id=10; Cat='Essential'; Name='Microsoft Store Recommended Search Results - Disable'; Action='StoreSearch' },
+    [PSCustomObject]@{ Id=11; Cat='Essential'; Name='Prevent Device Companion Apps'; Action='PreventCompanion' },
+    [PSCustomObject]@{ Id=12; Cat='Essential'; Name='Restore Point - Create'; Action='RestorePoint' },
+    [PSCustomObject]@{ Id=13; Cat='Essential'; Name='Services - Set to Manual'; Action='ServicesManual' },
+    [PSCustomObject]@{ Id=14; Cat='Essential'; Name='Start Menu Previous Layout - Enable'; Action='StartMenuLayout' },
+    [PSCustomObject]@{ Id=15; Cat='Essential'; Name='Telemetry - Disable'; Action='Telemetry' },
+    [PSCustomObject]@{ Id=16; Cat='Essential'; Name='Temporary Files - Remove'; Action='TempFiles' },
+    [PSCustomObject]@{ Id=17; Cat='Essential'; Name='Widgets - Remove'; Action='Widgets' },
+    [PSCustomObject]@{ Id=18; Cat='Essential'; Name='Windows Platform Binary Table (WPBT) - Disable'; Action='WPBT' },
 
-$Global:AppList = @(
-    [PSCustomObject]@{ Id=1; Cat='Browsers'; Name='Brave'; Pkg='Brave.Brave' }
-    [PSCustomObject]@{ Id=2; Cat='Browsers'; Name='Chrome'; Pkg='Google.Chrome' }
-    [PSCustomObject]@{ Id=3; Cat='Browsers'; Name='Edge'; Pkg='Microsoft.Edge' }
-    [PSCustomObject]@{ Id=4; Cat='Browsers'; Name='Firefox'; Pkg='Mozilla.Firefox' }
-    [PSCustomObject]@{ Id=5; Cat='Browsers'; Name='Tor Browser'; Pkg='TorProject.TorBrowser' }
-    [PSCustomObject]@{ Id=6; Cat='Comms'; Name='Discord'; Pkg='Discord.Discord' }
-    [PSCustomObject]@{ Id=7; Cat='Comms'; Name='Zoom'; Pkg='Zoom.Zoom' }
-    [PSCustomObject]@{ Id=8; Cat='Comms'; Name='Telegram'; Pkg='Telegram.TelegramDesktop' }
-    [PSCustomObject]@{ Id=9; Cat='Comms'; Name='WhatsApp'; Pkg='WhatsApp.WhatsApp' }
-    [PSCustomObject]@{ Id=10; Cat='Comms'; Name='Slack'; Pkg='SlackTechnologies.Slack' }
-    [PSCustomObject]@{ Id=11; Cat='Dev'; Name='VS Code'; Pkg='Microsoft.VisualStudioCode' }
-    [PSCustomObject]@{ Id=12; Cat='Dev'; Name='Git'; Pkg='Git.Git' }
-    [PSCustomObject]@{ Id=13; Cat='Dev'; Name='Python 3'; Pkg='Python.Python.3.12' }
-    [PSCustomObject]@{ Id=14; Cat='Dev'; Name='Node.js'; Pkg='OpenJS.NodeJS' }
-    [PSCustomObject]@{ Id=15; Cat='Dev'; Name='Docker Desktop'; Pkg='Docker.DockerDesktop' }
-    [PSCustomObject]@{ Id=16; Cat='Doc'; Name='LibreOffice'; Pkg='TheDocumentFoundation.LibreOffice' }
-    [PSCustomObject]@{ Id=17; Cat='Doc'; Name='Adobe Acrobat'; Pkg='Adobe.Acrobat.Reader.64-bit' }
-    [PSCustomObject]@{ Id=18; Cat='Games'; Name='Steam'; Pkg='Valve.Steam' }
-    [PSCustomObject]@{ Id=19; Cat='Games'; Name='Epic Games'; Pkg='EpicGames.EpicGamesLauncher' }
-    [PSCustomObject]@{ Id=20; Cat='Games'; Name='Battle.net'; Pkg='Blizzard.BattleNet' }
-    [PSCustomObject]@{ Id=21; Cat='Media'; Name='VLC'; Pkg='VideoLAN.VLC' }
-    [PSCustomObject]@{ Id=22; Cat='Media'; Name='Spotify'; Pkg='Spotify.Spotify' }
-    [PSCustomObject]@{ Id=23; Cat='Media'; Name='OBS Studio'; Pkg='OBSProject.OBSStudio' }
-    [PSCustomObject]@{ Id=24; Cat='Utils'; Name='7-Zip'; Pkg='7zip.7zip' }
-    [PSCustomObject]@{ Id=25; Cat='Utils'; Name='WinRAR'; Pkg='RARLab.WinRAR' }
-    [PSCustomObject]@{ Id=26; Cat='Utils'; Name='Everything'; Pkg='voidtools.Everything' }
-    [PSCustomObject]@{ Id=27; Cat='Utils'; Name='PowerToys'; Pkg='Microsoft.PowerToys' }
-)
-
-$Global:DebloatList = @(
-    [PSCustomObject]@{ Id=1; Name='Cortana'; Pkg='Microsoft.549981C3F5F10' }
-    [PSCustomObject]@{ Id=2; Name='Bing News'; Pkg='Microsoft.BingNews' }
-    [PSCustomObject]@{ Id=3; Name='Bing Weather'; Pkg='Microsoft.BingWeather' }
-    [PSCustomObject]@{ Id=4; Name='Get Help'; Pkg='Microsoft.GetHelp' }
-    [PSCustomObject]@{ Id=5; Name='Tips (Get Started)'; Pkg='Microsoft.Getstarted' }
-    [PSCustomObject]@{ Id=6; Name='Office Hub'; Pkg='Microsoft.MicrosoftOfficeHub' }
-    [PSCustomObject]@{ Id=7; Name='Solitaire'; Pkg='Microsoft.MicrosoftSolitaireCollection' }
-    [PSCustomObject]@{ Id=8; Name='People'; Pkg='Microsoft.People' }
-    [PSCustomObject]@{ Id=9; Name='Skype'; Pkg='Microsoft.SkypeApp' }
-    [PSCustomObject]@{ Id=10; Name='Feedback Hub'; Pkg='Microsoft.WindowsFeedbackHub' }
-    [PSCustomObject]@{ Id=11; Name='Xbox App'; Pkg='Microsoft.XboxApp' }
-    [PSCustomObject]@{ Id=12; Name='Xbox Overlay'; Pkg='Microsoft.XboxGamingOverlay' }
-    [PSCustomObject]@{ Id=13; Name='Your Phone'; Pkg='Microsoft.YourPhone' }
-    [PSCustomObject]@{ Id=14; Name='Groove Music'; Pkg='Microsoft.ZuneMusic' }
-    [PSCustomObject]@{ Id=15; Name='Movies &amp; TV'; Pkg='Microsoft.ZuneVideo' }
+    # Advanced Tweaks - CAUTION (20)
+    [PSCustomObject]@{ Id=19; Cat='Advanced'; Name='Adobe URL Block List - Enable'; Action='AdobeBlock' },
+    [PSCustomObject]@{ Id=20; Cat='Advanced'; Name='Background Apps - Disable'; Action='BgApps' },
+    [PSCustomObject]@{ Id=21; Cat='Advanced'; Name='Brave Browser - Debloat'; Action='BraveDebloat' },
+    [PSCustomObject]@{ Id=22; Cat='Advanced'; Name='Date & Time - Set Time to UTC'; Action='UTC' },
+    [PSCustomObject]@{ Id=23; Cat='Advanced'; Name='Disable Reserved Storage'; Action='Reserved' },
+    [PSCustomObject]@{ Id=24; Cat='Advanced'; Name='File Explorer Home and Gallery - Disable'; Action='FileExplorerHome' },
+    [PSCustomObject]@{ Id=25; Cat='Advanced'; Name='IPv6 - Disable'; Action='IPv6' },
+    [PSCustomObject]@{ Id=26; Cat='Advanced'; Name='IPv6 - Set IPv4 as Preferred'; Action='IPv4Pref' },
+    [PSCustomObject]@{ Id=27; Cat='Advanced'; Name='Logitech Download Assistant Auto-Install - Disable'; Action='Logitech' },
+    [PSCustomObject]@{ Id=28; Cat='Advanced'; Name='Microsoft Edge - Debloat'; Action='EdgeDebloat' },
+    [PSCustomObject]@{ Id=29; Cat='Advanced'; Name='Microsoft Edge - Remove'; Action='EdgeRemove' },
+    [PSCustomObject]@{ Id=30; Cat='Advanced'; Name='Microsoft OneDrive - Remove'; Action='OneDrive' },
+    [PSCustomObject]@{ Id=31; Cat='Advanced'; Name='Razer Software Auto-Install - Disable'; Action='Razer' },
+    [PSCustomObject]@{ Id=32; Cat='Advanced'; Name='RDP Unsigned File Warnings - Disable'; Action='RDPWarn' },
+    [PSCustomObject]@{ Id=33; Cat='Advanced'; Name='Right-Click Menu Previous Layout - Enable'; Action='RightClickMenu' },
+    [PSCustomObject]@{ Id=34; Cat='Advanced'; Name='Storage Sense - Disable'; Action='StorageSense' },
+    [PSCustomObject]@{ Id=35; Cat='Advanced'; Name='System Tray Notifications & Calendar - Disable'; Action='Notifications' },
+    [PSCustomObject]@{ Id=36; Cat='Advanced'; Name='Teredo - Disable'; Action='Teredo' },
+    [PSCustomObject]@{ Id=37; Cat='Advanced'; Name='Visual Effects - Set to Best Performance'; Action='VisualFX' },
+    [PSCustomObject]@{ Id=38; Cat='Advanced'; Name='Windows AI - Disable And Remove'; Action='WindowsAI' }
 )
 
 # ==========================================
@@ -196,7 +162,7 @@ function Show-MaintenanceGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: TABBED TWEAKS
+# FUNGSI GUI: TABBED TWEAKS (MEGA LIST)
 # ==========================================
 function Show-TweaksGUI {
     $categories = $Global:TweakList.Cat | Sort-Object -Unique
@@ -235,21 +201,51 @@ function Show-TweaksGUI {
             $chk = $window.FindName("Chk_$($t.Id)")
             if ($chk.IsChecked -eq $true) { $selected += $t.Action }
         }
+        
         foreach ($act in $selected) {
             switch ($act) {
-                'Telemetry' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-Service -Name DiagTrack -StartupType Disabled -ErrorAction SilentlyContinue; Stop-Service -Name DiagTrack -Force -ErrorAction SilentlyContinue }
-                'Activity' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "EnableActivityFeed" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'Activity' { 
+                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "EnableActivityFeed" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "PublishUserActivities" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "UploadUserActivities" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                }
+                'BitLocker' { Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\BitLocker" -Name "PreventDeviceEncryption" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
                 'Consumer' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsConsumerFeatures" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
-                'Location' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableLocation" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
-                'Hibernate' { Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" -Name "HibernateEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue; powercfg -h off }
+                'DeliveryOpt' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" -Name "DODownloadMode" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'DiskCleanup' { Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -Wait -NoNewWindow }
                 'EndTask' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" -Name "TaskbarEndTask" -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue }
-                'FileExt' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 0 -Type DWord }
-                'Hidden' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -Value 1 -Type DWord }
+                'AutoFolder' { Set-ItemProperty -Path "HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags\AllFolders\Shell" -Name "FolderType" -Value "NotSpecified" -Force -ErrorAction SilentlyContinue }
+                'Hibernation' { Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" -Name "HibernateEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue; powercfg -h off }
+                'Location' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableLocation" -Value 1 -Type DWord -ErrorAction SilentlyContinue; Set-Service -Name lfsvc -StartupType Disabled -ErrorAction SilentlyContinue; Stop-Service -Name lfsvc -Force -ErrorAction SilentlyContinue }
+                'StoreSearch' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SubscribedContent-338388Enabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'PreventCompanion' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Device Metadata" -Name "PreventDeviceMetadataFromNetwork" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
+                'RestorePoint' { if ((Get-ComputerRestorePoint).Count -eq $null) { Enable-ComputerRestore -Drive "C:\" }; Checkpoint-Computer -Description "Toolkit Restore" -RestorePointType "MODIFY_SETTINGS" }
+                'ServicesManual' { $services = @("DiagTrack", "dmwappushservice", "MapsBroker", "RetailDemo", "WSearch"); foreach ($svc in $services) { Set-Service -Name $svc -StartupType Manual -ErrorAction SilentlyContinue } }
+                'StartMenuLayout' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\Shell\Bags\1\Desktop" -Name "FFlags" -Value 1075839525 -Type DWord -ErrorAction SilentlyContinue }
+                'Telemetry' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-Service -Name DiagTrack -StartupType Disabled -ErrorAction SilentlyContinue; Stop-Service -Name DiagTrack -Force -ErrorAction SilentlyContinue }
+                'TempFiles' { $folders = @("$env:TEMP", "C:\Windows\Temp", "C:\Windows\Prefetch", "C:\Windows\SoftwareDistribution\Download"); foreach ($f in $folders) { if (Test-Path $f) { Get-ChildItem -Path $f -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue } } }
+                'Widgets' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarDa" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'WPBT' { $file = "C:\Windows\System32\wpbbin.exe"; if (Test-Path $file) { takeown /f $file | Out-Null; icacls $file /deny "Everyone:(X)" | Out-Null } }
+                'AdobeBlock' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown" -Name "bEnableAcrobatDocumentCloud" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
                 'BgApps' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Name "GlobalUserDisabled" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
-                'Bing' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "BingSearchEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
-                'GameBar' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\GameBar" -Name "AutoGameModeEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
-                'UltimatePerf' { powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 }
+                'BraveDebloat' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\BraveSoftware\Brave" -Name "MetricsReportingEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\BraveSoftware\Brave" -Name "PromotionsEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'UTC' { Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" -Name "RealTimeIsUniversal" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
+                'Reserved' { Set-WindowsReservedStorageState -State Disabled -ErrorAction SilentlyContinue }
+                'FileExplorerHome' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowRecent" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowFrequent" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'IPv6' { Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters" -Name "DisabledComponents" -Value 255 -Type DWord -ErrorAction SilentlyContinue }
+                'IPv4Pref' { Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters" -Name "DisabledComponents" -Value 32 -Type DWord -ErrorAction SilentlyContinue }
+                'Logitech' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Device Metadata" -Name "PreventDeviceMetadataFromNetwork" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
+                'EdgeDebloat' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Edge" -Name "EdgeShoppingAssistantEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Edge" -Name "ShowRecommendationsEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'EdgeRemove' { Get-AppxPackage -Name "Microsoft.MicrosoftEdge.Stable" -AllUsers | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue }
                 'OneDrive' { Stop-Process -Name "OneDrive" -Force -ErrorAction SilentlyContinue; Start-Process "C:\Windows\System32\OneDriveSetup.exe" -ArgumentList "/uninstall" -Wait -ErrorAction SilentlyContinue }
+                'Razer' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Device Metadata" -Name "PreventDeviceMetadataFromNetwork" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
+                'RDPWarn' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Terminal Server Client" -Name "AuthenticationLevelOverride" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'RightClickMenu' { New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Force | Out-Null; Set-ItemProperty -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32" -Name "(Default)" -Value "" }
+                'StorageSense' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy" -Name "01" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'Notifications' { Set-ItemProperty -Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer" -Name "DisableNotificationCenter" -Value 1 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications" -Name "ToastEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'Teredo' { netsh interface teredo set state disabled }
+                'VisualFX' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" -Name "VisualFXSetting" -Value 2 -Type DWord -ErrorAction SilentlyContinue }
+                'WindowsAI' { Set-ItemProperty -Path "HKCU:\Software\Policies\Microsoft\Windows\WindowsCopilot" -Name "TurnOffWindowsCopilot" -Value 1 -Type DWord -ErrorAction SilentlyContinue; Get-AppxPackage -Name "Microsoft.Copilot" -AllUsers | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue }
             }
         }
         $btnApply.Content = "SELESAI DITERAPKAN!"
@@ -413,7 +409,6 @@ function Show-DnsGUI {
         }
         Clear-DnsClientCache
         
-        # Tampilkan Notifikasi Sukses
         [System.Windows.MessageBox]::Show("DNS berhasil diubah ke: $selection", "Sukses", "OK", "Information") | Out-Null
         $window.Close()
     })
@@ -504,7 +499,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.2.0" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.2.1" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>

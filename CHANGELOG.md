@@ -112,3 +112,6 @@
 ### Added
 - **Mega DNS Switcher:** Menambahkan 8 pilihan DNS (Google, Cloudflare, Cloudflare Malware, OpenDNS, Quad9, AdGuard) ke dalam antarmuka ComboBox.
 - **Security Updates Only:** Menambahkan opsi khusus di Update Manager untuk menunda fitur baru, namun tetap menerima pembaruan keamanan.
+## [3.2.1] - 2026-10-25
+### Added
+- **Mega Tweaks & Categories:** Menambahkan 38 Tweak (Essential & Advanced) sesuai referensi CTT, mencakup optimasi privasi, performa, UI, AI, dan pembersihan mendalam.
