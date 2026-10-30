@@ -1,4 +1,7 @@
-﻿if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+﻿$ErrorActionPreference = 'SilentlyContinue'
+Add-Type -AssemblyName PresentationFramework
+
+if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://raw.githubusercontent.com/elfadhildev/powershell-windows-admin-toolkit/main/toolkit.ps1 | iex`"" -Verb RunAs
     exit
 }
@@ -15,7 +18,7 @@ function Backup-RegistryTweaks {
 }
 
 # ==========================================
-# FUNGSI EKSEKUSI
+# FUNGSI EKSEKUSI (Akan dijalankan di jendela baru)
 # ==========================================
 function Invoke-Maintenance {
     Clear-Host; Write-Host "========== MAINTENANCE PC ==========" -ForegroundColor Cyan
@@ -154,13 +157,13 @@ function Invoke-EventLogAnalyzer {
 }
 
 # ==========================================
-# GUI (WPF) - ANTARMUKA v2.0.2
+# GUI (WPF) - ANTARMUKA v2.0.3
 # ==========================================
 function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v2.0.2" Height="600" Width="900"
+        Title="Panduan PowerShell - Control Panel v2.0.3" Height="600" Width="900"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
@@ -189,41 +192,41 @@ function Show-GUI {
     $btnEventLog = $window.FindName("BtnEventLog")
     $txtStatus = $window.FindName("TxtStatus")
 
-    # SOLUSI PASTI: Mengambil string kode fungsi menggunakan (Get-Command ...).Definition
+    # SOLUSI PASTI: Eksekusi fungsi di jendela baru
     $btnMaintenance.Add_Click({ 
         $txtStatus.Text = "Menjalankan Maintenance..."
         $cmd = (Get-Command Invoke-Maintenance).Definition
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -Verb RunAs 
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { $cmd; Invoke-Maintenance }" -Verb RunAs 
     })
 
     $btnAudit.Add_Click({ 
         $txtStatus.Text = "Menjalankan System Audit..."
         $cmd = (Get-Command Invoke-SystemAudit).Definition
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd 
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { $cmd; Invoke-SystemAudit }" 
     })
 
     $btnNetwork.Add_Click({ 
         $txtStatus.Text = "Menjalankan Network Diagnostics..."
         $cmd = (Get-Command Invoke-NetworkDiagnostics).Definition
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd 
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { $cmd; Invoke-NetworkDiagnostics }" 
     })
 
     $btnDebloater.Add_Click({ 
         $txtStatus.Text = "Menjalankan Debloater..."
         $cmd = (Get-Command Invoke-WindowsDebloater).Definition
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -Verb RunAs 
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { $cmd; Invoke-WindowsDebloater }" -Verb RunAs 
     })
 
     $btnTweaks.Add_Click({ 
         $txtStatus.Text = "Menjalankan System Tweaks..."
         $cmd = (Get-Command Invoke-SystemTweaks).Definition
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -Verb RunAs 
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { $cmd; Invoke-SystemTweaks }" -Verb RunAs 
     })
 
     $btnEventLog.Add_Click({ 
         $txtStatus.Text = "Menjalankan Event Log Analyzer..."
         $cmd = (Get-Command Invoke-EventLogAnalyzer).Definition
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd 
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { $cmd; Invoke-EventLogAnalyzer }" 
     })
 
     $window.ShowDialog() | Out-Null

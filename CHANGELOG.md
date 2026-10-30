@@ -58,3 +58,7 @@
 ## [2.0.2] - 2026-10-25
 ### Fixed
 - **GUI Parser Error:** Mengganti metode pemanggilan fungsi `.ToString()` dengan `(Get-Command ...).Definition` agar PowerShell tidak bingung saat membaca parameter fungsi yang memiliki tanda hubung.
+## [2.0.3] - 2026-10-25
+### Fixed
+- **WPF Assembly:** Menambahkan `Add-Type -AssemblyName PresentationFramework` agar kelas GUI bisa dimuat oleh PowerShell.
+- **Eksekusi Fungsi:** Memperbaiki pemanggilan fungsi di jendela baru menggunakan blok `& { $cmd; Invoke-Fungsi }`.
