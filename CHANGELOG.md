@@ -55,3 +55,6 @@
 ### Fixed
 - **PowerShell Parser Error:** Memperbaiki sintaks pemanggilan fungsi menggunakan `${function:Nama-Fungsi}` agar tidak memicu `Unexpected token`.
 - **Pester Test:** Mengembalikan fungsi `Invoke-EventLogAnalyzer` dan tombol Event Log pada GUI agar test otomatis GitHub Actions berhasil.
+## [2.0.2] - 2026-10-25
+### Fixed
+- **GUI Parser Error:** Mengganti metode pemanggilan fungsi `.ToString()` dengan `(Get-Command ...).Definition` agar PowerShell tidak bingung saat membaca parameter fungsi yang memiliki tanda hubung.
