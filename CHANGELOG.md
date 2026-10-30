@@ -51,3 +51,7 @@
 - **Major UI Update (GUI):** Mengubah antarmuka dari Command Line menjadi Graphical User Interface (WPF/XAML) berbasis Tile, terinspirasi dari Chris Titus WinUtil.
 - Menambahkan tombol interaktif (Maintenance, Audit, Network, Debloater, Tweaks) yang dapat diklik dengan mouse.
 - Menggunakan Dark Mode modern dengan border tipis.
+## [2.0.1] - 2026-10-25
+### Fixed
+- **PowerShell Parser Error:** Memperbaiki sintaks pemanggilan fungsi menggunakan `${function:Nama-Fungsi}` agar tidak memicu `Unexpected token`.
+- **Pester Test:** Mengembalikan fungsi `Invoke-EventLogAnalyzer` dan tombol Event Log pada GUI agar test otomatis GitHub Actions berhasil.
