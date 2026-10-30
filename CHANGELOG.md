@@ -70,3 +70,9 @@
 ### Fixed
 - **String Escaping:** Menggunakan Base64 Encoding untuk mengirim isi fungsi ke jendela baru agar terhindar dari error `Missing expression after ','`.
 - **IEX Comment Bug:** Menghapus komentar di baris pertama skrip agar `irm | iex` tidak memicu error `# is not recognized`.
+## [2.1.0] - 2026-10-25
+### Fixed
+- **GUI Execution Ultimate:** Menggunakan `-EncodedCommand` dengan Base64 UTF-16LE untuk mengirim fungsi ke jendela baru secara utuh, bebas dari error tanda kutip.
+- **Dependency Injection:** Menyertakan fungsi pendukung (seperti `Backup-RegistryTweaks`) ke dalam Base64 agar tidak error saat dipanggil di jendela baru.
+- **Event Log Restore:** Mengembalikan isi fungsi `Invoke-EventLogAnalyzer` yang sempat kosong.
+- **BOM Removal:** Menyimpan file tanpa BOM untuk mencegah error `$ErrorActionPreference` saat dijalankan via `irm | iex`.

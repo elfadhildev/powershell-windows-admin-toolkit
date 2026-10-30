@@ -1,6 +1,4 @@
-﻿$ErrorActionPreference = 'SilentlyContinue'
 Add-Type -AssemblyName PresentationFramework
-
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
     Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://raw.githubusercontent.com/elfadhildev/powershell-windows-admin-toolkit/main/toolkit.ps1 | iex`"" -Verb RunAs
@@ -146,16 +144,55 @@ function Invoke-SystemTweaks {
 }
 
 function Invoke-EventLogAnalyzer {
-    Clear-Host; Write-Host "========== SMART EVENT LOG ANALYZER ==========" -ForegroundColor Cyan
-    Write-Host "Fitur Event Log Analyzer berjalan di sini (Sama seperti versi sebelumnya)."
-    Read-Host "`nTekan Enter untuk kembali..."
+    do {
+        Clear-Host; Write-Host "========== SMART EVENT LOG ANALYZER ==========" -ForegroundColor Cyan
+        Write-Host "[+] Memindai Event Log (7 Hari Terakhir)..." -ForegroundColor Yellow
+        $events = Get-WinEvent -FilterHashtable @{LogName='System','Application'; Level=1,2; StartTime=(Get-Date).AddDays(-7)} -ErrorAction SilentlyContinue
+        
+        if (-not $events) { Write-Host "`n[+] Luar biasa! Tidak ada Error/Critical." -ForegroundColor Green; Read-Host "`nTekan Enter..."; return }
+        $summary = $events | Group-Object ProviderName | Sort-Object Count -Descending | Select-Object -First 10
+        Write-Host "`n[!] Ditemukan $($events.Count) error. Berikut Top 10 Penyebab:" -ForegroundColor Red
+        $i = 0; $summary | ForEach-Object { $i++; Write-Host "[$i] $($_.Name) ($($_.Count) kali)" -ForegroundColor Gray }
+        
+        Write-Host "===================================================" -ForegroundColor Cyan
+        Write-Host "Ketik nomor untuk melihat detail, atau 'x' kembali." -ForegroundColor Yellow
+        $choice = Read-Host "Pilih"
+        if ($choice -eq 'x' -or $choice -eq '') { return }
+
+        $selectedItem = $summary[$choice - 1]
+        if ($selectedItem) {
+            $provider = $selectedItem.Name
+            Clear-Host; Write-Host "========== DETAIL ERROR: $provider ==========" -ForegroundColor Cyan
+            $details = $events | Where-Object { $_.ProviderName -eq $provider } | Select-Object -First 3
+            foreach ($d in $details) { Write-Host "Waktu  : $($d.TimeCreated)" -ForegroundColor DarkGray; Write-Host "ID     : $($d.Id)"; Write-Host "Pesan  : $($d.Message -replace "`r`n", ' ')" -ForegroundColor White; Write-Host "---------------------------------------------------" }
+            Write-Host "`n[💡] SARAN PERBAIKAN:" -ForegroundColor Yellow
+            $fixAction = $null
+            switch -Wildcard ($provider) {
+                "*DistributedCOM*" { Write-Host "Error 10016 SANGAT UMUM dan biasanya aman diabaikan." -ForegroundColor Green }
+                "*Service Control Manager*" { Write-Host "Service gagal berjalan. Disarankan: Repair System (SFC)." -ForegroundColor Red; $fixAction = "SFC" }
+                "*VSS*" { Write-Host "VSS gagal buat Restore Point. Disarankan: Repair System (SFC)." -ForegroundColor Red; $fixAction = "SFC" }
+                "*CAPI2*" { Write-Host "CAPI2 gagal validasi update. Disarankan: Reset Update Cache." -ForegroundColor Red; $fixAction = "Update" }
+                Default { Write-Host "Error spesifik tidak diketahui. Abaikan jika PC normal." -ForegroundColor Gray }
+            }
+            Write-Host "`n===================================================" -ForegroundColor Cyan
+            if ($fixAction -eq "SFC") {
+                Write-Host "1. Jalankan Repair System (SFC & DISM) sekarang`n2. Kembali"
+                $action = Read-Host "`nPilih (1-2)"
+                if ($action -eq '1') { Start-Process cmd -ArgumentList "/c sfc /scannow" -Wait -NoNewWindow; Start-Process cmd -ArgumentList "/c DISM /Online /Cleanup-Image /RestoreHealth" -Wait -NoNewWindow }
+            } elseif ($fixAction -eq "Update") {
+                Write-Host "1. Reset Update Cache sekarang`n2. Kembali"
+                $action = Read-Host "`nPilih (1-2)"
+                if ($action -eq '1') { Stop-Service -Name wuauserv, cryptSvc, bits, msiserver -Force -ErrorAction SilentlyContinue; Remove-Item -Path "C:\Windows\SoftwareDistribution\*" -Recurse -Force -ErrorAction SilentlyContinue; Start-Service -Name wuauserv, cryptSvc, bits, msiserver -ErrorAction SilentlyContinue }
+            } else { Read-Host "`nTekan Enter untuk kembali..." }
+        }
+    } while ($true)
 }
 
 function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v2.0.5" Height="600" Width="900"
+        Title="Panduan PowerShell - Control Panel v2.1.0" Height="600" Width="900"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
@@ -186,45 +223,45 @@ function Show-GUI {
 
     $btnMaintenance.Add_Click({ 
         $txtStatus.Text = "Menjalankan Maintenance..."
-        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Invoke-Maintenance).Definition))
-        $cmd = "`$f = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64')); Invoke-Expression `$f; Invoke-Maintenance"
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -Verb RunAs 
+        $s = (Get-Command Invoke-Maintenance).ScriptBlock.ToString()
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; Invoke-Maintenance }"))
+        Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 -Verb RunAs 
     })
 
     $btnAudit.Add_Click({ 
         $txtStatus.Text = "Menjalankan System Audit..."
-        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Invoke-SystemAudit).Definition))
-        $cmd = "`$f = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64')); Invoke-Expression `$f; Invoke-SystemAudit"
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd 
+        $s = (Get-Command Invoke-SystemAudit).ScriptBlock.ToString()
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; Invoke-SystemAudit }"))
+        Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 
     })
 
     $btnNetwork.Add_Click({ 
         $txtStatus.Text = "Menjalankan Network Diagnostics..."
-        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Invoke-NetworkDiagnostics).Definition))
-        $cmd = "`$f = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64')); Invoke-Expression `$f; Invoke-NetworkDiagnostics"
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd 
+        $s = (Get-Command Invoke-NetworkDiagnostics).ScriptBlock.ToString()
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; Invoke-NetworkDiagnostics }"))
+        Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 
     })
 
     $btnDebloater.Add_Click({ 
         $txtStatus.Text = "Menjalankan Debloater..."
-        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Invoke-WindowsDebloater).Definition))
-        $cmd = "`$f = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64')); Invoke-Expression `$f; Invoke-WindowsDebloater"
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -Verb RunAs 
+        $s = (Get-Command Invoke-WindowsDebloater).ScriptBlock.ToString()
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; Invoke-WindowsDebloater }"))
+        Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 -Verb RunAs 
     })
 
     $btnTweaks.Add_Click({ 
         $txtStatus.Text = "Menjalankan System Tweaks..."
-        $b64_1 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Backup-RegistryTweaks).Definition))
-        $b64_2 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Invoke-SystemTweaks).Definition))
-        $cmd = "`$f1 = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64_1')); Invoke-Expression `$f1; `$f2 = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64_2')); Invoke-Expression `$f2; Invoke-SystemTweaks"
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -Verb RunAs 
+        $s1 = (Get-Command Backup-RegistryTweaks).ScriptBlock.ToString()
+        $s2 = (Get-Command Invoke-SystemTweaks).ScriptBlock.ToString()
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s1 ; $s2 ; Invoke-SystemTweaks }"))
+        Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 -Verb RunAs 
     })
 
     $btnEventLog.Add_Click({ 
         $txtStatus.Text = "Menjalankan Event Log Analyzer..."
-        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Invoke-EventLogAnalyzer).Definition))
-        $cmd = "`$f = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64')); Invoke-Expression `$f; Invoke-EventLogAnalyzer"
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd 
+        $s = (Get-Command Invoke-EventLogAnalyzer).ScriptBlock.ToString()
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; Invoke-EventLogAnalyzer }"))
+        Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 
     })
 
     $window.ShowDialog() | Out-Null
