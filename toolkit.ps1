@@ -108,6 +108,53 @@ $Global:DebloatList = @(
 )
 
 # ==========================================
+# DATA TWEAKS MEGA LIST (Escaped Ampersands)
+# ==========================================
+$Global:TweakList = @(
+    # Essential Tweaks (18)
+    [PSCustomObject]@{ Id=1; Cat='Essential'; Name='Activity History - Disable'; Action='Activity' },
+    [PSCustomObject]@{ Id=2; Cat='Essential'; Name='BitLocker - Disable'; Action='BitLocker' },
+    [PSCustomObject]@{ Id=3; Cat='Essential'; Name='ConsumerFeatures - Disable'; Action='Consumer' },
+    [PSCustomObject]@{ Id=4; Cat='Essential'; Name='Delivery Optimization - Disable'; Action='DeliveryOpt' },
+    [PSCustomObject]@{ Id=5; Cat='Essential'; Name='Disk Cleanup - Run'; Action='DiskCleanup' },
+    [PSCustomObject]@{ Id=6; Cat='Essential'; Name='End Task With Right Click - Enable'; Action='EndTask' },
+    [PSCustomObject]@{ Id=7; Cat='Essential'; Name='File Explorer Automatic Folder Discovery - Disable'; Action='AutoFolder' },
+    [PSCustomObject]@{ Id=8; Cat='Essential'; Name='Hibernation - Disable'; Action='Hibernation' },
+    [PSCustomObject]@{ Id=9; Cat='Essential'; Name='Location Tracking - Disable'; Action='Location' },
+    [PSCustomObject]@{ Id=10; Cat='Essential'; Name='Microsoft Store Recommended Search Results - Disable'; Action='StoreSearch' },
+    [PSCustomObject]@{ Id=11; Cat='Essential'; Name='Prevent Device Companion Apps'; Action='PreventCompanion' },
+    [PSCustomObject]@{ Id=12; Cat='Essential'; Name='Restore Point - Create'; Action='RestorePoint' },
+    [PSCustomObject]@{ Id=13; Cat='Essential'; Name='Services - Set to Manual'; Action='ServicesManual' },
+    [PSCustomObject]@{ Id=14; Cat='Essential'; Name='Start Menu Previous Layout - Enable'; Action='StartMenuLayout' },
+    [PSCustomObject]@{ Id=15; Cat='Essential'; Name='Telemetry - Disable'; Action='Telemetry' },
+    [PSCustomObject]@{ Id=16; Cat='Essential'; Name='Temporary Files - Remove'; Action='TempFiles' },
+    [PSCustomObject]@{ Id=17; Cat='Essential'; Name='Widgets - Remove'; Action='Widgets' },
+    [PSCustomObject]@{ Id=18; Cat='Essential'; Name='Windows Platform Binary Table (WPBT) - Disable'; Action='WPBT' },
+
+    # Advanced Tweaks - CAUTION (20) - Ampersands Escaped!
+    [PSCustomObject]@{ Id=19; Cat='Advanced'; Name='Adobe URL Block List - Enable'; Action='AdobeBlock' },
+    [PSCustomObject]@{ Id=20; Cat='Advanced'; Name='Background Apps - Disable'; Action='BgApps' },
+    [PSCustomObject]@{ Id=21; Cat='Advanced'; Name='Brave Browser - Debloat'; Action='BraveDebloat' },
+    [PSCustomObject]@{ Id=22; Cat='Advanced'; Name='Date &amp; Time - Set Time to UTC'; Action='UTC' },
+    [PSCustomObject]@{ Id=23; Cat='Advanced'; Name='Disable Reserved Storage'; Action='Reserved' },
+    [PSCustomObject]@{ Id=24; Cat='Advanced'; Name='File Explorer Home and Gallery - Disable'; Action='FileExplorerHome' },
+    [PSCustomObject]@{ Id=25; Cat='Advanced'; Name='IPv6 - Disable'; Action='IPv6' },
+    [PSCustomObject]@{ Id=26; Cat='Advanced'; Name='IPv6 - Set IPv4 as Preferred'; Action='IPv4Pref' },
+    [PSCustomObject]@{ Id=27; Cat='Advanced'; Name='Logitech Download Assistant Auto-Install - Disable'; Action='Logitech' },
+    [PSCustomObject]@{ Id=28; Cat='Advanced'; Name='Microsoft Edge - Debloat'; Action='EdgeDebloat' },
+    [PSCustomObject]@{ Id=29; Cat='Advanced'; Name='Microsoft Edge - Remove'; Action='EdgeRemove' },
+    [PSCustomObject]@{ Id=30; Cat='Advanced'; Name='Microsoft OneDrive - Remove'; Action='OneDrive' },
+    [PSCustomObject]@{ Id=31; Cat='Advanced'; Name='Razer Software Auto-Install - Disable'; Action='Razer' },
+    [PSCustomObject]@{ Id=32; Cat='Advanced'; Name='RDP Unsigned File Warnings - Disable'; Action='RDPWarn' },
+    [PSCustomObject]@{ Id=33; Cat='Advanced'; Name='Right-Click Menu Previous Layout - Enable'; Action='RightClickMenu' },
+    [PSCustomObject]@{ Id=34; Cat='Advanced'; Name='Storage Sense - Disable'; Action='StorageSense' },
+    [PSCustomObject]@{ Id=35; Cat='Advanced'; Name='System Tray Notifications &amp; Calendar - Disable'; Action='Notifications' },
+    [PSCustomObject]@{ Id=36; Cat='Advanced'; Name='Teredo - Disable'; Action='Teredo' },
+    [PSCustomObject]@{ Id=37; Cat='Advanced'; Name='Visual Effects - Set to Best Performance'; Action='VisualFX' },
+    [PSCustomObject]@{ Id=38; Cat='Advanced'; Name='Windows AI - Disable And Remove'; Action='WindowsAI' }
+)
+
+# ==========================================
 # FUNGSI GUI: DEEP CLEAN MAINTENANCE
 # ==========================================
 function Show-MaintenanceGUI {
@@ -181,7 +228,8 @@ function Show-TweaksGUI {
         <TabControl Grid.Row="0" Name="TabMain" Background="#1E1E1E" BorderBrush="#3F3F46">
 "@
     foreach ($cat in $categories) {
-        $xamlStr += "<TabItem Header='$cat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10'>"
+        $safeCat = $cat -replace '&', '&amp;'
+        $xamlStr += "<TabItem Header='$safeCat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10'>"
         $items = $Global:TweakList | Where-Object { $_.Cat -eq $cat }
         foreach ($item in $items) {
             $safeName = $item.Name -replace '&', '&amp;'
@@ -262,57 +310,6 @@ function Show-TweaksGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: TABBED APPS
-# ==========================================
-function Show-AppsGUI {
-    $categories = $Global:AppList.Cat | Sort-Object -Unique
-    $xamlStr = @"
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Install Applications" Height="700" Width="600"
-        WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
-    <Grid Margin="15">
-        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-        <TabControl Grid.Row="0" Name="TabMain" Background="#1E1E1E" BorderBrush="#3F3F46">
-"@
-    foreach ($cat in $categories) {
-        $xamlStr += "<TabItem Header='$cat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10'>"
-        $items = $Global:AppList | Where-Object { $_.Cat -eq $cat }
-        foreach ($item in $items) {
-            $safeName = $item.Name -replace '&', '&amp;'
-            $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$safeName' Foreground='White' Margin='0,8,0,8'/>"
-        }
-        $xamlStr += "</StackPanel></ScrollViewer></TabItem>"
-    }
-    $xamlStr += @"
-        </TabControl>
-        <Button Grid.Row="1" Name="BtnInstall" Content="INSTALL SELECTED APPS" Width="250" Height="40" Background="#0078D7" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,15,0,0" HorizontalAlignment="Center"/>
-    </Grid>
-</Window>
-"@
-    $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xamlStr))
-    $window = [Windows.Markup.XamlReader]::Load($reader)
-    $btnInstall = $window.FindName("BtnInstall")
-
-    $btnInstall.Add_Click({
-        $btnInstall.Content = "INSTALLING... (Cek Terminal)"
-        $btnInstall.IsEnabled = $false
-        $selected = @()
-        foreach ($app in $Global:AppList) {
-            $chk = $window.FindName("Chk_$($app.Id)")
-            if ($chk.IsChecked -eq $true) { $selected += $app.Pkg }
-        }
-        if ($selected.Count -gt 0) {
-            foreach ($pkg in $selected) {
-                Start-Process powershell -ArgumentList "-NoExit", "-Command", "winget install --id $pkg --accept-source-agreements --accept-package-agreements"
-            }
-        }
-        $window.Close()
-    })
-    $window.ShowDialog() | Out-Null
-}
-
-# ==========================================
 # FUNGSI GUI: DEBLOATER (KATEGORI & TOMBOL SELECT)
 # ==========================================
 function Show-DebloaterGUI {
@@ -335,7 +332,8 @@ function Show-DebloaterGUI {
         <TabControl Grid.Row="1" Name="TabMain" Background="#1E1E1E" BorderBrush="#3F3F46">
 "@
     foreach ($cat in $categories) {
-        $xamlStr += "<TabItem Header='$cat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10'>"
+        $safeCat = $cat -replace '&', '&amp;'
+        $xamlStr += "<TabItem Header='$safeCat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10'>"
         $items = $Global:DebloatList | Where-Object { $_.Cat -eq $cat }
         foreach ($item in $items) {
             $safeName = $item.Name -replace '&', '&amp;'
@@ -388,6 +386,58 @@ function Show-DebloaterGUI {
         }
         $btnRemove.Content = "SELESAI DIBERSIHKAN!"
         Start-Sleep -Seconds 1
+        $window.Close()
+    })
+    $window.ShowDialog() | Out-Null
+}
+
+# ==========================================
+# FUNGSI GUI: TABBED APPS
+# ==========================================
+function Show-AppsGUI {
+    $categories = $Global:AppList.Cat | Sort-Object -Unique
+    $xamlStr = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Install Applications" Height="700" Width="600"
+        WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
+    <Grid Margin="15">
+        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TabControl Grid.Row="0" Name="TabMain" Background="#1E1E1E" BorderBrush="#3F3F46">
+"@
+    foreach ($cat in $categories) {
+        $safeCat = $cat -replace '&', '&amp;'
+        $xamlStr += "<TabItem Header='$safeCat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10'>"
+        $items = $Global:AppList | Where-Object { $_.Cat -eq $cat }
+        foreach ($item in $items) {
+            $safeName = $item.Name -replace '&', '&amp;'
+            $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$safeName' Foreground='White' Margin='0,8,0,8'/>"
+        }
+        $xamlStr += "</StackPanel></ScrollViewer></TabItem>"
+    }
+    $xamlStr += @"
+        </TabControl>
+        <Button Grid.Row="1" Name="BtnInstall" Content="INSTALL SELECTED APPS" Width="250" Height="40" Background="#0078D7" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,15,0,0" HorizontalAlignment="Center"/>
+    </Grid>
+</Window>
+"@
+    $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xamlStr))
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+    $btnInstall = $window.FindName("BtnInstall")
+
+    $btnInstall.Add_Click({
+        $btnInstall.Content = "INSTALLING... (Cek Terminal)"
+        $btnInstall.IsEnabled = $false
+        $selected = @()
+        foreach ($app in $Global:AppList) {
+            $chk = $window.FindName("Chk_$($app.Id)")
+            if ($chk.IsChecked -eq $true) { $selected += $app.Pkg }
+        }
+        if ($selected.Count -gt 0) {
+            foreach ($pkg in $selected) {
+                Start-Process powershell -ArgumentList "-NoExit", "-Command", "winget install --id $pkg --accept-source-agreements --accept-package-agreements"
+            }
+        }
         $window.Close()
     })
     $window.ShowDialog() | Out-Null
@@ -539,7 +589,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.2.3" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.2.4" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>

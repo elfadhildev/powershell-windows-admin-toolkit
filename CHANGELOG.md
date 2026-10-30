@@ -122,3 +122,7 @@
 ### Fixed
 - **Debloater List Kosong:** Mengisi `$Global:DebloatList` dengan 35 paket bloatware Windows 11 yang dikategorikan (Microsoft Apps, Bing & Web Services, Developer Tools, Xbox & Gaming, Utilities & Productivity).
 - **Fitur Tambahan:** Menambahkan tombol "Select All" dan "Clear Selection" pada GUI Debloater untuk memudahkan pemilihan massal.
+## [3.2.4] - 2026-10-25
+### Fixed
+- **XAML EntityName Error:** Meng-escape karakter `&` menjadi `&amp;` pada nama kategori Debloater (`Bing & Web Services`, `Xbox & Gaming`, `Utilities & Productivity`) dan nama item.
+- **Tweaks Panel Kosong:** Memastikan `$Global:TweakList` terdefinisi dengan benar dan tersedia di dalam fungsi `Show-TweaksGUI` sebelum loop pembuatan CheckBox.
