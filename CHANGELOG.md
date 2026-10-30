@@ -66,3 +66,7 @@
 ### Fixed
 - **irm|iex Compatibility:** Menggunakan `[scriptblock]::Create` untuk mencegah error `if is not recognized` saat skrip dijalankan dari URL.
 - **WPF Assembly:** Memuat `PresentationFramework` dengan `-PassThru` agar kelas `XamlReader` selalu tersedia.
+## [2.0.5] - 2026-10-25
+### Fixed
+- **String Escaping:** Menggunakan Base64 Encoding untuk mengirim isi fungsi ke jendela baru agar terhindar dari error `Missing expression after ','`.
+- **IEX Comment Bug:** Menghapus komentar di baris pertama skrip agar `irm | iex` tidak memicu error `# is not recognized`.

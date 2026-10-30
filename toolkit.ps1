@@ -1,16 +1,12 @@
-﻿# Memuat Assembly WPF dengan cara yang paling andal
-Add-Type -AssemblyName PresentationFramework -PassThru | Out-Null
+﻿$ErrorActionPreference = 'SilentlyContinue'
+Add-Type -AssemblyName PresentationFramework
 
-# Cek Admin (dibungkus agar aman saat dieksekusi via irm|iex)
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
-    Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -Command `"& ([scriptblock]::Create((irm https://raw.githubusercontent.com/elfadhildev/powershell-windows-admin-toolkit/main/toolkit.ps1)))`"" -Verb RunAs
+    Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -Command `"irm https://raw.githubusercontent.com/elfadhildev/powershell-windows-admin-toolkit/main/toolkit.ps1 | iex`"" -Verb RunAs
     exit
 }
 
-# ==========================================
-# FUNGSI BANTUAN
-# ==========================================
 function Backup-RegistryTweaks {
     $backupDir = "$env:USERPROFILE\Desktop\ToolkitRegistryBackup"
     if (-not (Test-Path $backupDir)) { New-Item -Path $backupDir -ItemType Directory -Force | Out-Null }
@@ -19,9 +15,6 @@ function Backup-RegistryTweaks {
     Start-Process cmd -ArgumentList "/c reg export `"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced`" `"$regFile`" /y" -Wait -NoNewWindow
 }
 
-# ==========================================
-# FUNGSI EKSEKUSI
-# ==========================================
 function Invoke-Maintenance {
     Clear-Host; Write-Host "========== MAINTENANCE PC ==========" -ForegroundColor Cyan
     Write-Host "[+] Membersihkan Cache DNS..." -ForegroundColor Yellow
@@ -158,14 +151,11 @@ function Invoke-EventLogAnalyzer {
     Read-Host "`nTekan Enter untuk kembali..."
 }
 
-# ==========================================
-# GUI (WPF)
-# ==========================================
 function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v2.0.4" Height="600" Width="900"
+        Title="Panduan PowerShell - Control Panel v2.0.5" Height="600" Width="900"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
@@ -194,12 +184,48 @@ function Show-GUI {
     $btnEventLog = $window.FindName("BtnEventLog")
     $txtStatus = $window.FindName("TxtStatus")
 
-    $btnMaintenance.Add_Click({ $txtStatus.Text = "Menjalankan Maintenance..."; $cmd = (Get-Command Invoke-Maintenance).Definition; Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { $cmd; Invoke-Maintenance }" -Verb RunAs })
-    $btnAudit.Add_Click({ $txtStatus.Text = "Menjalankan System Audit..."; $cmd = (Get-Command Invoke-SystemAudit).Definition; Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { $cmd; Invoke-SystemAudit }" })
-    $btnNetwork.Add_Click({ $txtStatus.Text = "Menjalankan Network Diagnostics..."; $cmd = (Get-Command Invoke-NetworkDiagnostics).Definition; Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { $cmd; Invoke-NetworkDiagnostics }" })
-    $btnDebloater.Add_Click({ $txtStatus.Text = "Menjalankan Debloater..."; $cmd = (Get-Command Invoke-WindowsDebloater).Definition; Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { $cmd; Invoke-WindowsDebloater }" -Verb RunAs })
-    $btnTweaks.Add_Click({ $txtStatus.Text = "Menjalankan System Tweaks..."; $cmd = (Get-Command Invoke-SystemTweaks).Definition; Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { $cmd; Invoke-SystemTweaks }" -Verb RunAs })
-    $btnEventLog.Add_Click({ $txtStatus.Text = "Menjalankan Event Log Analyzer..."; $cmd = (Get-Command Invoke-EventLogAnalyzer).Definition; Start-Process powershell -ArgumentList "-NoExit", "-Command", "& { $cmd; Invoke-EventLogAnalyzer }" })
+    $btnMaintenance.Add_Click({ 
+        $txtStatus.Text = "Menjalankan Maintenance..."
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Invoke-Maintenance).Definition))
+        $cmd = "`$f = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64')); Invoke-Expression `$f; Invoke-Maintenance"
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -Verb RunAs 
+    })
+
+    $btnAudit.Add_Click({ 
+        $txtStatus.Text = "Menjalankan System Audit..."
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Invoke-SystemAudit).Definition))
+        $cmd = "`$f = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64')); Invoke-Expression `$f; Invoke-SystemAudit"
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd 
+    })
+
+    $btnNetwork.Add_Click({ 
+        $txtStatus.Text = "Menjalankan Network Diagnostics..."
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Invoke-NetworkDiagnostics).Definition))
+        $cmd = "`$f = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64')); Invoke-Expression `$f; Invoke-NetworkDiagnostics"
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd 
+    })
+
+    $btnDebloater.Add_Click({ 
+        $txtStatus.Text = "Menjalankan Debloater..."
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Invoke-WindowsDebloater).Definition))
+        $cmd = "`$f = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64')); Invoke-Expression `$f; Invoke-WindowsDebloater"
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -Verb RunAs 
+    })
+
+    $btnTweaks.Add_Click({ 
+        $txtStatus.Text = "Menjalankan System Tweaks..."
+        $b64_1 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Backup-RegistryTweaks).Definition))
+        $b64_2 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Invoke-SystemTweaks).Definition))
+        $cmd = "`$f1 = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64_1')); Invoke-Expression `$f1; `$f2 = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64_2')); Invoke-Expression `$f2; Invoke-SystemTweaks"
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd -Verb RunAs 
+    })
+
+    $btnEventLog.Add_Click({ 
+        $txtStatus.Text = "Menjalankan Event Log Analyzer..."
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes((Get-Command Invoke-EventLogAnalyzer).Definition))
+        $cmd = "`$f = [System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String('$b64')); Invoke-Expression `$f; Invoke-EventLogAnalyzer"
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd 
+    })
 
     $window.ShowDialog() | Out-Null
 }
