@@ -21,27 +21,15 @@ function Invoke-Maintenance {
     Clear-Host
     Write-Host "========== MAINTENANCE PC ==========" -ForegroundColor Cyan
     Write-Host "[+] Memulai Maintenance..." -ForegroundColor Cyan
-    
     Write-Host "[1/3] Membersihkan Cache DNS..." -ForegroundColor Yellow
     Clear-DnsClientCache; ipconfig /release | Out-Null; ipconfig /renew | Out-Null
-    Write-Host " -> Cache DNS & IP berhasil diperbarui." -ForegroundColor Green
-
     Write-Host "[2/3] Membersihkan File Sementara..." -ForegroundColor Yellow
     $TempFolders = @("$env:TEMP", "C:\Windows\Temp", "C:\Windows\Prefetch", "C:\Windows\SoftwareDistribution\Download")
     foreach ($Folder in $TempFolders) { if (Test-Path $Folder) { Get-ChildItem -Path $Folder -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue } }
     Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -NoNewWindow -Wait
-    Write-Host " -> File sementara dibersihkan." -ForegroundColor Green
-
     Write-Host "[3/3] Optimasi Drive C..." -ForegroundColor Yellow
-    Write-Host " -> Mendeteksi jenis drive..." -ForegroundColor Gray
     $DriveType = (Get-PhysicalDisk | Where-Object { $_.DeviceID -eq (Get-Partition -DriveLetter C).DiskNumber }).MediaType
-    if ($DriveType -eq "SSD") { 
-        Write-Host " -> SSD Terdeteksi. Menjalankan ReTrim (Mohon tunggu)..." -ForegroundColor Gray
-        Optimize-Volume -DriveLetter C -ReTrim | Out-Null 
-    } else { 
-        Write-Host " -> HDD Terdeteksi. Menjalankan Defrag (Mohon tunggu)..." -ForegroundColor Gray
-        Optimize-Volume -DriveLetter C -Defrag | Out-Null
-    }
+    if ($DriveType -eq "SSD") { Optimize-Volume -DriveLetter C -ReTrim | Out-Null } else { Optimize-Volume -DriveLetter C -Defrag | Out-Null }
     Write-Host " -> Optimasi selesai." -ForegroundColor Green
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
@@ -49,67 +37,34 @@ function Invoke-Maintenance {
 function Invoke-SystemAudit {
     Clear-Host; Write-Host "========== SISTEM AUDIT ==========" -ForegroundColor Cyan
     $os = Get-CimInstance Win32_OperatingSystem; $cpu = Get-CimInstance Win32_Processor; $ram = [math]::Round((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1GB, 2)
-    
-    $report = "=== SYSTEM AUDIT ===`nOS: $($os.Caption) | CPU: $($cpu.Name) | RAM: $ram GB`n"
+    $report = "OS: $($os.Caption) | CPU: $($cpu.Name) | RAM: $ram GB`n"
     Write-Host " OS: $($os.Caption) | CPU: $($cpu.Name) | RAM: $ram GB"
-
     $lic = Get-CimInstance SoftwareLicensingProduct | Where-Object { $_.PartialProductKey }
     if ($lic.LicenseStatus -eq 1) { $report += "Lisensi: Windows Teraktivasi`n"; Write-Host " Lisensi: Windows Teraktivasi" -ForegroundColor Green } else { $report += "Lisensi: Belum Teraktivasi`n"; Write-Host " Lisensi: Belum Teraktivasi" -ForegroundColor Red }
-    
     Write-Host "`n[+] Storage:" -ForegroundColor Yellow
     $disks = Get-PhysicalDisk | Select-Object DeviceId, FriendlyName, MediaType, HealthStatus, @{N='Size(GB)';E={[math]::Round($_.Size/1GB,2)}}
     $disks | Format-Table -AutoSize
     $report += "`n[Storage]`n" + ($disks | Out-String)
-
     Write-Host "[+] Driver Bermasalah:" -ForegroundColor Yellow
     $badDrivers = Get-PnpDevice -PresentOnly | Where-Object { $_.Status -ne "OK" }
-    if ($badDrivers) {
-        $badDrivers | Select-Object Class, FriendlyName, Status | Format-Table -AutoSize
-        $report += "`n[Driver Bermasalah]`n" + ($badDrivers | Select-Object Class, FriendlyName, Status | Out-String)
-    } else {
-        Write-Host " -> Semua driver berstatus OK." -ForegroundColor Green
-        $report += "`n[Driver Bermasalah] Semua driver berstatus OK.`n"
-    }
-
-    Write-Host "`n[🛡️] Anda bisa menyimpan laporan ini ke dalam file teks." -ForegroundColor Yellow
-    $save = Read-Host "Simpan laporan ke Desktop? (y/n)"
-    if ($save -eq 'y') {
-        $file = "$env:USERPROFILE\Desktop\System_Audit_$(Get-Date -Format 'yyyyMMdd_HHmmss').txt"
-        $report | Out-File -FilePath $file -Encoding UTF8
-        Write-Host "[+] Laporan disimpan di: $file" -ForegroundColor Green
-    }
+    if ($badDrivers) { $badDrivers | Select-Object Class, FriendlyName, Status | Format-Table -AutoSize; $report += "`n[Driver]`n" + ($badDrivers | Out-String) } else { Write-Host " -> Semua driver OK." -ForegroundColor Green; $report += "`n[Driver] Semua OK.`n" }
+    $save = Read-Host "`nSimpan laporan ke Desktop? (y/n)"
+    if ($save -eq 'y') { $file = "$env:USERPROFILE\Desktop\System_Audit_$(Get-Date -Format 'yyyyMMdd_HHmmss').txt"; $report | Out-File -FilePath $file -Encoding UTF8; Write-Host "[+] Laporan disimpan di: $file" -ForegroundColor Green }
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
 function Invoke-NetworkDiagnostics {
     $ErrorActionPreference = 'SilentlyContinue'; Clear-Host
     Write-Host "========== DIAGNOSTIK JARINGAN ==========" -ForegroundColor Cyan
-    
     Write-Host "`n[+] Konfigurasi IP & DNS:" -ForegroundColor Yellow
     Get-NetIPConfiguration | Where-Object { $_.IPv4Address } | Select-Object InterfaceAlias, IPv4Address, @{N='Gateway';E={$_.IPv4DefaultGateway.NextHop}}, @{N='DNS';E={$_.DNSServer.ServerAddresses -join ', '}} | Format-List
-
-    Write-Host "[+] Koneksi Internet Aktif (Established):" -ForegroundColor Yellow
-    Get-NetTCPConnection -State Established | ForEach-Object {
-        $Process = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue
-        [PSCustomObject]@{
-            LocalPort  = $_.LocalPort
-            RemoteAddr = $_.RemoteAddress
-            RemotePort = $_.RemotePort
-            Process    = if($Process){$Process.ProcessName}else{'<unknown>'}
-            PID        = $_.OwningProcess
-        }
-    } | Sort-Object Process | Format-Table -AutoSize
-
-    Write-Host "[+] Tes Resolusi DNS (google.com):" -ForegroundColor Yellow
-    $dns = Resolve-DnsName -Name "google.com" -Type A -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($dns) { Write-Host " -> Berhasil: google.com -> $($dns.IPAddress)" -ForegroundColor Green } else { Write-Host " -> Gagal melakukan resolusi DNS!" -ForegroundColor Red }
-
+    Write-Host "[+] Koneksi Aktif (Established):" -ForegroundColor Yellow
+    Get-NetTCPConnection -State Established | ForEach-Object { $Process = Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue; [PSCustomObject]@{ LocalPort=$_.LocalPort; RemoteAddr=$_.RemoteAddress; RemotePort=$_.RemotePort; Process=if($Process){$Process.ProcessName}else{'<unknown>'}; PID=$_.OwningProcess } } | Sort-Object Process | Format-Table -AutoSize
     Read-Host "`nTekan Enter untuk kembali ke menu..."
 }
 
 function Invoke-BackupUserProfile {
-    Clear-Host
-    Write-Host "========== BACKUP PROFIL USER ==========" -ForegroundColor Cyan
+    Clear-Host; Write-Host "========== BACKUP PROFIL USER ==========" -ForegroundColor Cyan
     $DestinationFolder = Join-Path -Path 'D:\Backup_PC' -ChildPath "Backup_$(Get-Date -Format 'yyyy-MM-dd')"
     $FoldersToBackup = @('Documents', 'Pictures', 'Desktop', 'Downloads', 'Music', 'Videos', 'AppData\Roaming', 'AppData\Local\Packages')
     $ExcludeFolders = @('Cache', 'Temp', 'CrashDumps', 'GPUCache', 'Microsoft\Windows\INetCache')
@@ -120,94 +75,158 @@ function Invoke-BackupUserProfile {
 }
 
 # ==========================================
-# 5. WINGET APP INSTALLER (KATEGORI - CTT STYLE)
+# 5. WINGET APP INSTALLER (MEGA UPDATE)
 # ==========================================
 function Invoke-WingetAppInstaller {
     $apps = @(
         # Browsers
-        [PSCustomObject]@{ Cat='Browsers'; Name='Google Chrome'; Id='Google.Chrome' },
-        [PSCustomObject]@{ Cat='Browsers'; Name='Mozilla Firefox'; Id='Mozilla.Firefox' },
         [PSCustomObject]@{ Cat='Browsers'; Name='Brave'; Id='Brave.Brave' },
-        [PSCustomObject]@{ Cat='Browsers'; Name='Microsoft Edge'; Id='Microsoft.Edge' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Chrome'; Id='Google.Chrome' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Chromium'; Id='Hibbiki.Chromium' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Edge'; Id='Microsoft.Edge' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Firefox'; Id='Mozilla.Firefox' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Firefox ESR'; Id='Mozilla.Firefox.ESR' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Floorp'; Id='Ablaze.Floorp' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='LibreWolf'; Id='LibreWolf.LibreWolf' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Mullvad Browser'; Id='Mullvad.MullvadBrowser' },
         [PSCustomObject]@{ Cat='Browsers'; Name='Opera GX'; Id='Opera.OperaGX' },
         [PSCustomObject]@{ Cat='Browsers'; Name='Tor Browser'; Id='TorProject.TorBrowser' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Ungoogled Chromium'; Id='eloston.ungoogled-chromium' },
         [PSCustomObject]@{ Cat='Browsers'; Name='Vivaldi'; Id='Vivaldi.Vivaldi' },
-        [PSCustomObject]@{ Cat='Browsers'; Name='LibreWolf'; Id='LibreWolf.LibreWolf' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Waterfox'; Id='Waterfox.Waterfox' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Zen Browser'; Id='Zen-Team.Zen-Browser' },
 
         # Communications
+        [PSCustomObject]@{ Cat='Communications'; Name='Betterbird'; Id='Betterbird.Betterbird' },
         [PSCustomObject]@{ Cat='Communications'; Name='Discord'; Id='Discord.Discord' },
-        [PSCustomObject]@{ Cat='Communications'; Name='Zoom'; Id='Zoom.Zoom' },
-        [PSCustomObject]@{ Cat='Communications'; Name='Telegram Desktop'; Id='Telegram.TelegramDesktop' },
-        [PSCustomObject]@{ Cat='Communications'; Name='WhatsApp'; Id='WhatsApp.WhatsApp' },
-        [PSCustomObject]@{ Cat='Communications'; Name='Slack'; Id='SlackTechnologies.Slack' },
-        [PSCustomObject]@{ Cat='Communications'; Name='Microsoft Teams'; Id='Microsoft.Teams' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Element'; Id='Element.Element' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Proton Mail'; Id='Proton.ProtonMail' },
         [PSCustomObject]@{ Cat='Communications'; Name='Signal'; Id='OpenWhisperSystems.Signal' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Slack'; Id='SlackTechnologies.Slack' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Teams'; Id='Microsoft.Teams' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Telegram'; Id='Telegram.TelegramDesktop' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Viber'; Id='Viber.Viber' },
+        [PSCustomObject]@{ Cat='Communications'; Name='WhatsApp'; Id='WhatsApp.WhatsApp' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Zoom'; Id='Zoom.Zoom' },
 
         # Development
-        [PSCustomObject]@{ Cat='Development'; Name='Visual Studio Code'; Id='Microsoft.VisualStudioCode' },
-        [PSCustomObject]@{ Cat='Development'; Name='Git'; Id='Git.Git' },
-        [PSCustomObject]@{ Cat='Development'; Name='Python 3'; Id='Python.Python.3.12' },
-        [PSCustomObject]@{ Cat='Development'; Name='Node.js'; Id='OpenJS.NodeJS' },
+        [PSCustomObject]@{ Cat='Development'; Name='Bruno'; Id='Bruno.Bruno' },
+        [PSCustomObject]@{ Cat='Development'; Name='CMake'; Id='Kitware.CMake' },
         [PSCustomObject]@{ Cat='Development'; Name='Docker Desktop'; Id='Docker.DockerDesktop' },
-        [PSCustomObject]@{ Cat='Development'; Name='Postman'; Id='Postman.Postman' },
+        [PSCustomObject]@{ Cat='Development'; Name='Git'; Id='Git.Git' },
+        [PSCustomObject]@{ Cat='Development'; Name='GitHub CLI'; Id='GitHub.cli' },
         [PSCustomObject]@{ Cat='Development'; Name='GitHub Desktop'; Id='GitHub.GitHubDesktop' },
+        [PSCustomObject]@{ Cat='Development'; Name='Go'; Id='GoLang.Go' },
+        [PSCustomObject]@{ Cat='Development'; Name='JetBrains Toolbox'; Id='JetBrains.Toolbox' },
+        [PSCustomObject]@{ Cat='Development'; Name='Lazygit'; Id='JesseDuffield.lazygit' },
         [PSCustomObject]@{ Cat='Development'; Name='Neovim'; Id='Neovim.Neovim' },
+        [PSCustomObject]@{ Cat='Development'; Name='Node.js'; Id='OpenJS.NodeJS' },
+        [PSCustomObject]@{ Cat='Development'; Name='Node.js LTS'; Id='OpenJS.NodeJS.LTS' },
+        [PSCustomObject]@{ Cat='Development'; Name='Postman'; Id='Postman.Postman' },
+        [PSCustomObject]@{ Cat='Development'; Name='Python 3'; Id='Python.Python.3.12' },
+        [PSCustomObject]@{ Cat='Development'; Name='Ruby'; Id='RubyInstallerTeam.Ruby' },
+        [PSCustomObject]@{ Cat='Development'; Name='Rust'; Id='Rustlang.Rustup' },
+        [PSCustomObject]@{ Cat='Development'; Name='Sublime Text'; Id='SublimeHQ.SublimeText.4' },
+        [PSCustomObject]@{ Cat='Development'; Name='Unity Game Engine'; Id='Unity.UnityHub' },
+        [PSCustomObject]@{ Cat='Development'; Name='Visual Studio 2022'; Id='Microsoft.VisualStudio.2022.Community' },
+        [PSCustomObject]@{ Cat='Development'; Name='VS Code'; Id='Microsoft.VisualStudioCode' },
+        [PSCustomObject]@{ Cat='Development'; Name='Zed'; Id='ZedIndustries.Zed' },
 
-        # Document & Office
-        [PSCustomObject]@{ Cat='Document'; Name='LibreOffice'; Id='TheDocumentFoundation.LibreOffice' },
-        [PSCustomObject]@{ Cat='Document'; Name='ONLYOFFICE'; Id='ONLYOFFICE.DesktopEditors' },
+        # Document
         [PSCustomObject]@{ Cat='Document'; Name='Adobe Acrobat Reader'; Id='Adobe.Acrobat.Reader.64-bit' },
-        [PSCustomObject]@{ Cat='Document'; Name='Sumatra PDF'; Id='SumatraPDF.SumatraPDF' },
+        [PSCustomObject]@{ Cat='Document'; Name='Foxit PDF Reader'; Id='Foxit.FoxitReader' },
+        [PSCustomObject]@{ Cat='Document'; Name='Joplin'; Id='Joplin.Joplin' },
+        [PSCustomObject]@{ Cat='Document'; Name='LibreOffice'; Id='TheDocumentFoundation.LibreOffice' },
         [PSCustomObject]@{ Cat='Document'; Name='Obsidian'; Id='Obsidian.Obsidian' },
+        [PSCustomObject]@{ Cat='Document'; Name='ONLYOFFICE Desktop'; Id='ONLYOFFICE.DesktopEditors' },
         [PSCustomObject]@{ Cat='Document'; Name='PDF24 Creator'; Id='PDF24.PDF24Creator' },
+        [PSCustomObject]@{ Cat='Document'; Name='Sumatra PDF'; Id='SumatraPDF.SumatraPDF' },
+        [PSCustomObject]@{ Cat='Document'; Name='Zotero'; Id='DigitalScholar.Zotero' },
 
         # Games
-        [PSCustomObject]@{ Cat='Games'; Name='Steam'; Id='Valve.Steam' },
-        [PSCustomObject]@{ Cat='Games'; Name='Epic Games Launcher'; Id='EpicGames.EpicGamesLauncher' },
         [PSCustomObject]@{ Cat='Games'; Name='Battle.net'; Id='Blizzard.BattleNet' },
+        [PSCustomObject]@{ Cat='Games'; Name='EA App'; Id='ElectronicArts.EADesktop' },
+        [PSCustomObject]@{ Cat='Games'; Name='Epic Games Launcher'; Id='EpicGames.EpicGamesLauncher' },
+        [PSCustomObject]@{ Cat='Games'; Name='GeForce NOW'; Id='Nvidia.GeForceNow' },
         [PSCustomObject]@{ Cat='Games'; Name='GOG Galaxy'; Id='GOG.Galaxy' },
+        [PSCustomObject]@{ Cat='Games'; Name='Heroic Games Launcher'; Id='HeroicGamesLauncher.HeroicGamesLauncher' },
         [PSCustomObject]@{ Cat='Games'; Name='Playnite'; Id='Playnite.Playnite' },
+        [PSCustomObject]@{ Cat='Games'; Name='Prism Launcher'; Id='PrismLauncher.PrismLauncher' },
+        [PSCustomObject]@{ Cat='Games'; Name='Steam'; Id='Valve.Steam' },
+        [PSCustomObject]@{ Cat='Games'; Name='Ubisoft Connect'; Id='Ubisoft.Connect' },
 
         # Microsoft Tools
+        [PSCustomObject]@{ Cat='Microsoft'; Name='Autoruns'; Id='Microsoft.Sysinternals.Autoruns' },
+        [PSCustomObject]@{ Cat='Microsoft'; Name='.NET Runtime 8'; Id='Microsoft.DotNet.Runtime.8' },
+        [PSCustomObject]@{ Cat='Microsoft'; Name='OneDrive'; Id='Microsoft.OneDrive' },
+        [PSCustomObject]@{ Cat='Microsoft'; Name='PowerShell'; Id='Microsoft.PowerShell' },
         [PSCustomObject]@{ Cat='Microsoft'; Name='PowerToys'; Id='Microsoft.PowerToys' },
+        [PSCustomObject]@{ Cat='Microsoft'; Name='Process Explorer'; Id='Microsoft.Sysinternals.ProcessExplorer' },
+        [PSCustomObject]@{ Cat='Microsoft'; Name='Process Monitor'; Id='Microsoft.Sysinternals.ProcessMonitor' },
         [PSCustomObject]@{ Cat='Microsoft'; Name='Windows Terminal'; Id='Microsoft.WindowsTerminal' },
-        [PSCustomObject]@{ Cat='Microsoft'; Name='Sysinternals Suite'; Id='Microsoft.Sysinternals' },
-        [PSCustomObject]@{ Cat='Microsoft'; Name='.NET Desktop Runtime 8'; Id='Microsoft.DotNet.DesktopRuntime.8' },
+        [PSCustomObject]@{ Cat='Microsoft'; Name='Visual C++ 2015-2022'; Id='Microsoft.VCRedist.2015+.x64' },
 
         # Multimedia
-        [PSCustomObject]@{ Cat='Multimedia'; Name='VLC Media Player'; Id='VideoLAN.VLC' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='Spotify'; Id='Spotify.Spotify' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='OBS Studio'; Id='OBSProject.OBSStudio' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='GIMP'; Id='GIMP.GIMP' },
         [PSCustomObject]@{ Cat='Multimedia'; Name='Audacity'; Id='Audacity.Audacity' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='Blender'; Id='BlenderFoundation.Blender' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='Calibre'; Id='calibre.calibre' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='GIMP'; Id='GIMP.GIMP' },
         [PSCustomObject]@{ Cat='Multimedia'; Name='HandBrake'; Id='HandBrake.HandBrake' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='ImageGlass'; Id='DuongDieuPhap.ImageGlass' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='IrfanView'; Id='IrfanSkiljan.IrfanView' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='iTunes'; Id='Apple.iTunes' },
         [PSCustomObject]@{ Cat='Multimedia'; Name='K-Lite Codec Standard'; Id='CodecGuide.K-LiteCodecPack.Standard' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='Notepad++'; Id='Notepad++.Notepad++' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='OBS Studio'; Id='OBSProject.OBSStudio' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='Paint.NET'; Id='dotPDN.PaintDotNet' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='ShareX'; Id='ShareX.ShareX' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='Spotify'; Id='Spotify.Spotify' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='VLC Media Player'; Id='VideoLAN.VLC' },
 
         # Pro Tools
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='Wireshark'; Id='WiresharkFoundation.Wireshark' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='Advanced IP Scanner'; Id='Famatech.AdvancedIPScanner' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='Cinebench R23'; Id='Maxon.CinebenchR23' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='CPU-Z'; Id='CPUID.CPU-Z' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='Display Driver Uninstaller'; Id='Wagnardsoft.DisplayDriverUninstaller' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='GPU-Z'; Id='TechPowerUp.GPU-Z' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='HWiNFO'; Id='REALiX.HWiNFO' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='HWMonitor'; Id='CPUID.HWMonitor' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='Mullvad VPN'; Id='Mullvad.MullvadVPN' },
         [PSCustomObject]@{ Cat='Pro Tools'; Name='Nmap'; Id='Insecure.Nmap' },
         [PSCustomObject]@{ Cat='Pro Tools'; Name='PuTTY'; Id='PuTTY.PuTTY' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='WinSCP'; Id='WinSCP.WinSCP' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='CPU-Z'; Id='CPUID.CPU-Z' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='GPU-Z'; Id='TechPowerUp.GPU-Z' },
         [PSCustomObject]@{ Cat='Pro Tools'; Name='Ventoy'; Id='Ventoy.Ventoy' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='WinSCP'; Id='WinSCP.WinSCP' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='Wireshark'; Id='WiresharkFoundation.Wireshark' },
 
         # Utilities
+        [PSCustomObject]@{ Cat='Utilities'; Name='1Password'; Id='AgileBits.1Password' },
         [PSCustomObject]@{ Cat='Utilities'; Name='7-Zip'; Id='7zip.7zip' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='WinRAR'; Id='RARLab.WinRAR' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='Everything'; Id='voidtools.Everything' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='Rufus'; Id='Rufus.Rufus' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='TeamViewer'; Id='TeamViewer.TeamViewer' },
         [PSCustomObject]@{ Cat='Utilities'; Name='AnyDesk'; Id='AnyDeskSoftwareGmbH.AnyDesk' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='AutoHotkey'; Id='AutoHotkey.AutoHotkey' },
         [PSCustomObject]@{ Cat='Utilities'; Name='Bitwarden'; Id='Bitwarden.Bitwarden' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='KeePassXC'; Id='KeePassXCTeam.KeePassXC' }
+        [PSCustomObject]@{ Cat='Utilities'; Name='Bulk Crap Uninstaller'; Id='Klocman.BulkCrapUninstaller' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Crystal Disk Info'; Id='CrystalDewWorld.CrystalDiskInfo' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Dropbox'; Id='Dropbox.Dropbox' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Everything'; Id='voidtools.Everything' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Files'; Id='FilesCommunity.Files' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Google Drive'; Id='Google.Drive' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Internet Download Manager'; Id='Tonec.InternetDownloadManager' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='KeePassXC'; Id='KeePassXCTeam.KeePassXC' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='MSI Afterburner'; Id='Guru3D.Afterburner' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='NanaZip'; Id='M2Team.NanaZip' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='qBittorrent'; Id='qBittorrent.qBittorrent' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Revo Uninstaller'; Id='RevoUninstaller.RevoUninstaller' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Rufus'; Id='Rufus.Rufus' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Tailscale'; Id='tailscale.tailscale' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='TeamViewer'; Id='TeamViewer.TeamViewer' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='WinRAR'; Id='RARLab.WinRAR' }
     )
 
     $categories = $apps.Cat | Sort-Object -Unique
 
     do {
         Clear-Host
-        Write-Host "========== WINGET APP INSTALLER (KATEGORI) ==========" -ForegroundColor Cyan
+        Write-Host "========== WINGET APP INSTALLER (MEGA LIST) ==========" -ForegroundColor Cyan
         Write-Host "Pilih Kategori Aplikasi:" -ForegroundColor Yellow
         for ($i = 0; $i -lt $categories.Count; $i++) {
             Write-Host " $($i + 1). $($categories[$i])"
@@ -566,18 +585,18 @@ function Invoke-DnsSwitcher {
 }
 
 # ==========================================
-# MENU UTAMA (v1.9.8)
+# MENU UTAMA (v1.9.9)
 # ==========================================
 function Show-Menu {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.8      " -ForegroundColor Cyan
+    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.9      " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host " 1. Maintenance PC (Bersihkan & Optimasi)" -ForegroundColor Green
     Write-Host " 2. System Audit (Cek Hardware & OS)" -ForegroundColor Magenta
     Write-Host " 3. Network Diagnostics (Cek Jaringan)" -ForegroundColor Magenta
     Write-Host " 4. Backup Profil User" -ForegroundColor Green
-    Write-Host " 5. Install Aplikasi Populer (Winget - CTT Style)" -ForegroundColor Yellow
+    Write-Host " 5. Install Aplikasi Populer (Winget - MEGA LIST)" -ForegroundColor Yellow
     Write-Host " 6. Windows Debloater (Hapus Bloatware)" -ForegroundColor Yellow
     Write-Host " 7. Buat System Restore Point" -ForegroundColor Yellow
     Write-Host " 8. System Tweaks (Privasi & Performa)" -ForegroundColor Cyan

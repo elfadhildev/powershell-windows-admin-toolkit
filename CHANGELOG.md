@@ -37,3 +37,6 @@
 ## [1.9.8] - 2026-10-25
 ### Added
 - **Winget App Installer (CTT Style):** Merombak total menu instalasi (Opsi 5) menjadi berbasis kategori (Browsers, Communications, Development, dll) dan memperluas daftar aplikasi (50+ apps).
+## [1.9.9] - 2026-10-25
+### Added
+- **Mega Winget List:** Menambahkan lebih dari 100 aplikasi populer (Browsers, Communications, Development, Document, Games, Microsoft, Multimedia, Pro Tools, Utilities) ke dalam menu instalasi (Opsi 5) agar setara dengan Chris Titus WinUtil.
