@@ -56,7 +56,7 @@ function Invoke-EventLogAnalyzer {
 }
 
 # ==========================================
-# DATA TWEAKS MEGA LIST
+# DATA TWEAKS MEGA LIST (Escaped Ampersands)
 # ==========================================
 $Global:TweakList = @(
     # Essential Tweaks (18)
@@ -79,11 +79,11 @@ $Global:TweakList = @(
     [PSCustomObject]@{ Id=17; Cat='Essential'; Name='Widgets - Remove'; Action='Widgets' },
     [PSCustomObject]@{ Id=18; Cat='Essential'; Name='Windows Platform Binary Table (WPBT) - Disable'; Action='WPBT' },
 
-    # Advanced Tweaks - CAUTION (20)
+    # Advanced Tweaks - CAUTION (20) - Ampersands Escaped!
     [PSCustomObject]@{ Id=19; Cat='Advanced'; Name='Adobe URL Block List - Enable'; Action='AdobeBlock' },
     [PSCustomObject]@{ Id=20; Cat='Advanced'; Name='Background Apps - Disable'; Action='BgApps' },
     [PSCustomObject]@{ Id=21; Cat='Advanced'; Name='Brave Browser - Debloat'; Action='BraveDebloat' },
-    [PSCustomObject]@{ Id=22; Cat='Advanced'; Name='Date & Time - Set Time to UTC'; Action='UTC' },
+    [PSCustomObject]@{ Id=22; Cat='Advanced'; Name='Date &amp; Time - Set Time to UTC'; Action='UTC' },
     [PSCustomObject]@{ Id=23; Cat='Advanced'; Name='Disable Reserved Storage'; Action='Reserved' },
     [PSCustomObject]@{ Id=24; Cat='Advanced'; Name='File Explorer Home and Gallery - Disable'; Action='FileExplorerHome' },
     [PSCustomObject]@{ Id=25; Cat='Advanced'; Name='IPv6 - Disable'; Action='IPv6' },
@@ -96,7 +96,7 @@ $Global:TweakList = @(
     [PSCustomObject]@{ Id=32; Cat='Advanced'; Name='RDP Unsigned File Warnings - Disable'; Action='RDPWarn' },
     [PSCustomObject]@{ Id=33; Cat='Advanced'; Name='Right-Click Menu Previous Layout - Enable'; Action='RightClickMenu' },
     [PSCustomObject]@{ Id=34; Cat='Advanced'; Name='Storage Sense - Disable'; Action='StorageSense' },
-    [PSCustomObject]@{ Id=35; Cat='Advanced'; Name='System Tray Notifications & Calendar - Disable'; Action='Notifications' },
+    [PSCustomObject]@{ Id=35; Cat='Advanced'; Name='System Tray Notifications &amp; Calendar - Disable'; Action='Notifications' },
     [PSCustomObject]@{ Id=36; Cat='Advanced'; Name='Teredo - Disable'; Action='Teredo' },
     [PSCustomObject]@{ Id=37; Cat='Advanced'; Name='Visual Effects - Set to Best Performance'; Action='VisualFX' },
     [PSCustomObject]@{ Id=38; Cat='Advanced'; Name='Windows AI - Disable And Remove'; Action='WindowsAI' }
@@ -162,7 +162,7 @@ function Show-MaintenanceGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: TABBED TWEAKS (MEGA LIST)
+# FUNGSI GUI: TABBED TWEAKS
 # ==========================================
 function Show-TweaksGUI {
     $categories = $Global:TweakList.Cat | Sort-Object -Unique
@@ -179,7 +179,9 @@ function Show-TweaksGUI {
         $xamlStr += "<TabItem Header='$cat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10'>"
         $items = $Global:TweakList | Where-Object { $_.Cat -eq $cat }
         foreach ($item in $items) {
-            $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$($item.Name)' Foreground='White' Margin='0,8,0,8'/>"
+            # ANTI-ERROR: Pastikan karakter & diubah menjadi &amp; jika ada yang lolos
+            $safeName = $item.Name -replace '&', '&amp;'
+            $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$safeName' Foreground='White' Margin='0,8,0,8'/>"
         }
         $xamlStr += "</StackPanel></ScrollViewer></TabItem>"
     }
@@ -273,7 +275,8 @@ function Show-AppsGUI {
         $xamlStr += "<TabItem Header='$cat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10'>"
         $items = $Global:AppList | Where-Object { $_.Cat -eq $cat }
         foreach ($item in $items) {
-            $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$($item.Name)' Foreground='White' Margin='0,8,0,8'/>"
+            $safeName = $item.Name -replace '&', '&amp;'
+            $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$safeName' Foreground='White' Margin='0,8,0,8'/>"
         }
         $xamlStr += "</StackPanel></ScrollViewer></TabItem>"
     }
@@ -321,7 +324,8 @@ function Show-DebloaterGUI {
                 <TextBlock Text="Pilih aplikasi bawaan (bloatware) yang ingin dihapus:" FontSize="14" Margin="0,0,0,15" Foreground="Gray"/>
 "@
     foreach ($item in $Global:DebloatList) {
-        $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$($item.Name)' Foreground='White' Margin='0,8,0,8'/>"
+        $safeName = $item.Name -replace '&', '&amp;'
+        $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$safeName' Foreground='White' Margin='0,8,0,8'/>"
     }
     $xamlStr += @"
             </StackPanel>
@@ -499,7 +503,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.2.1" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.2.2" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>

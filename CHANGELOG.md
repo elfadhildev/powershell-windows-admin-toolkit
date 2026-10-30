@@ -115,3 +115,6 @@
 ## [3.2.1] - 2026-10-25
 ### Added
 - **Mega Tweaks & Categories:** Menambahkan 38 Tweak (Essential & Advanced) sesuai referensi CTT, mencakup optimasi privasi, performa, UI, AI, dan pembersihan mendalam.
+## [3.2.2] - 2026-10-25
+### Fixed
+- **XAML Ampersand Escaping:** Memperbaiki karakter `&` pada nama Tweak ("Date & Time" dan "Notifications & Calendar") menjadi `&amp;`. Menambahkan fungsi replace otomatis di dalam loop GUI agar tidak akan pernah error lagi jika ada karakter `&`.
