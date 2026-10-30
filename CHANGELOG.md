@@ -43,3 +43,6 @@
 ## [1.10.0] - 2026-10-25
 ### Added
 - **System Tweaks (CTT Style):** Merombak total Opsi 8. Sekarang mendukung multi-select (bisa pilih beberapa tweak sekaligus) dan dibagi menjadi kategori Essential dan Advanced Tweaks seperti di Chris Titus WinUtil.
+## [1.10.1] - 2026-10-25
+### Added
+- **System Tweaks Mega Update:** Menambahkan lebih dari 15 tweak baru (Essential & Advanced) untuk menyaingi CTT WinUtil. Mencakup tweak privasi, performa, UI, dan pembersihan sistem.

@@ -75,7 +75,7 @@ function Invoke-BackupUserProfile {
 }
 
 # ==========================================
-# 5. WINGET APP INSTALLER (MEGA UPDATE)
+# 5. WINGET APP INSTALLER
 # ==========================================
 function Invoke-WingetAppInstaller {
     $apps = @(
@@ -173,11 +173,11 @@ function Invoke-CreateRestorePoint {
 }
 
 # ==========================================
-# 8. SYSTEM TWEAKS (CTT STYLE - MULTI SELECT)
+# 8. SYSTEM TWEAKS (CTT MEGA UPDATE)
 # ==========================================
 function Invoke-SystemTweaks {
     Clear-Host
-    Write-Host "========== SYSTEM TWEAKS (CTT STYLE) ==========" -ForegroundColor Cyan
+    Write-Host "========== SYSTEM TWEAKS (CTT MEGA UPDATE) ==========" -ForegroundColor Cyan
     Backup-RegistryTweaks
 
     $tweaks = @(
@@ -191,12 +191,24 @@ function Invoke-SystemTweaks {
         [PSCustomObject]@{ Id=8; Cat='Essential'; Name='Show Hidden Files'; Action='Hidden' },
         [PSCustomObject]@{ Id=9; Cat='Essential'; Name='Create System Restore Point'; Action='Restore' },
         [PSCustomObject]@{ Id=10; Cat='Essential'; Name='Run Disk Cleanup'; Action='Cleanup' },
+        [PSCustomObject]@{ Id=11; Cat='Essential'; Name='Set Services to Manual'; Action='ServicesManual' },
+        [PSCustomObject]@{ Id=12; Cat='Essential'; Name='Disable GameDVR'; Action='GameDVR' },
+        [PSCustomObject]@{ Id=13; Cat='Essential'; Name='Disable Wi-Fi Sense'; Action='WifiSense' },
+        [PSCustomObject]@{ Id=14; Cat='Essential'; Name='Disable HomeGroup'; Action='HomeGroup' },
 
-        [PSCustomObject]@{ Id=11; Cat='Advanced'; Name='Disable Background Apps'; Action='BgApps' },
-        [PSCustomObject]@{ Id=12; Cat='Advanced'; Name='Disable Storage Sense'; Action='Storage' },
-        [PSCustomObject]@{ Id=13; Cat='Advanced'; Name='Disable Bing Search in Start Menu'; Action='Bing' },
-        [PSCustomObject]@{ Id=14; Cat='Advanced'; Name='Disable Game Bar'; Action='GameBar' },
-        [PSCustomObject]@{ Id=15; Cat='Advanced'; Name='Enable Ultimate Performance Power Plan'; Action='UltimatePerf' }
+        [PSCustomObject]@{ Id=15; Cat='Advanced'; Name='Disable Background Apps'; Action='BgApps' },
+        [PSCustomObject]@{ Id=16; Cat='Advanced'; Name='Disable Storage Sense'; Action='Storage' },
+        [PSCustomObject]@{ Id=17; Cat='Advanced'; Name='Disable Bing Search in Start Menu'; Action='Bing' },
+        [PSCustomObject]@{ Id=18; Cat='Advanced'; Name='Disable Game Bar'; Action='GameBar' },
+        [PSCustomObject]@{ Id=19; Cat='Advanced'; Name='Enable Ultimate Performance Power Plan'; Action='UltimatePerf' },
+        [PSCustomObject]@{ Id=20; Cat='Advanced'; Name='Disable Notification Tray/Calendar'; Action='Notifications' },
+        [PSCustomObject]@{ Id=21; Cat='Advanced'; Name='Disable Fullscreen Optimizations'; Action='FSO' },
+        [PSCustomObject]@{ Id=22; Cat='Advanced'; Name='Disable IPv6'; Action='IPv6' },
+        [PSCustomObject]@{ Id=23; Cat='Advanced'; Name='Disable Microsoft Edge Debloat'; Action='EdgeDebloat' },
+        [PSCustomObject]@{ Id=24; Cat='Advanced'; Name='Disable OneDrive'; Action='OneDrive' },
+        [PSCustomObject]@{ Id=25; Cat='Advanced'; Name='Disable Reserved Storage'; Action='Reserved' },
+        [PSCustomObject]@{ Id=26; Cat='Advanced'; Name='Set Time to UTC'; Action='UTC' },
+        [PSCustomObject]@{ Id=27; Cat='Advanced'; Name='Enable Adobe URL Block List'; Action='AdobeBlock' }
     )
 
     $essential = $tweaks | Where-Object { $_.Cat -eq 'Essential' }
@@ -209,7 +221,7 @@ function Invoke-SystemTweaks {
     foreach ($t in $advanced) { Write-Host " $($t.Id). $($t.Name)" }
 
     Write-Host "`n===================================================" -ForegroundColor Cyan
-    Write-Host "Pilih nomor tweak (pisahkan dengan koma, misal: 1,5,11), atau 'x' batal." -ForegroundColor Yellow
+    Write-Host "Pilih nomor tweak (pisahkan dengan koma, misal: 1,5,15), atau 'x' batal." -ForegroundColor Yellow
     $inputTweaks = Read-Host "Pilihan Anda"
 
     if ($inputTweaks -eq 'x' -or $inputTweaks -eq '') { return }
@@ -221,22 +233,67 @@ function Invoke-SystemTweaks {
         if ($t) {
             Write-Host " -> Menerapkan: $($t.Name)..." -ForegroundColor Yellow
             switch ($t.Action) {
-                'Telemetry' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
-                'Activity' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "EnableActivityFeed" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
-                'Consumer' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsConsumerFeatures" -Value 1 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
-                'Location' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableLocation" -Value 1 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
-                'Hibernate' { powercfg -h off; Write-Host "    Berhasil (Hibernasi dimatikan)." -ForegroundColor Green }
-                'EndTask' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" -Name "TaskbarEndTask" -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
-                'FileExt' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 0 -Type DWord; Write-Host "    Berhasil." -ForegroundColor Green }
-                'Hidden' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -Value 1 -Type DWord; Write-Host "    Berhasil." -ForegroundColor Green }
+                'Telemetry' { 
+                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                    Set-Service -Name DiagTrack -StartupType Disabled -ErrorAction SilentlyContinue
+                    Stop-Service -Name DiagTrack -Force -ErrorAction SilentlyContinue
+                }
+                'Activity' { 
+                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "EnableActivityFeed" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "PublishUserActivities" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "UploadUserActivities" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                }
+                'Consumer' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsConsumerFeatures" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
+                'Location' { 
+                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableLocation" -Value 1 -Type DWord -ErrorAction SilentlyContinue
+                    Set-Service -Name lfsvc -StartupType Disabled -ErrorAction SilentlyContinue
+                }
+                'Hibernate' { 
+                    Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Session Manager\Power" -Name "HibernateEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                    powercfg -h off 
+                }
+                'EndTask' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" -Name "TaskbarEndTask" -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue }
+                'FileExt' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 0 -Type DWord }
+                'Hidden' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -Value 1 -Type DWord }
                 'Restore' { Invoke-CreateRestorePoint }
-                'Cleanup' { Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -NoNewWindow -Wait; Write-Host "    Berhasil." -ForegroundColor Green }
-                'BgApps' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Name "GlobalUserDisabled" -Value 1 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
-                'Storage' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy" -Name "01" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
-                'Bing' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "BingSearchEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
-                'GameBar' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\GameBar" -Name "AutoGameModeEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
-                'UltimatePerf' { powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61; Write-Host "    Berhasil (Ultimate Performance Plan ditambahkan)." -ForegroundColor Green }
+                'Cleanup' { Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -NoNewWindow -Wait }
+                'ServicesManual' {
+                    $services = @("DiagTrack", "dmwappushservice", "MapsBroker", "RetailDemo", "WSearch")
+                    foreach ($svc in $services) { Set-Service -Name $svc -StartupType Manual -ErrorAction SilentlyContinue }
+                }
+                'GameDVR' { Set-ItemProperty -Path "HKCU:\System\GameConfigStore" -Name "GameDVR_Enabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'WifiSense' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\WcmSvc\wifinetworkmanager\config" -Name "AutoConnectAllowedOEM" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'HomeGroup' { Set-Service -Name HomeGroupListener -StartupType Manual -ErrorAction SilentlyContinue; Set-Service -Name HomeGroupProvider -StartupType Manual -ErrorAction SilentlyContinue }
+                
+                'BgApps' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Name "GlobalUserDisabled" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
+                'Storage' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy" -Name "01" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'Bing' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "BingSearchEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'GameBar' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\GameBar" -Name "AutoGameModeEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+                'UltimatePerf' { powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 }
+                'Notifications' { 
+                    Set-ItemProperty -Path "HKCU:\Software\Policies\Microsoft\Windows\Explorer" -Name "DisableNotificationCenter" -Value 1 -Type DWord -ErrorAction SilentlyContinue
+                    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications" -Name "ToastEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                }
+                'FSO' { 
+                    Set-ItemProperty -Path "HKCU:\System\GameConfigStore" -Name "GameDVR_FSEBehaviorMode" -Value 2 -Type DWord -ErrorAction SilentlyContinue
+                    Set-ItemProperty -Path "HKCU:\System\GameConfigStore" -Name "GameDVR_HonorUserFSEBehaviorMode" -Value 1 -Type DWord -ErrorAction SilentlyContinue
+                }
+                'IPv6' { Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\TCPIP6\Parameters" -Name "DisabledComponents" -Value 0xFF -Type DWord -ErrorAction SilentlyContinue }
+                'EdgeDebloat' { 
+                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Edge" -Name "EdgeShoppingAssistantEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Edge" -Name "ShowRecommendationsEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                }
+                'OneDrive' { 
+                    Stop-Process -Name "OneDrive" -Force -ErrorAction SilentlyContinue
+                    Start-Process "C:\Windows\System32\OneDriveSetup.exe" -ArgumentList "/uninstall" -Wait -ErrorAction SilentlyContinue
+                }
+                'Reserved' { Set-WindowsReservedStorageState -State Disabled -ErrorAction SilentlyContinue }
+                'UTC' { Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation" -Name "RealTimeIsUniversal" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
+                'AdobeBlock' { 
+                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Adobe\Adobe Acrobat\DC\FeatureLockDown" -Name "bEnableAcrobatDocumentCloud" -Value 0 -Type DWord -ErrorAction SilentlyContinue
+                }
             }
+            Write-Host "    Berhasil." -ForegroundColor Green
         }
     }
 
@@ -494,12 +551,12 @@ function Invoke-DnsSwitcher {
 }
 
 # ==========================================
-# MENU UTAMA (v1.10.0)
+# MENU UTAMA (v1.10.1)
 # ==========================================
 function Show-Menu {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.10.0     " -ForegroundColor Cyan
+    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.10.1     " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host " 1. Maintenance PC (Bersihkan & Optimasi)" -ForegroundColor Green
     Write-Host " 2. System Audit (Cek Hardware & OS)" -ForegroundColor Magenta
@@ -508,7 +565,7 @@ function Show-Menu {
     Write-Host " 5. Install Aplikasi Populer (Winget - MEGA LIST)" -ForegroundColor Yellow
     Write-Host " 6. Windows Debloater (Hapus Bloatware)" -ForegroundColor Yellow
     Write-Host " 7. Buat System Restore Point" -ForegroundColor Yellow
-    Write-Host " 8. System Tweaks (CTT STYLE - Multi Select)" -ForegroundColor Cyan
+    Write-Host " 8. System Tweaks (CTT STYLE - Mega List)" -ForegroundColor Cyan
     Write-Host " 9. One-Click Fixes (Perbaikan Sistem)" -ForegroundColor Cyan
     Write-Host "10. Windows Update Manager" -ForegroundColor Cyan
     Write-Host "11. AUTOMATION PRESETS (Setup Cepat)" -ForegroundColor Magenta
