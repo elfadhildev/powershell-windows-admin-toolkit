@@ -46,3 +46,8 @@
 ## [1.10.1] - 2026-10-25
 ### Added
 - **System Tweaks Mega Update:** Menambahkan lebih dari 15 tweak baru (Essential & Advanced) untuk menyaingi CTT WinUtil. Mencakup tweak privasi, performa, UI, dan pembersihan sistem.
+## [2.0.0] - 2026-10-25
+### Added
+- **Major UI Update (GUI):** Mengubah antarmuka dari Command Line menjadi Graphical User Interface (WPF/XAML) berbasis Tile, terinspirasi dari Chris Titus WinUtil.
+- Menambahkan tombol interaktif (Maintenance, Audit, Network, Debloater, Tweaks) yang dapat diklik dengan mouse.
+- Menggunakan Dark Mode modern dengan border tipis.
