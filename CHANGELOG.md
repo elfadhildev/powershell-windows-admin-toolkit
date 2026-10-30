@@ -108,3 +108,7 @@
 ### Fixed
 - **Dialog Return Value:** Memperbaiki fungsi `Show-CustomDialog` agar mengembalikan nilai pilihan tombol dengan benar menggunakan `Hashtable` dan `GetNewClosure()`.
 - **Update Manager, DNS, & Backup:** Memastikan perintah (Pause Update, Ganti DNS, Export/Import) benar-benar dieksekusi setelah pengguna memilih opsi di dialog.
+## [3.2.0] - 2026-10-25
+### Added
+- **Mega DNS Switcher:** Menambahkan 8 pilihan DNS (Google, Cloudflare, Cloudflare Malware, OpenDNS, Quad9, AdGuard) ke dalam antarmuka ComboBox.
+- **Security Updates Only:** Menambahkan opsi khusus di Update Manager untuk menunda fitur baru, namun tetap menerima pembaruan keamanan.

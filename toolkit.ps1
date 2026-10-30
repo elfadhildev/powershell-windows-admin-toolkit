@@ -6,7 +6,7 @@ if (-not $isAdmin) {
 }
 
 # ==========================================
-# FUNGSI CLI
+# FUNGSI CLI (Wajib ada untuk Pester & Jendela Baru)
 # ==========================================
 function Invoke-Maintenance {
     Write-Host "Maintenance CLI berjalan (Untuk Pester Test)..."
@@ -358,57 +358,129 @@ function Show-DebloaterGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: UTILITY MELEWAH (Dark Mode) - FIXED RETURN
+# FUNGSI GUI: DNS SWITCHER (MEGA UPDATE)
 # ==========================================
-function Show-CustomDialog($title, $message, $buttons) {
+function Show-DnsGUI {
     $xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="$title" Height="250" Width="450"
+        Title="DNS Switcher" Height="350" Width="500"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White" WindowStyle="ToolWindow">
     <Grid Margin="20">
-        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="$message" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center"/>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Pilih Penyedia DNS:" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+        <ComboBox Grid.Row="1" Name="CmbDns" Background="#2D2D30" Foreground="Black" Height="35" FontSize="14" Margin="0,0,0,15">
+            <ComboBoxItem Content="Default (DHCP)" IsSelected="True"/>
+            <ComboBoxItem Content="Google (8.8.8.8)"/>
+            <ComboBoxItem Content="Cloudflare (1.1.1.1)"/>
+            <ComboBoxItem Content="Cloudflare Malware (1.1.1.2)"/>
+            <ComboBoxItem Content="Cloudflare Malware+Adult (1.1.1.3)"/>
+            <ComboBoxItem Content="OpenDNS (208.67.222.222)"/>
+            <ComboBoxItem Content="Quad9 (9.9.9.9)"/>
+            <ComboBoxItem Content="AdGuard Ads+Trackers (94.140.14.14)"/>
+            <ComboBoxItem Content="AdGuard Ads+Malware+Adult (94.140.14.15)"/>
+        </ComboBox>
+        <TextBlock Grid.Row="2" Text="Catatan: Mengubah DNS dapat mempercepat internet dan memblokir iklan/malware." FontSize="12" Foreground="Gray" TextWrapping="Wrap"/>
+        <Button Grid.Row="3" Name="BtnApplyDns" Content="APPLY DNS" Width="150" Height="40" Background="#0078D7" Foreground="White" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center"/>
+    </Grid>
+</Window>
 "@
-    foreach ($b in $buttons) {
-        $xaml += "<Button Name='Btn_$($b.Value)' Content='$($b.Label)' Width='100' Height='35' Margin='10,0' Background='#0078D7' Foreground='White' FontWeight='Bold'/>"
-    }
-    $xaml += "</StackPanel></Grid></Window>"
-    
     $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xaml))
     $window = [Windows.Markup.XamlReader]::Load($reader)
-    
-    # Menggunakan Hashtable untuk menyimpan hasil (Pass by reference)
-    $resultBag = @{ Value = $null }
+    $cmb = $window.FindName("CmbDns")
+    $btn = $window.FindName("BtnApplyDns")
 
-    foreach ($b in $buttons) {
-        $btn = $window.FindName("Btn_$($b.Value)")
-        $val = $b.Value
-        $btn.Add_Click({ 
-            $resultBag.Value = $val
-            $window.Close() 
-        }.GetNewClosure()) # GetNewClosure penting agar $resultBag dan $val terikat
-    }
-    
+    $btn.Add_Click({
+        $selection = $cmb.SelectedItem.Content.ToString()
+        $dns1 = ""; $dns2 = ""
+        
+        switch -Wildcard ($selection) {
+            "*Google*" { $dns1 = "8.8.8.8"; $dns2 = "8.8.4.4" }
+            "*Cloudflare (1.1.1.1)*" { $dns1 = "1.1.1.1"; $dns2 = "1.0.0.1" }
+            "*Cloudflare Malware (1.1.1.2)*" { $dns1 = "1.1.1.2"; $dns2 = "1.0.0.2" }
+            "*Cloudflare Malware+Adult*" { $dns1 = "1.1.1.3"; $dns2 = "1.0.0.3" }
+            "*OpenDNS*" { $dns1 = "208.67.222.222"; $dns2 = "208.67.220.220" }
+            "*Quad9*" { $dns1 = "9.9.9.9"; $dns2 = "149.112.112.112" }
+            "*AdGuard Ads+Trackers*" { $dns1 = "94.140.14.14"; $dns2 = "94.140.15.15" }
+            "*AdGuard Ads+Malware+Adult*" { $dns1 = "94.140.14.15"; $dns2 = "94.140.15.16" }
+        }
+
+        $adapters = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
+        if ($selection -match "Default") { 
+            foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ResetServerAddresses } 
+        } else {
+            foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ($dns1, $dns2) }
+        }
+        Clear-DnsClientCache
+        
+        # Tampilkan Notifikasi Sukses
+        [System.Windows.MessageBox]::Show("DNS berhasil diubah ke: $selection", "Sukses", "OK", "Information") | Out-Null
+        $window.Close()
+    })
     $window.ShowDialog() | Out-Null
-    return $resultBag.Value
 }
 
-function Show-DnsGUI {
-    $res = Show-CustomDialog "DNS Switcher" "Pilih penyedia DNS:`nCloudflare (Tercepat)`nGoogle (Stabil)`nReset ke DHCP (Otomatis)" @([PSCustomObject]@{Label='Cloudflare';Value='CF'}, [PSCustomObject]@{Label='Google';Value='GOOG'}, [PSCustomObject]@{Label='Reset';Value='DHCP'})
-    $adapters = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
-    if ($res -eq 'CF') { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("1.1.1.1","1.0.0.1") }; Clear-DnsClientCache; Show-CustomDialog "Sukses" "DNS Cloudflare Diterapkan." @([PSCustomObject]@{Label='OK';Value='OK'}) }
-    elseif ($res -eq 'GOOG') { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("8.8.8.8","8.8.4.4") }; Clear-DnsClientCache; Show-CustomDialog "Sukses" "DNS Google Diterapkan." @([PSCustomObject]@{Label='OK';Value='OK'}) }
-    elseif ($res -eq 'DHCP') { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ResetServerAddresses }; Clear-DnsClientCache; Show-CustomDialog "Sukses" "DNS Direset ke DHCP." @([PSCustomObject]@{Label='OK';Value='OK'}) }
-}
-
+# ==========================================
+# FUNGSI GUI: UPDATE MANAGER (SECURITY ONLY)
+# ==========================================
 function Show-UpdateGUI {
-    $res = Show-CustomDialog "Update Manager" "Pilih aksi pembaruan Windows:`nPause 1 Tahun (Aman)`nPause 50 Tahun (Ekstrem)`nResume (Kembalikan Normal)" @([PSCustomObject]@{Label='Pause 1 Tahun';Value='1Y'}, [PSCustomObject]@{Label='Pause 50 Thn';Value='50Y'}, [PSCustomObject]@{Label='Resume';Value='RESUME'})
+    $xaml = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Update Manager" Height="350" Width="500"
+        WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White" WindowStyle="ToolWindow">
+    <Grid Margin="20">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Pilih Aksi Pembaruan Windows:" FontSize="16" FontWeight="Bold" Margin="0,0,0,15"/>
+        <StackPanel Grid.Row="1">
+            <Button Name="BtnPause1" Content="Pause 1 Tahun (Aman)" Height="40" Margin="0,5" Background="#2D2D30" Foreground="White"/>
+            <Button Name="BtnPause50" Content="Pause 50 Tahun (Ekstrem)" Height="40" Margin="0,5" Background="#2D2D30" Foreground="White"/>
+            <Button Name="BtnSecurity" Content="Security Updates Only (Hanya Keamanan)" Height="40" Margin="0,5" Background="#107C10" Foreground="White" FontWeight="Bold"/>
+            <Button Name="BtnResume" Content="Resume Normal Updates" Height="40" Margin="0,5" Background="#2D2D30" Foreground="White"/>
+        </StackPanel>
+        <Button Grid.Row="2" Name="BtnCancel" Content="Batal" Width="100" Height="30" Background="#D83B01" Foreground="White" Margin="0,15,0,0" HorizontalAlignment="Right"/>
+    </Grid>
+</Window>
+"@
+    $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xaml))
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+    $btnPause1 = $window.FindName("BtnPause1")
+    $btnPause50 = $window.FindName("BtnPause50")
+    $btnSecurity = $window.FindName("BtnSecurity")
+    $btnResume = $window.FindName("BtnResume")
+    $btnCancel = $window.FindName("BtnCancel")
+
     $UpdateKey = "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings"; if (-not (Test-Path $UpdateKey)) { New-Item -Path $UpdateKey -Force | Out-Null }
-    if ($res -eq '1Y') { Set-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -Value 365 -Type DWord; Set-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -Value (Get-Date).AddDays(365).ToString("yyyy-MM-ddTHH:mm:ssZ"); Show-CustomDialog "Sukses" "Update dijeda 1 tahun." @([PSCustomObject]@{Label='OK';Value='OK'}) }
-    elseif ($res -eq '50Y') { Set-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -Value 18250 -Type DWord; Set-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -Value (Get-Date).AddYears(50).ToString("yyyy-MM-ddTHH:mm:ssZ"); Show-CustomDialog "Sukses" "Update dijeda 50 tahun." @([PSCustomObject]@{Label='OK';Value='OK'}) }
-    elseif ($res -eq 'RESUME') { Remove-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -ErrorAction SilentlyContinue; Remove-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -ErrorAction SilentlyContinue; Show-CustomDialog "Sukses" "Update dilanjutkan." @([PSCustomObject]@{Label='OK';Value='OK'}) }
+
+    $btnPause1.Add_Click({ 
+        Set-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -Value 365 -Type DWord
+        Set-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -Value (Get-Date).AddDays(365).ToString("yyyy-MM-ddTHH:mm:ssZ")
+        [System.Windows.MessageBox]::Show("Update dijeda 1 tahun.", "Sukses") | Out-Null
+        $window.Close() 
+    })
+    $btnPause50.Add_Click({ 
+        Set-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -Value 18250 -Type DWord
+        Set-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -Value (Get-Date).AddYears(50).ToString("yyyy-MM-ddTHH:mm:ssZ")
+        [System.Windows.MessageBox]::Show("Update dijeda 50 tahun.", "Sukses") | Out-Null
+        $window.Close() 
+    })
+    $btnSecurity.Add_Click({ 
+        Set-ItemProperty -Path $UpdateKey -Name "DeferFeatureUpdates" -Value 1 -Type DWord
+        Set-ItemProperty -Path $UpdateKey -Name "DeferFeatureUpdatesPeriodInDays" -Value 365 -Type DWord
+        [System.Windows.MessageBox]::Show("Hanya update keamanan yang akan diinstal (Feature update ditunda 1 tahun).", "Sukses") | Out-Null
+        $window.Close() 
+    })
+    $btnResume.Add_Click({ 
+        Remove-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -ErrorAction SilentlyContinue
+        Remove-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -ErrorAction SilentlyContinue
+        Remove-ItemProperty -Path $UpdateKey -Name "DeferFeatureUpdates" -ErrorAction SilentlyContinue
+        Remove-ItemProperty -Path $UpdateKey -Name "DeferFeatureUpdatesPeriodInDays" -ErrorAction SilentlyContinue
+        [System.Windows.MessageBox]::Show("Update dilanjutkan seperti normal.", "Sukses") | Out-Null
+        $window.Close() 
+    })
+    $btnCancel.Add_Click({ $window.Close() })
+
+    $window.ShowDialog() | Out-Null
 }
 
 function Show-BackupGUI {
@@ -432,7 +504,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.1.4" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.2.0" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
