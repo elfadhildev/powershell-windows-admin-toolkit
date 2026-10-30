@@ -120,23 +120,139 @@ function Invoke-BackupUserProfile {
 }
 
 # ==========================================
-# FUNGSI 5-7: INSTALLER & DEBLOATER
+# 5. WINGET APP INSTALLER (KATEGORI - CTT STYLE)
 # ==========================================
 function Invoke-WingetAppInstaller {
-    Clear-Host; Write-Host "========== WINGET APP INSTALLER ==========" -ForegroundColor Cyan
-    Write-Host "1. Chrome       2. Firefox      3. Brave        4. Opera GX" -ForegroundColor Magenta
-    Write-Host "5. VLC          6. Spotify      7. iTunes       8. OBS Studio" -ForegroundColor Magenta
-    Write-Host "9. Discord     10. Zoom        11. Telegram    12. WhatsApp" -ForegroundColor Magenta
-    Write-Host "13. 7-Zip      14. WinRAR      15. PowerToys   16. Everything" -ForegroundColor Magenta
-    Write-Host "17. VS Code    18. Git         19. Notepad++   20. Python 3" -ForegroundColor Magenta
-    Write-Host "21. Steam      22. Epic Games  23. Playnite" -ForegroundColor Magenta
-    $inputApps = Read-Host "`nMasukkan nomor (pisahkan koma, misal: 1,5,17)"
-    $apps = @{'1'='Google.Chrome';'2'='Mozilla.Firefox';'3'='Brave.Brave';'4'='Opera.OperaGX';'5'='VideoLAN.VLC';'6'='Spotify.Spotify';'7'='Apple.iTunes';'8'='OBSProject.OBSStudio';'9'='Discord.Discord';'10'='Zoom.Zoom';'11'='Telegram.TelegramDesktop';'12'='WhatsApp.WhatsApp';'13'='7zip.7zip';'14'='RARLab.WinRAR';'15'='Microsoft.PowerToys';'16'='voidtools.Everything';'17'='Microsoft.VisualStudioCode';'18'='Git.Git';'19'='Notepad++.Notepad++';'20'='Python.Python.3.12';'21'='Valve.Steam';'22'='EpicGames.EpicGamesLauncher';'23'='Playnite.Playnite'}
-    $selected = $inputApps -split ',' | ForEach-Object { $_.Trim() }
-    foreach ($s in $selected) { if ($apps.ContainsKey($s)) { winget install --id $apps[$s] --accept-source-agreements --accept-package-agreements --silent } }
-    Read-Host "`n[+] Selesai. Tekan Enter..."
+    $apps = @(
+        # Browsers
+        [PSCustomObject]@{ Cat='Browsers'; Name='Google Chrome'; Id='Google.Chrome' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Mozilla Firefox'; Id='Mozilla.Firefox' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Brave'; Id='Brave.Brave' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Microsoft Edge'; Id='Microsoft.Edge' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Opera GX'; Id='Opera.OperaGX' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Tor Browser'; Id='TorProject.TorBrowser' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Vivaldi'; Id='Vivaldi.Vivaldi' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='LibreWolf'; Id='LibreWolf.LibreWolf' },
+
+        # Communications
+        [PSCustomObject]@{ Cat='Communications'; Name='Discord'; Id='Discord.Discord' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Zoom'; Id='Zoom.Zoom' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Telegram Desktop'; Id='Telegram.TelegramDesktop' },
+        [PSCustomObject]@{ Cat='Communications'; Name='WhatsApp'; Id='WhatsApp.WhatsApp' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Slack'; Id='SlackTechnologies.Slack' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Microsoft Teams'; Id='Microsoft.Teams' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Signal'; Id='OpenWhisperSystems.Signal' },
+
+        # Development
+        [PSCustomObject]@{ Cat='Development'; Name='Visual Studio Code'; Id='Microsoft.VisualStudioCode' },
+        [PSCustomObject]@{ Cat='Development'; Name='Git'; Id='Git.Git' },
+        [PSCustomObject]@{ Cat='Development'; Name='Python 3'; Id='Python.Python.3.12' },
+        [PSCustomObject]@{ Cat='Development'; Name='Node.js'; Id='OpenJS.NodeJS' },
+        [PSCustomObject]@{ Cat='Development'; Name='Docker Desktop'; Id='Docker.DockerDesktop' },
+        [PSCustomObject]@{ Cat='Development'; Name='Postman'; Id='Postman.Postman' },
+        [PSCustomObject]@{ Cat='Development'; Name='GitHub Desktop'; Id='GitHub.GitHubDesktop' },
+        [PSCustomObject]@{ Cat='Development'; Name='Neovim'; Id='Neovim.Neovim' },
+
+        # Document & Office
+        [PSCustomObject]@{ Cat='Document'; Name='LibreOffice'; Id='TheDocumentFoundation.LibreOffice' },
+        [PSCustomObject]@{ Cat='Document'; Name='ONLYOFFICE'; Id='ONLYOFFICE.DesktopEditors' },
+        [PSCustomObject]@{ Cat='Document'; Name='Adobe Acrobat Reader'; Id='Adobe.Acrobat.Reader.64-bit' },
+        [PSCustomObject]@{ Cat='Document'; Name='Sumatra PDF'; Id='SumatraPDF.SumatraPDF' },
+        [PSCustomObject]@{ Cat='Document'; Name='Obsidian'; Id='Obsidian.Obsidian' },
+        [PSCustomObject]@{ Cat='Document'; Name='PDF24 Creator'; Id='PDF24.PDF24Creator' },
+
+        # Games
+        [PSCustomObject]@{ Cat='Games'; Name='Steam'; Id='Valve.Steam' },
+        [PSCustomObject]@{ Cat='Games'; Name='Epic Games Launcher'; Id='EpicGames.EpicGamesLauncher' },
+        [PSCustomObject]@{ Cat='Games'; Name='Battle.net'; Id='Blizzard.BattleNet' },
+        [PSCustomObject]@{ Cat='Games'; Name='GOG Galaxy'; Id='GOG.Galaxy' },
+        [PSCustomObject]@{ Cat='Games'; Name='Playnite'; Id='Playnite.Playnite' },
+
+        # Microsoft Tools
+        [PSCustomObject]@{ Cat='Microsoft'; Name='PowerToys'; Id='Microsoft.PowerToys' },
+        [PSCustomObject]@{ Cat='Microsoft'; Name='Windows Terminal'; Id='Microsoft.WindowsTerminal' },
+        [PSCustomObject]@{ Cat='Microsoft'; Name='Sysinternals Suite'; Id='Microsoft.Sysinternals' },
+        [PSCustomObject]@{ Cat='Microsoft'; Name='.NET Desktop Runtime 8'; Id='Microsoft.DotNet.DesktopRuntime.8' },
+
+        # Multimedia
+        [PSCustomObject]@{ Cat='Multimedia'; Name='VLC Media Player'; Id='VideoLAN.VLC' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='Spotify'; Id='Spotify.Spotify' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='OBS Studio'; Id='OBSProject.OBSStudio' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='GIMP'; Id='GIMP.GIMP' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='Audacity'; Id='Audacity.Audacity' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='HandBrake'; Id='HandBrake.HandBrake' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='K-Lite Codec Standard'; Id='CodecGuide.K-LiteCodecPack.Standard' },
+
+        # Pro Tools
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='Wireshark'; Id='WiresharkFoundation.Wireshark' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='Nmap'; Id='Insecure.Nmap' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='PuTTY'; Id='PuTTY.PuTTY' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='WinSCP'; Id='WinSCP.WinSCP' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='CPU-Z'; Id='CPUID.CPU-Z' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='GPU-Z'; Id='TechPowerUp.GPU-Z' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='Ventoy'; Id='Ventoy.Ventoy' },
+
+        # Utilities
+        [PSCustomObject]@{ Cat='Utilities'; Name='7-Zip'; Id='7zip.7zip' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='WinRAR'; Id='RARLab.WinRAR' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Everything'; Id='voidtools.Everything' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Rufus'; Id='Rufus.Rufus' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='TeamViewer'; Id='TeamViewer.TeamViewer' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='AnyDesk'; Id='AnyDeskSoftwareGmbH.AnyDesk' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Bitwarden'; Id='Bitwarden.Bitwarden' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='KeePassXC'; Id='KeePassXCTeam.KeePassXC' }
+    )
+
+    $categories = $apps.Cat | Sort-Object -Unique
+
+    do {
+        Clear-Host
+        Write-Host "========== WINGET APP INSTALLER (KATEGORI) ==========" -ForegroundColor Cyan
+        Write-Host "Pilih Kategori Aplikasi:" -ForegroundColor Yellow
+        for ($i = 0; $i -lt $categories.Count; $i++) {
+            Write-Host " $($i + 1). $($categories[$i])"
+        }
+        Write-Host " 0. Kembali ke Menu Utama" -ForegroundColor Red
+        
+        $catChoice = Read-Host "`nMasukkan nomor kategori"
+        
+        if ($catChoice -eq '0') { return }
+        
+        $selectedCatIndex = [int]$catChoice - 1
+        if ($selectedCatIndex -ge 0 -and $selectedCatIndex -lt $categories.Count) {
+            $selectedCat = $categories[$selectedCatIndex]
+            $filteredApps = $apps | Where-Object { $_.Cat -eq $selectedCat }
+            
+            Clear-Host
+            Write-Host "========== $($selectedCat.ToUpper()) ==========" -ForegroundColor Cyan
+            Write-Host "Pilih aplikasi yang ingin diinstal (pisahkan dengan koma, misal: 1,2):" -ForegroundColor Yellow
+            for ($j = 0; $j -lt $filteredApps.Count; $j++) {
+                Write-Host " $($j + 1). $($filteredApps[$j].Name)"
+            }
+            Write-Host " 0. Batal"
+            
+            $appChoice = Read-Host "`nMasukkan nomor aplikasi"
+            
+            if ($appChoice -ne '0' -and $appChoice -ne '') {
+                $selectedIndices = $appChoice -split ',' | ForEach-Object { $_.Trim() }
+                foreach ($idx in $selectedIndices) {
+                    $appIndex = [int]$idx - 1
+                    if ($appIndex -ge 0 -and $appIndex -lt $filteredApps.Count) {
+                        $appId = $filteredApps[$appIndex].Id
+                        $appName = $filteredApps[$appIndex].Name
+                        Write-Host "`n[+] Menginstal $appName..." -ForegroundColor Green
+                        winget install --id $appId --accept-source-agreements --accept-package-agreements --silent
+                    }
+                }
+                Read-Host "`n[+] Proses instalasi selesai. Tekan Enter untuk kembali..."
+            }
+        }
+    } while ($true)
 }
 
+# ==========================================
+# FUNGSI 6-7: DEBLOATER & RESTORE
+# ==========================================
 function Invoke-WindowsDebloater {
     Clear-Host; Write-Host "========== WINDOWS DEBLOATER ==========" -ForegroundColor Cyan
     $debloatList = @([PSCustomObject]@{No='1';App='Cortana';Pkg='Microsoft.549981C3F5F10'},[PSCustomObject]@{No='2';App='Bing News';Pkg='Microsoft.BingNews'},[PSCustomObject]@{No='3';App='Bing Weather';Pkg='Microsoft.BingWeather'},[PSCustomObject]@{No='4';App='Get Help';Pkg='Microsoft.GetHelp'},[PSCustomObject]@{No='5';App='Tips';Pkg='Microsoft.Getstarted'},[PSCustomObject]@{No='6';App='Office Hub';Pkg='Microsoft.MicrosoftOfficeHub'},[PSCustomObject]@{No='7';App='Solitaire';Pkg='Microsoft.MicrosoftSolitaireCollection'},[PSCustomObject]@{No='8';App='People';Pkg='Microsoft.People'},[PSCustomObject]@{No='9';App='Skype';Pkg='Microsoft.SkypeApp'},[PSCustomObject]@{No='10';App='Feedback Hub';Pkg='Microsoft.WindowsFeedbackHub'},[PSCustomObject]@{No='11';App='Xbox App';Pkg='Microsoft.XboxApp'},[PSCustomObject]@{No='12';App='Xbox Overlay';Pkg='Microsoft.XboxGamingOverlay'},[PSCustomObject]@{No='13';App='Your Phone';Pkg='Microsoft.YourPhone'},[PSCustomObject]@{No='14';App='Groove Music';Pkg='Microsoft.ZuneMusic'},[PSCustomObject]@{No='15';App='Movies & TV';Pkg='Microsoft.ZuneVideo'})
@@ -450,18 +566,18 @@ function Invoke-DnsSwitcher {
 }
 
 # ==========================================
-# MENU UTAMA (v1.9.7)
+# MENU UTAMA (v1.9.8)
 # ==========================================
 function Show-Menu {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.7      " -ForegroundColor Cyan
+    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.8      " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host " 1. Maintenance PC (Bersihkan & Optimasi)" -ForegroundColor Green
     Write-Host " 2. System Audit (Cek Hardware & OS)" -ForegroundColor Magenta
     Write-Host " 3. Network Diagnostics (Cek Jaringan)" -ForegroundColor Magenta
     Write-Host " 4. Backup Profil User" -ForegroundColor Green
-    Write-Host " 5. Install Aplikasi Populer (Winget)" -ForegroundColor Yellow
+    Write-Host " 5. Install Aplikasi Populer (Winget - CTT Style)" -ForegroundColor Yellow
     Write-Host " 6. Windows Debloater (Hapus Bloatware)" -ForegroundColor Yellow
     Write-Host " 7. Buat System Restore Point" -ForegroundColor Yellow
     Write-Host " 8. System Tweaks (Privasi & Performa)" -ForegroundColor Cyan

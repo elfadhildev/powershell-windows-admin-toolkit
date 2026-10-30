@@ -34,3 +34,6 @@
 ## [1.9.7] - 2026-07-18
 ### Fixed
 - **UI/UX:** Menambahkan perintah `Clear-Host` pada fungsi Opsi 1 (Maintenance) dan Opsi 4 (Backup) agar layar menu sebelumnya bersih dan proses terlihat seperti berada di "halaman baru".
+## [1.9.8] - 2026-10-25
+### Added
+- **Winget App Installer (CTT Style):** Merombak total menu instalasi (Opsi 5) menjadi berbasis kategori (Browsers, Communications, Development, dll) dan memperluas daftar aplikasi (50+ apps).
