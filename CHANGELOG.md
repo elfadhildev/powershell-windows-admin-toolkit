@@ -81,3 +81,8 @@
 - **5 Opsi Baru di GUI:** Menambahkan tombol Install Apps, App Backup, Update Mgr, DNS Switcher, dan Presets.
 ### Fixed
 - **Auto Close Window:** Menghapus parameter `-NoExit` pada `Start-Process` agar jendela anak otomatis tertutup saat fungsi selesai, sehingga pengguna langsung kembali ke menu utama GUI.
+## [3.0.0] - 2026-10-25
+### Added
+- **Full GUI Experience:** Mengubah hampir semua fungsi menjadi GUI (Checkbox & MessageBox).
+- **Deep Clean Maintenance:** Fitur pembersihan mendalam (Temp, DNS, Disk Cleanup, DISM WinSxS, SFC) di dalam GUI interaktif.
+- **Install Apps GUI:** Menambahkan 40 aplikasi populer dengan sistem Checkbox.
