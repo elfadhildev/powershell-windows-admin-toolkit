@@ -104,3 +104,7 @@
 ## [3.1.3] - 2026-10-25
 ### Fixed
 - **XAML Escaping Error:** Memperbaiki karakter `&` yang tidak di-escape pada item "Movies & TV" di daftar Debloater, yang menyebabkan error `An error occurred while parsing EntityName`.
+## [3.1.4] - 2026-10-25
+### Fixed
+- **Dialog Return Value:** Memperbaiki fungsi `Show-CustomDialog` agar mengembalikan nilai pilihan tombol dengan benar menggunakan `Hashtable` dan `GetNewClosure()`.
+- **Update Manager, DNS, & Backup:** Memastikan perintah (Pause Update, Ganti DNS, Export/Import) benar-benar dieksekusi setelah pengguna memilih opsi di dialog.

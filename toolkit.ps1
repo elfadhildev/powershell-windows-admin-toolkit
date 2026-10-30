@@ -6,7 +6,7 @@ if (-not $isAdmin) {
 }
 
 # ==========================================
-# FUNGSI CLI (Wajib ada untuk Pester & Jendela Baru)
+# FUNGSI CLI
 # ==========================================
 function Invoke-Maintenance {
     Write-Host "Maintenance CLI berjalan (Untuk Pester Test)..."
@@ -58,7 +58,7 @@ function Invoke-EventLogAnalyzer {
 }
 
 # ==========================================
-# DATA GLOBAL (Kategori & Bloatware)
+# DATA GLOBAL
 # ==========================================
 $Global:TweakList = @(
     [PSCustomObject]@{ Id=1; Cat='Privacy'; Name='Disable Telemetry'; Action='Telemetry' },
@@ -133,7 +133,7 @@ $Global:DebloatList = @(
     [PSCustomObject]@{ Id=12; Name='Xbox Overlay'; Pkg='Microsoft.XboxGamingOverlay' }
     [PSCustomObject]@{ Id=13; Name='Your Phone'; Pkg='Microsoft.YourPhone' }
     [PSCustomObject]@{ Id=14; Name='Groove Music'; Pkg='Microsoft.ZuneMusic' }
-    [PSCustomObject]@{ Id=15; Name='Movies &amp; TV'; Pkg='Microsoft.ZuneVideo' } # ESCAPED!
+    [PSCustomObject]@{ Id=15; Name='Movies &amp; TV'; Pkg='Microsoft.ZuneVideo' }
 )
 
 # ==========================================
@@ -310,7 +310,7 @@ function Show-AppsGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: DEBLOATER (FIXED!)
+# FUNGSI GUI: DEBLOATER
 # ==========================================
 function Show-DebloaterGUI {
     $xamlStr = @"
@@ -358,7 +358,7 @@ function Show-DebloaterGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: UTILITY MELEWAH (Dark Mode)
+# FUNGSI GUI: UTILITY MELEWAH (Dark Mode) - FIXED RETURN
 # ==========================================
 function Show-CustomDialog($title, $message, $buttons) {
     $xaml = @"
@@ -378,14 +378,21 @@ function Show-CustomDialog($title, $message, $buttons) {
     
     $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xaml))
     $window = [Windows.Markup.XamlReader]::Load($reader)
-    $script:result = $null
+    
+    # Menggunakan Hashtable untuk menyimpan hasil (Pass by reference)
+    $resultBag = @{ Value = $null }
+
     foreach ($b in $buttons) {
         $btn = $window.FindName("Btn_$($b.Value)")
         $val = $b.Value
-        $btn.Add_Click({ $script:result = $val; $window.Close() })
+        $btn.Add_Click({ 
+            $resultBag.Value = $val
+            $window.Close() 
+        }.GetNewClosure()) # GetNewClosure penting agar $resultBag dan $val terikat
     }
+    
     $window.ShowDialog() | Out-Null
-    return $script:result
+    return $resultBag.Value
 }
 
 function Show-DnsGUI {
@@ -411,7 +418,6 @@ function Show-BackupGUI {
     elseif ($res -eq 'IMP') { if (Test-Path $backupFile) { Start-Process powershell -ArgumentList "-NoExit", "-Command", "winget import -i '$backupFile' --accept-source-agreements --accept-package-agreements" } else { Show-CustomDialog "Gagal" "File backup tidak ditemukan di Desktop." @([PSCustomObject]@{Label='OK';Value='OK'}) } }
 }
 
-# Perbaikan: Fungsi Start-SimpleCLI mengirimkan definisi fungsi dengan benar
 function Show-SimpleCLI($title, $funcName) {
     $body = (Get-Command $funcName).ScriptBlock.ToString()
     $cmd = "& { function $funcName { $body } ; $funcName }"
@@ -426,7 +432,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.1.3" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.1.4" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
