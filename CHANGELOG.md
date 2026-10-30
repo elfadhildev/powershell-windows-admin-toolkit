@@ -91,3 +91,8 @@
 - **Tabbed GUI (CTT Style):** Tweaks dan Install Apps sekarang dikategorikan ke dalam Tab (Privasi, Performa, Browsers, Dev, dll) agar rapi dan tidak perlu scroll panjang.
 - **Premium Dark UI:** Semua kotak dialog (DNS, Update, Backup) diganti dengan jendela WPF kustom yang mendukung Dark Mode, bukan lagi MessageBox putih kaku.
 - **Fixed Pester & Debloater:** Mengembalikan fungsi CLI yang hilang agar test otomatis lulus dan Debloater tidak error.
+## [3.1.1] - 2026-10-25
+### Fixed
+- **XAML Parsing Error:** Menghapus atribut `Name='Panel_UIUX'` (yang mengandung karakter `/`) pada TabItem yang menyebabkan GUI Tweaks gagal dimuat.
+- **Debloater Missing Function:** Memperbaiki fungsi `Show-SimpleCLI` agar menggunakan Base64 Encoding, sehingga fungsi Debloater (dan CLI lainnya) berhasil dikirim ke jendela baru tanpa error.
+- **Premium Dark UI:** Mengganti semua sisa `MessageBox` putih kaku (untuk notifikasi sukses/gagal DNS, Update, Backup) dengan jendela kustom Dark Mode.

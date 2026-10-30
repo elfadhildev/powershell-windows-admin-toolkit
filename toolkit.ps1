@@ -6,10 +6,10 @@ if (-not $isAdmin) {
 }
 
 # ==========================================
-# DEFINISI FUNGSI CLI (Wajib ada untuk Pester)
+# FUNGSI CLI (Wajib ada untuk Pester & Jendela Baru)
 # ==========================================
 function Invoke-Maintenance {
-    Write-Host "Maintenance CLI berjalan..."
+    Write-Host "Maintenance CLI berjalan (Untuk Pester Test)..."
 }
 
 function Invoke-SystemAudit {
@@ -69,7 +69,7 @@ function Invoke-EventLogAnalyzer {
 }
 
 # ==========================================
-# DATA GLOBAL DENGAN KATEGORI
+# DATA GLOBAL (Kategori)
 # ==========================================
 $Global:TweakList = @(
     [PSCustomObject]@{ Id=1; Cat='Privacy'; Name='Disable Telemetry'; Action='Telemetry' },
@@ -77,9 +77,9 @@ $Global:TweakList = @(
     [PSCustomObject]@{ Id=3; Cat='Privacy'; Name='Disable Consumer Features'; Action='Consumer' },
     [PSCustomObject]@{ Id=4; Cat='Privacy'; Name='Disable Location Tracking'; Action='Location' },
     [PSCustomObject]@{ Id=5; Cat='Performance'; Name='Disable Hibernation (Hemat Disk)'; Action='Hibernate' },
-    [PSCustomObject]@{ Id=6; Cat='UI/UX'; Name='Enable End Task With Right Click'; Action='EndTask' },
-    [PSCustomObject]@{ Id=7; Cat='UI/UX'; Name='Show File Extensions'; Action='FileExt' },
-    [PSCustomObject]@{ Id=8; Cat='UI/UX'; Name='Show Hidden Files'; Action='Hidden' },
+    [PSCustomObject]@{ Id=6; Cat='UIUX'; Name='Enable End Task With Right Click'; Action='EndTask' },
+    [PSCustomObject]@{ Id=7; Cat='UIUX'; Name='Show File Extensions'; Action='FileExt' },
+    [PSCustomObject]@{ Id=8; Cat='UIUX'; Name='Show Hidden Files'; Action='Hidden' },
     [PSCustomObject]@{ Id=9; Cat='System'; Name='Create System Restore Point'; Action='Restore' },
     [PSCustomObject]@{ Id=10; Cat='System'; Name='Run Disk Cleanup'; Action='Cleanup' },
     [PSCustomObject]@{ Id=11; Cat='Performance'; Name='Set Services to Manual'; Action='ServicesManual' },
@@ -88,10 +88,10 @@ $Global:TweakList = @(
     [PSCustomObject]@{ Id=14; Cat='Privacy'; Name='Disable HomeGroup'; Action='HomeGroup' },
     [PSCustomObject]@{ Id=15; Cat='Performance'; Name='Disable Background Apps'; Action='BgApps' },
     [PSCustomObject]@{ Id=16; Cat='System'; Name='Disable Storage Sense'; Action='Storage' },
-    [PSCustomObject]@{ Id=17; Cat='UI/UX'; Name='Disable Bing Search in Start'; Action='Bing' },
+    [PSCustomObject]@{ Id=17; Cat='UIUX'; Name='Disable Bing Search in Start'; Action='Bing' },
     [PSCustomObject]@{ Id=18; Cat='Performance'; Name='Disable Game Bar'; Action='GameBar' },
     [PSCustomObject]@{ Id=19; Cat='Performance'; Name='Enable Ultimate Performance'; Action='UltimatePerf' },
-    [PSCustomObject]@{ Id=20; Cat='UI/UX'; Name='Disable Notification Tray'; Action='Notifications' },
+    [PSCustomObject]@{ Id=20; Cat='UIUX'; Name='Disable Notification Tray'; Action='Notifications' },
     [PSCustomObject]@{ Id=21; Cat='Performance'; Name='Disable Fullscreen Optimizations'; Action='FSO' },
     [PSCustomObject]@{ Id=22; Cat='Network'; Name='Disable IPv6'; Action='IPv6' },
     [PSCustomObject]@{ Id=23; Cat='System'; Name='Disable Edge Debloat'; Action='EdgeDebloat' },
@@ -189,7 +189,7 @@ function Show-MaintenanceGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: TABBED TWEAKS (Kategori)
+# FUNGSI GUI: TABBED TWEAKS
 # ==========================================
 function Show-TweaksGUI {
     $categories = $Global:TweakList.Cat | Sort-Object -Unique
@@ -203,7 +203,7 @@ function Show-TweaksGUI {
         <TabControl Grid.Row="0" Name="TabMain" Background="#1E1E1E" BorderBrush="#3F3F46">
 "@
     foreach ($cat in $categories) {
-        $xamlStr += "<TabItem Header='$cat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10' Name='Panel_$cat'>"
+        $xamlStr += "<TabItem Header='$cat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10'>"
         $items = $Global:TweakList | Where-Object { $_.Cat -eq $cat }
         foreach ($item in $items) {
             $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$($item.Name)' Foreground='White' Margin='0,8,0,8'/>"
@@ -253,7 +253,7 @@ function Show-TweaksGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: TABBED APPS (Kategori)
+# FUNGSI GUI: TABBED APPS
 # ==========================================
 function Show-AppsGUI {
     $categories = $Global:AppList.Cat | Sort-Object -Unique
@@ -267,7 +267,7 @@ function Show-AppsGUI {
         <TabControl Grid.Row="0" Name="TabMain" Background="#1E1E1E" BorderBrush="#3F3F46">
 "@
     foreach ($cat in $categories) {
-        $xamlStr += "<TabItem Header='$cat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10' Name='Panel_$cat'>"
+        $xamlStr += "<TabItem Header='$cat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10'>"
         $items = $Global:AppList | Where-Object { $_.Cat -eq $cat }
         foreach ($item in $items) {
             $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$($item.Name)' Foreground='White' Margin='0,8,0,8'/>"
@@ -303,7 +303,7 @@ function Show-AppsGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: UTILITY MELEWAH (Bukan MessageBox)
+# FUNGSI GUI: UTILITY MELEWAH (Dark Mode)
 # ==========================================
 function Show-CustomDialog($title, $message, $buttons) {
     $xaml = @"
@@ -336,28 +336,31 @@ function Show-CustomDialog($title, $message, $buttons) {
 function Show-DnsGUI {
     $res = Show-CustomDialog "DNS Switcher" "Pilih penyedia DNS:`nCloudflare (Tercepat)`nGoogle (Stabil)`nReset ke DHCP (Otomatis)" @([PSCustomObject]@{Label='Cloudflare';Value='CF'}, [PSCustomObject]@{Label='Google';Value='GOOG'}, [PSCustomObject]@{Label='Reset';Value='DHCP'})
     $adapters = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
-    if ($res -eq 'CF') { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("1.1.1.1","1.0.0.1") }; Clear-DnsClientCache; [System.Windows.MessageBox]::Show("DNS Cloudflare Diterapkan.") }
-    elseif ($res -eq 'GOOG') { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("8.8.8.8","8.8.4.4") }; Clear-DnsClientCache; [System.Windows.MessageBox]::Show("DNS Google Diterapkan.") }
-    elseif ($res -eq 'DHCP') { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ResetServerAddresses }; Clear-DnsClientCache; [System.Windows.MessageBox]::Show("DNS Direset ke DHCP.") }
+    if ($res -eq 'CF') { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("1.1.1.1","1.0.0.1") }; Clear-DnsClientCache; Show-CustomDialog "Sukses" "DNS Cloudflare Diterapkan." @([PSCustomObject]@{Label='OK';Value='OK'}) }
+    elseif ($res -eq 'GOOG') { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("8.8.8.8","8.8.4.4") }; Clear-DnsClientCache; Show-CustomDialog "Sukses" "DNS Google Diterapkan." @([PSCustomObject]@{Label='OK';Value='OK'}) }
+    elseif ($res -eq 'DHCP') { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ResetServerAddresses }; Clear-DnsClientCache; Show-CustomDialog "Sukses" "DNS Direset ke DHCP." @([PSCustomObject]@{Label='OK';Value='OK'}) }
 }
 
 function Show-UpdateGUI {
     $res = Show-CustomDialog "Update Manager" "Pilih aksi pembaruan Windows:`nPause 1 Tahun (Aman)`nPause 50 Tahun (Ekstrem)`nResume (Kembalikan Normal)" @([PSCustomObject]@{Label='Pause 1 Tahun';Value='1Y'}, [PSCustomObject]@{Label='Pause 50 Thn';Value='50Y'}, [PSCustomObject]@{Label='Resume';Value='RESUME'})
     $UpdateKey = "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings"; if (-not (Test-Path $UpdateKey)) { New-Item -Path $UpdateKey -Force | Out-Null }
-    if ($res -eq '1Y') { Set-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -Value 365 -Type DWord; Set-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -Value (Get-Date).AddDays(365).ToString("yyyy-MM-ddTHH:mm:ssZ"); [System.Windows.MessageBox]::Show("Update dijeda 1 tahun.") }
-    elseif ($res -eq '50Y') { Set-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -Value 18250 -Type DWord; Set-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -Value (Get-Date).AddYears(50).ToString("yyyy-MM-ddTHH:mm:ssZ"); [System.Windows.MessageBox]::Show("Update dijeda 50 tahun.") }
-    elseif ($res -eq 'RESUME') { Remove-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -ErrorAction SilentlyContinue; Remove-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -ErrorAction SilentlyContinue; [System.Windows.MessageBox]::Show("Update dilanjutkan.") }
+    if ($res -eq '1Y') { Set-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -Value 365 -Type DWord; Set-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -Value (Get-Date).AddDays(365).ToString("yyyy-MM-ddTHH:mm:ssZ"); Show-CustomDialog "Sukses" "Update dijeda 1 tahun." @([PSCustomObject]@{Label='OK';Value='OK'}) }
+    elseif ($res -eq '50Y') { Set-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -Value 18250 -Type DWord; Set-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -Value (Get-Date).AddYears(50).ToString("yyyy-MM-ddTHH:mm:ssZ"); Show-CustomDialog "Sukses" "Update dijeda 50 tahun." @([PSCustomObject]@{Label='OK';Value='OK'}) }
+    elseif ($res -eq 'RESUME') { Remove-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -ErrorAction SilentlyContinue; Remove-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -ErrorAction SilentlyContinue; Show-CustomDialog "Sukses" "Update dilanjutkan." @([PSCustomObject]@{Label='OK';Value='OK'}) }
 }
 
 function Show-BackupGUI {
     $res = Show-CustomDialog "App Backup Manager" "Simpan daftar aplikasi Anda ke file (Export)`natau Instal ulang dari file backup (Import)?" @([PSCustomObject]@{Label='Export Aplikasi';Value='EXP'}, [PSCustomObject]@{Label='Import Aplikasi';Value='IMP'})
     $backupFile = "$env:USERPROFILE\Desktop\MyAppsBackup.json"
-    if ($res -eq 'EXP') { winget export -o $backupFile --accept-source-agreements; [System.Windows.MessageBox]::Show("Backup berhasil disimpan di Desktop: MyAppsBackup.json") }
-    elseif ($res -eq 'IMP') { if (Test-Path $backupFile) { Start-Process powershell -ArgumentList "-NoExit", "-Command", "winget import -i '$backupFile' --accept-source-agreements --accept-package-agreements" } else { [System.Windows.MessageBox]::Show("File backup tidak ditemukan di Desktop.") } }
+    if ($res -eq 'EXP') { winget export -o $backupFile --accept-source-agreements; Show-CustomDialog "Sukses" "Backup berhasil disimpan di Desktop: MyAppsBackup.json" @([PSCustomObject]@{Label='OK';Value='OK'}) }
+    elseif ($res -eq 'IMP') { if (Test-Path $backupFile) { Start-Process powershell -ArgumentList "-NoExit", "-Command", "winget import -i '$backupFile' --accept-source-agreements --accept-package-agreements" } else { Show-CustomDialog "Gagal" "File backup tidak ditemukan di Desktop." @([PSCustomObject]@{Label='OK';Value='OK'}) } }
 }
 
-function Show-SimpleCLI($title, $cmd) {
-    Start-Process powershell -ArgumentList "-NoExit", "-Command", $cmd
+# Perbaikan: Fungsi Start-SimpleCLI dengan Base64 agar fungsi ikut terkirim
+function Show-SimpleCLI($title, $funcName) {
+    $s = (Get-Command $funcName).ScriptBlock.ToString()
+    $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; $funcName }"))
+    Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64
 }
 
 # ==========================================
@@ -367,7 +370,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.1.0" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.1.1" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
@@ -409,7 +412,7 @@ function Show-GUI {
     $btnUpdate.Add_Click({ Show-UpdateGUI })
     $btnDNS.Add_Click({ Show-DnsGUI })
     
-    # CLI Fallbacks
+    # CLI Fallbacks (Menggunakan Base64)
     $btnAudit.Add_Click({ Show-SimpleCLI "System Audit" "Invoke-SystemAudit" })
     $btnNetwork.Add_Click({ Show-SimpleCLI "Network Diagnostics" "Invoke-NetworkDiagnostics" })
     $btnDebloater.Add_Click({ Show-SimpleCLI "Windows Debloater" "Invoke-WindowsDebloater" })
