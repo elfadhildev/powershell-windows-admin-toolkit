@@ -118,3 +118,7 @@
 ## [3.2.2] - 2026-10-25
 ### Fixed
 - **XAML Ampersand Escaping:** Memperbaiki karakter `&` pada nama Tweak ("Date & Time" dan "Notifications & Calendar") menjadi `&amp;`. Menambahkan fungsi replace otomatis di dalam loop GUI agar tidak akan pernah error lagi jika ada karakter `&`.
+## [3.2.3] - 2026-10-25
+### Fixed
+- **Debloater List Kosong:** Mengisi `$Global:DebloatList` dengan 35 paket bloatware Windows 11 yang dikategorikan (Microsoft Apps, Bing & Web Services, Developer Tools, Xbox & Gaming, Utilities & Productivity).
+- **Fitur Tambahan:** Menambahkan tombol "Select All" dan "Clear Selection" pada GUI Debloater untuk memudahkan pemilihan massal.
