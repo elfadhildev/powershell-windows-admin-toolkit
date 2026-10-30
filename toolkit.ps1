@@ -133,7 +133,7 @@ $Global:DebloatList = @(
     [PSCustomObject]@{ Id=12; Name='Xbox Overlay'; Pkg='Microsoft.XboxGamingOverlay' }
     [PSCustomObject]@{ Id=13; Name='Your Phone'; Pkg='Microsoft.YourPhone' }
     [PSCustomObject]@{ Id=14; Name='Groove Music'; Pkg='Microsoft.ZuneMusic' }
-    [PSCustomObject]@{ Id=15; Name='Movies & TV'; Pkg='Microsoft.ZuneVideo' }
+    [PSCustomObject]@{ Id=15; Name='Movies &amp; TV'; Pkg='Microsoft.ZuneVideo' } # ESCAPED!
 )
 
 # ==========================================
@@ -310,7 +310,7 @@ function Show-AppsGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: DEBLOATER (NEW!)
+# FUNGSI GUI: DEBLOATER (FIXED!)
 # ==========================================
 function Show-DebloaterGUI {
     $xamlStr = @"
@@ -426,7 +426,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.1.2" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.1.3" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
@@ -464,12 +464,11 @@ function Show-GUI {
     $btnMaintenance.Add_Click({ Show-MaintenanceGUI })
     $btnTweaks.Add_Click({ Show-TweaksGUI })
     $btnInstall.Add_Click({ Show-AppsGUI })
-    $btnDebloater.Add_Click({ Show-DebloaterGUI }) # <-- SEKARANG GUI!
+    $btnDebloater.Add_Click({ Show-DebloaterGUI })
     $btnBackup.Add_Click({ Show-BackupGUI })
     $btnUpdate.Add_Click({ Show-UpdateGUI })
     $btnDNS.Add_Click({ Show-DnsGUI })
     
-    # CLI Fallbacks (Teks Terminal)
     $btnAudit.Add_Click({ Show-SimpleCLI "System Audit" "Invoke-SystemAudit" })
     $btnNetwork.Add_Click({ Show-SimpleCLI "Network Diagnostics" "Invoke-NetworkDiagnostics" })
     $btnEventLog.Add_Click({ Show-SimpleCLI "Event Log Analyzer" "Invoke-EventLogAnalyzer" })

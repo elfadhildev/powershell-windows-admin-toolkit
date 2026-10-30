@@ -101,3 +101,6 @@
 - **Debloater GUI:** Mengubah Debloater menjadi antarmuka kotak centang (Checkbox) yang mewah.
 ### Fixed
 - **CLI Return Error:** Memperbaiki fungsi `Show-SimpleCLI` dengan menyuntikkan definisi fungsi yang benar ke dalam Base64, sehingga setelah menekan Enter (System Audit, Network, Event Log), jendela langsung tertutup tanpa error merah.
+## [3.1.3] - 2026-10-25
+### Fixed
+- **XAML Escaping Error:** Memperbaiki karakter `&` yang tidak di-escape pada item "Movies & TV" di daftar Debloater, yang menyebabkan error `An error occurred while parsing EntityName`.
