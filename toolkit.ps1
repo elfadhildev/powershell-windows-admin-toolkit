@@ -33,17 +33,6 @@ function Invoke-NetworkDiagnostics {
     Read-Host "`nTekan Enter untuk kembali..."
 }
 
-function Invoke-WindowsDebloater {
-    Clear-Host; Write-Host "========== WINDOWS DEBLOATER ==========" -ForegroundColor Cyan
-    $debloatList = @([PSCustomObject]@{No='1';App='Cortana';Pkg='Microsoft.549981C3F5F10'},[PSCustomObject]@{No='2';App='Bing News';Pkg='Microsoft.BingNews'},[PSCustomObject]@{No='3';App='Bing Weather';Pkg='Microsoft.BingWeather'},[PSCustomObject]@{No='4';App='Get Help';Pkg='Microsoft.GetHelp'},[PSCustomObject]@{No='5';App='Tips';Pkg='Microsoft.Getstarted'},[PSCustomObject]@{No='6';App='Office Hub';Pkg='Microsoft.MicrosoftOfficeHub'},[PSCustomObject]@{No='7';App='Solitaire';Pkg='Microsoft.MicrosoftSolitaireCollection'},[PSCustomObject]@{No='8';App='People';Pkg='Microsoft.People'},[PSCustomObject]@{No='9';App='Skype';Pkg='Microsoft.SkypeApp'},[PSCustomObject]@{No='10';App='Feedback Hub';Pkg='Microsoft.WindowsFeedbackHub'},[PSCustomObject]@{No='11';App='Xbox App';Pkg='Microsoft.XboxApp'},[PSCustomObject]@{No='12';App='Xbox Overlay';Pkg='Microsoft.XboxGamingOverlay'},[PSCustomObject]@{No='13';App='Your Phone';Pkg='Microsoft.YourPhone'},[PSCustomObject]@{No='14';App='Groove Music';Pkg='Microsoft.ZuneMusic'},[PSCustomObject]@{No='15';App='Movies & TV';Pkg='Microsoft.ZuneVideo'})
-    $debloatList | Format-Table -AutoSize
-    $inputApps = Read-Host "Ketik nomor (misal: 1,2), 'all' untuk semua, atau 'x' batal"
-    if ($inputApps -eq 'x' -or $inputApps -eq '') { return }
-    if ($inputApps -eq 'all') { $toRemove = $debloatList } else { $selectedNums = $inputApps -split ',' | ForEach-Object { $_.Trim() }; $toRemove = $debloatList | Where-Object { $selectedNums -contains $_.No } }
-    foreach ($item in $toRemove) { $pkg = Get-AppxPackage -Name $item.Pkg -AllUsers -ErrorAction SilentlyContinue; if ($pkg) { Remove-AppxPackage -Package $pkg.PackageFullName -AllUsers -ErrorAction SilentlyContinue } }
-    Write-Host "`n[+] Selesai." -ForegroundColor Green; Read-Host "Tekan Enter..."
-}
-
 function Invoke-EventLogAnalyzer {
     do {
         Clear-Host; Write-Host "========== SMART EVENT LOG ANALYZER ==========" -ForegroundColor Cyan
@@ -69,7 +58,7 @@ function Invoke-EventLogAnalyzer {
 }
 
 # ==========================================
-# DATA GLOBAL (Kategori)
+# DATA GLOBAL (Kategori & Bloatware)
 # ==========================================
 $Global:TweakList = @(
     [PSCustomObject]@{ Id=1; Cat='Privacy'; Name='Disable Telemetry'; Action='Telemetry' },
@@ -127,6 +116,24 @@ $Global:AppList = @(
     [PSCustomObject]@{ Id=25; Cat='Utils'; Name='WinRAR'; Pkg='RARLab.WinRAR' }
     [PSCustomObject]@{ Id=26; Cat='Utils'; Name='Everything'; Pkg='voidtools.Everything' }
     [PSCustomObject]@{ Id=27; Cat='Utils'; Name='PowerToys'; Pkg='Microsoft.PowerToys' }
+)
+
+$Global:DebloatList = @(
+    [PSCustomObject]@{ Id=1; Name='Cortana'; Pkg='Microsoft.549981C3F5F10' }
+    [PSCustomObject]@{ Id=2; Name='Bing News'; Pkg='Microsoft.BingNews' }
+    [PSCustomObject]@{ Id=3; Name='Bing Weather'; Pkg='Microsoft.BingWeather' }
+    [PSCustomObject]@{ Id=4; Name='Get Help'; Pkg='Microsoft.GetHelp' }
+    [PSCustomObject]@{ Id=5; Name='Tips (Get Started)'; Pkg='Microsoft.Getstarted' }
+    [PSCustomObject]@{ Id=6; Name='Office Hub'; Pkg='Microsoft.MicrosoftOfficeHub' }
+    [PSCustomObject]@{ Id=7; Name='Solitaire'; Pkg='Microsoft.MicrosoftSolitaireCollection' }
+    [PSCustomObject]@{ Id=8; Name='People'; Pkg='Microsoft.People' }
+    [PSCustomObject]@{ Id=9; Name='Skype'; Pkg='Microsoft.SkypeApp' }
+    [PSCustomObject]@{ Id=10; Name='Feedback Hub'; Pkg='Microsoft.WindowsFeedbackHub' }
+    [PSCustomObject]@{ Id=11; Name='Xbox App'; Pkg='Microsoft.XboxApp' }
+    [PSCustomObject]@{ Id=12; Name='Xbox Overlay'; Pkg='Microsoft.XboxGamingOverlay' }
+    [PSCustomObject]@{ Id=13; Name='Your Phone'; Pkg='Microsoft.YourPhone' }
+    [PSCustomObject]@{ Id=14; Name='Groove Music'; Pkg='Microsoft.ZuneMusic' }
+    [PSCustomObject]@{ Id=15; Name='Movies & TV'; Pkg='Microsoft.ZuneVideo' }
 )
 
 # ==========================================
@@ -303,6 +310,54 @@ function Show-AppsGUI {
 }
 
 # ==========================================
+# FUNGSI GUI: DEBLOATER (NEW!)
+# ==========================================
+function Show-DebloaterGUI {
+    $xamlStr = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Windows Debloater" Height="600" Width="500"
+        WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
+    <Grid Margin="15">
+        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10" Name="PanelDebloat">
+                <TextBlock Text="Pilih aplikasi bawaan (bloatware) yang ingin dihapus:" FontSize="14" Margin="0,0,0,15" Foreground="Gray"/>
+"@
+    foreach ($item in $Global:DebloatList) {
+        $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$($item.Name)' Foreground='White' Margin='0,8,0,8'/>"
+    }
+    $xamlStr += @"
+            </StackPanel>
+        </ScrollViewer>
+        <Button Grid.Row="1" Name="BtnRemove" Content="UNINSTALL SELECTED" Width="250" Height="40" Background="#D83B01" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,15,0,0" HorizontalAlignment="Center"/>
+    </Grid>
+</Window>
+"@
+    $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xamlStr))
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+    $btnRemove = $window.FindName("BtnRemove")
+
+    $btnRemove.Add_Click({
+        $btnRemove.Content = "UNINSTALLING..."
+        $btnRemove.IsEnabled = $false
+        $selected = @()
+        foreach ($item in $Global:DebloatList) {
+            $chk = $window.FindName("Chk_$($item.Id)")
+            if ($chk.IsChecked -eq $true) { $selected += $item.Pkg }
+        }
+        foreach ($pkg in $selected) {
+            $appx = Get-AppxPackage -Name $pkg -AllUsers -ErrorAction SilentlyContinue
+            if ($appx) { Remove-AppxPackage -Package $appx.PackageFullName -AllUsers -ErrorAction SilentlyContinue }
+        }
+        $btnRemove.Content = "SELESAI DIBERSIHKAN!"
+        Start-Sleep -Seconds 1
+        $window.Close()
+    })
+    $window.ShowDialog() | Out-Null
+}
+
+# ==========================================
 # FUNGSI GUI: UTILITY MELEWAH (Dark Mode)
 # ==========================================
 function Show-CustomDialog($title, $message, $buttons) {
@@ -356,10 +411,11 @@ function Show-BackupGUI {
     elseif ($res -eq 'IMP') { if (Test-Path $backupFile) { Start-Process powershell -ArgumentList "-NoExit", "-Command", "winget import -i '$backupFile' --accept-source-agreements --accept-package-agreements" } else { Show-CustomDialog "Gagal" "File backup tidak ditemukan di Desktop." @([PSCustomObject]@{Label='OK';Value='OK'}) } }
 }
 
-# Perbaikan: Fungsi Start-SimpleCLI dengan Base64 agar fungsi ikut terkirim
+# Perbaikan: Fungsi Start-SimpleCLI mengirimkan definisi fungsi dengan benar
 function Show-SimpleCLI($title, $funcName) {
-    $s = (Get-Command $funcName).ScriptBlock.ToString()
-    $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; $funcName }"))
+    $body = (Get-Command $funcName).ScriptBlock.ToString()
+    $cmd = "& { function $funcName { $body } ; $funcName }"
+    $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($cmd))
     Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64
 }
 
@@ -370,7 +426,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.1.1" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.1.2" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
@@ -408,14 +464,14 @@ function Show-GUI {
     $btnMaintenance.Add_Click({ Show-MaintenanceGUI })
     $btnTweaks.Add_Click({ Show-TweaksGUI })
     $btnInstall.Add_Click({ Show-AppsGUI })
+    $btnDebloater.Add_Click({ Show-DebloaterGUI }) # <-- SEKARANG GUI!
     $btnBackup.Add_Click({ Show-BackupGUI })
     $btnUpdate.Add_Click({ Show-UpdateGUI })
     $btnDNS.Add_Click({ Show-DnsGUI })
     
-    # CLI Fallbacks (Menggunakan Base64)
+    # CLI Fallbacks (Teks Terminal)
     $btnAudit.Add_Click({ Show-SimpleCLI "System Audit" "Invoke-SystemAudit" })
     $btnNetwork.Add_Click({ Show-SimpleCLI "Network Diagnostics" "Invoke-NetworkDiagnostics" })
-    $btnDebloater.Add_Click({ Show-SimpleCLI "Windows Debloater" "Invoke-WindowsDebloater" })
     $btnEventLog.Add_Click({ Show-SimpleCLI "Event Log Analyzer" "Invoke-EventLogAnalyzer" })
 
     $window.ShowDialog() | Out-Null

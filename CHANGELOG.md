@@ -96,3 +96,8 @@
 - **XAML Parsing Error:** Menghapus atribut `Name='Panel_UIUX'` (yang mengandung karakter `/`) pada TabItem yang menyebabkan GUI Tweaks gagal dimuat.
 - **Debloater Missing Function:** Memperbaiki fungsi `Show-SimpleCLI` agar menggunakan Base64 Encoding, sehingga fungsi Debloater (dan CLI lainnya) berhasil dikirim ke jendela baru tanpa error.
 - **Premium Dark UI:** Mengganti semua sisa `MessageBox` putih kaku (untuk notifikasi sukses/gagal DNS, Update, Backup) dengan jendela kustom Dark Mode.
+## [3.1.2] - 2026-10-25
+### Added
+- **Debloater GUI:** Mengubah Debloater menjadi antarmuka kotak centang (Checkbox) yang mewah.
+### Fixed
+- **CLI Return Error:** Memperbaiki fungsi `Show-SimpleCLI` dengan menyuntikkan definisi fungsi yang benar ke dalam Base64, sehingga setelah menekan Enter (System Audit, Network, Event Log), jendela langsung tertutup tanpa error merah.
