@@ -62,3 +62,7 @@
 ### Fixed
 - **WPF Assembly:** Menambahkan `Add-Type -AssemblyName PresentationFramework` agar kelas GUI bisa dimuat oleh PowerShell.
 - **Eksekusi Fungsi:** Memperbaiki pemanggilan fungsi di jendela baru menggunakan blok `& { $cmd; Invoke-Fungsi }`.
+## [2.0.4] - 2026-10-25
+### Fixed
+- **irm|iex Compatibility:** Menggunakan `[scriptblock]::Create` untuk mencegah error `if is not recognized` saat skrip dijalankan dari URL.
+- **WPF Assembly:** Memuat `PresentationFramework` dengan `-PassThru` agar kelas `XamlReader` selalu tersedia.
