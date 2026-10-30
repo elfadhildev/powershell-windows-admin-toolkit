@@ -76,3 +76,8 @@
 - **Dependency Injection:** Menyertakan fungsi pendukung (seperti `Backup-RegistryTweaks`) ke dalam Base64 agar tidak error saat dipanggil di jendela baru.
 - **Event Log Restore:** Mengembalikan isi fungsi `Invoke-EventLogAnalyzer` yang sempat kosong.
 - **BOM Removal:** Menyimpan file tanpa BOM untuk mencegah error `$ErrorActionPreference` saat dijalankan via `irm | iex`.
+## [2.2.0] - 2026-10-25
+### Added
+- **5 Opsi Baru di GUI:** Menambahkan tombol Install Apps, App Backup, Update Mgr, DNS Switcher, dan Presets.
+### Fixed
+- **Auto Close Window:** Menghapus parameter `-NoExit` pada `Start-Process` agar jendela anak otomatis tertutup saat fungsi selesai, sehingga pengguna langsung kembali ke menu utama GUI.

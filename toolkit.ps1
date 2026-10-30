@@ -5,6 +5,9 @@ if (-not $isAdmin) {
     exit
 }
 
+# ==========================================
+# FUNGSI BANTUAN
+# ==========================================
 function Backup-RegistryTweaks {
     $backupDir = "$env:USERPROFILE\Desktop\ToolkitRegistryBackup"
     if (-not (Test-Path $backupDir)) { New-Item -Path $backupDir -ItemType Directory -Force | Out-Null }
@@ -13,6 +16,9 @@ function Backup-RegistryTweaks {
     Start-Process cmd -ArgumentList "/c reg export `"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced`" `"$regFile`" /y" -Wait -NoNewWindow
 }
 
+# ==========================================
+# FUNGSI EKSEKUSI
+# ==========================================
 function Invoke-Maintenance {
     Clear-Host; Write-Host "========== MAINTENANCE PC ==========" -ForegroundColor Cyan
     Write-Host "[+] Membersihkan Cache DNS..." -ForegroundColor Yellow
@@ -188,11 +194,161 @@ function Invoke-EventLogAnalyzer {
     } while ($true)
 }
 
+function Invoke-WingetAppInstaller {
+    $apps = @(
+        [PSCustomObject]@{ Cat='Browsers'; Name='Brave'; Id='Brave.Brave' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Chrome'; Id='Google.Chrome' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Edge'; Id='Microsoft.Edge' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Firefox'; Id='Mozilla.Firefox' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Tor Browser'; Id='TorProject.TorBrowser' },
+        [PSCustomObject]@{ Cat='Browsers'; Name='Vivaldi'; Id='Vivaldi.Vivaldi' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Discord'; Id='Discord.Discord' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Zoom'; Id='Zoom.Zoom' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Telegram'; Id='Telegram.TelegramDesktop' },
+        [PSCustomObject]@{ Cat='Communications'; Name='WhatsApp'; Id='WhatsApp.WhatsApp' },
+        [PSCustomObject]@{ Cat='Development'; Name='VS Code'; Id='Microsoft.VisualStudioCode' },
+        [PSCustomObject]@{ Cat='Development'; Name='Git'; Id='Git.Git' },
+        [PSCustomObject]@{ Cat='Development'; Name='Python 3'; Id='Python.Python.3.12' },
+        [PSCustomObject]@{ Cat='Development'; Name='Node.js'; Id='OpenJS.NodeJS' },
+        [PSCustomObject]@{ Cat='Document'; Name='LibreOffice'; Id='TheDocumentFoundation.LibreOffice' },
+        [PSCustomObject]@{ Cat='Document'; Name='ONLYOFFICE'; Id='ONLYOFFICE.DesktopEditors' },
+        [PSCustomObject]@{ Cat='Document'; Name='Adobe Acrobat Reader'; Id='Adobe.Acrobat.Reader.64-bit' },
+        [PSCustomObject]@{ Cat='Games'; Name='Steam'; Id='Valve.Steam' },
+        [PSCustomObject]@{ Cat='Games'; Name='Epic Games'; Id='EpicGames.EpicGamesLauncher' },
+        [PSCustomObject]@{ Cat='Microsoft'; Name='PowerToys'; Id='Microsoft.PowerToys' },
+        [PSCustomObject]@{ Cat='Microsoft'; Name='Windows Terminal'; Id='Microsoft.WindowsTerminal' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='VLC'; Id='VideoLAN.VLC' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='Spotify'; Id='Spotify.Spotify' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='OBS Studio'; Id='OBSProject.OBSStudio' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='Wireshark'; Id='WiresharkFoundation.Wireshark' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='Nmap'; Id='Insecure.Nmap' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='7-Zip'; Id='7zip.7zip' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='WinRAR'; Id='RARLab.WinRAR' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Everything'; Id='voidtools.Everything' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='Rufus'; Id='Rufus.Rufus' }
+    )
+
+    $categories = $apps.Cat | Sort-Object -Unique
+
+    do {
+        Clear-Host
+        Write-Host "========== WINGET APP INSTALLER ==========" -ForegroundColor Cyan
+        Write-Host "Pilih Kategori Aplikasi:" -ForegroundColor Yellow
+        for ($i = 0; $i -lt $categories.Count; $i++) { Write-Host " $($i + 1). $($categories[$i])" }
+        Write-Host " 0. Kembali ke Menu Utama" -ForegroundColor Red
+        
+        $catChoice = Read-Host "`nMasukkan nomor kategori"
+        if ($catChoice -eq '0' -or $catChoice -eq '') { return }
+        
+        $selectedCatIndex = [int]$catChoice - 1
+        if ($selectedCatIndex -ge 0 -and $selectedCatIndex -lt $categories.Count) {
+            $selectedCat = $categories[$selectedCatIndex]
+            $filteredApps = $apps | Where-Object { $_.Cat -eq $selectedCat }
+            
+            Clear-Host
+            Write-Host "========== $($selectedCat.ToUpper()) ==========" -ForegroundColor Cyan
+            Write-Host "Pilih aplikasi yang ingin diinstal (pisahkan dengan koma, misal: 1,2):" -ForegroundColor Yellow
+            for ($j = 0; $j -lt $filteredApps.Count; $j++) { Write-Host " $($j + 1). $($filteredApps[$j].Name)" }
+            Write-Host " 0. Batal"
+            
+            $appChoice = Read-Host "`nMasukkan nomor aplikasi"
+            if ($appChoice -ne '0' -and $appChoice -ne '') {
+                $selectedIndices = $appChoice -split ',' | ForEach-Object { $_.Trim() }
+                foreach ($idx in $selectedIndices) {
+                    $appIndex = [int]$idx - 1
+                    if ($appIndex -ge 0 -and $appIndex -lt $filteredApps.Count) {
+                        $appId = $filteredApps[$appIndex].Id; $appName = $filteredApps[$appIndex].Name
+                        Write-Host "`n[+] Menginstal $appName..." -ForegroundColor Green
+                        winget install --id $appId --accept-source-agreements --accept-package-agreements --silent
+                    }
+                }
+                Read-Host "`n[+] Proses instalasi selesai. Tekan Enter untuk kembali..."
+            }
+        }
+    } while ($true)
+}
+
+function Invoke-AppBackup {
+    Clear-Host; Write-Host "========== APP BACKUP MANAGER ==========" -ForegroundColor Cyan
+    Write-Host "1. Export Daftar Aplikasi`n2. Import & Install Daftar Aplikasi`n3. Kembali" -ForegroundColor Green
+    $choice = Read-Host "`nPilih (1-3)"
+    $backupFile = "$env:USERPROFILE\Desktop\MyAppsBackup.json"
+    switch ($choice) {
+        '1' { winget export -o $backupFile --accept-source-agreements; Write-Host "[+] SUKSES! File backup ada di Desktop." -ForegroundColor Green }
+        '2' { if (Test-Path $backupFile) { winget import -i $backupFile --accept-source-agreements --accept-package-agreements; Write-Host "`n[+] Selesai." -ForegroundColor Green } else { Write-Host "[!] File tidak ditemukan di Desktop." -ForegroundColor Red } }
+        '3' { return }
+    }
+    Read-Host "`nTekan Enter untuk kembali..."
+}
+
+function Invoke-UpdateManager {
+    Clear-Host; Write-Host "========== UPDATE MANAGER ==========" -ForegroundColor Cyan
+    Write-Host "1. Pause 35 hari`n2. Pause 1 Tahun`n3. Pause 50 Tahun (Ekstrem)`n4. Resume Updates`n5. Security Only`n6. Kembali" -ForegroundColor Yellow
+    $choice = Read-Host "`nPilih (1-6)"
+    $UpdateKey = "HKLM:\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings"; if (-not (Test-Path $UpdateKey)) { New-Item -Path $UpdateKey -Force | Out-Null }
+    switch ($choice) {
+        '1' { Set-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -Value 35 -Type DWord; Set-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -Value (Get-Date).AddDays(35).ToString("yyyy-MM-ddTHH:mm:ssZ"); Write-Host "[+] Paused 35 days." -ForegroundColor Green }
+        '2' { Set-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -Value 365 -Type DWord; Set-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -Value (Get-Date).AddDays(365).ToString("yyyy-MM-ddTHH:mm:ssZ"); Write-Host "[+] Paused 1 year." -ForegroundColor Green }
+        '3' { Set-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -Value 18250 -Type DWord; Set-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -Value (Get-Date).AddYears(50).ToString("yyyy-MM-ddTHH:mm:ssZ"); Write-Host "[+] Paused 50 years." -ForegroundColor Green }
+        '4' { Remove-ItemProperty -Path $UpdateKey -Name "PauseUpdatesExpiryTime" -ErrorAction SilentlyContinue; Remove-ItemProperty -Path $UpdateKey -Name "FlightSettingsMaxPauseDays" -ErrorAction SilentlyContinue; Write-Host "[+] Resumed." -ForegroundColor Green }
+        '5' { Set-ItemProperty -Path $UpdateKey -Name "DeferFeatureUpdates" -Value 1 -Type DWord; Set-ItemProperty -Path $UpdateKey -Name "DeferFeatureUpdatesPeriodInDays" -Value 365 -Type DWord; Write-Host "[+] Security updates only." -ForegroundColor Green }
+        '6' { return }
+    }
+    Read-Host "`nTekan Enter untuk kembali..."
+}
+
+function Invoke-DnsSwitcher {
+    Clear-Host
+    Write-Host "========== DNS & NETWORK SWITCHER ==========" -ForegroundColor Cyan
+    Write-Host "Mengubah DNS dapat mempercepat internet dan memblokir iklan." -ForegroundColor Gray
+    Write-Host "`nPilih DNS yang ingin digunakan:" -ForegroundColor Yellow
+    Write-Host "1. Cloudflare (1.1.1.1) - Tercepat & Privasi"
+    Write-Host "2. Google (8.8.8.8) - Paling Stabil"
+    Write-Host "3. Quad9 (9.9.9.9) - Blokir Malware"
+    Write-Host "4. Reset ke Otomatis (DHCP)"
+    Write-Host "5. Batal"
+    $choice = Read-Host "`nPilih (1-5)"
+    $adapters = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
+    if (-not $adapters) { Write-Host "`n[!] Tidak ada koneksi internet aktif." -ForegroundColor Red; Read-Host "Tekan Enter..."; return }
+    switch ($choice) {
+        '1' { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("1.1.1.1","1.0.0.1") }; Write-Host "`n[+] DNS diubah ke Cloudflare." -ForegroundColor Green }
+        '2' { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("8.8.8.8","8.8.4.4") }; Write-Host "`n[+] DNS diubah ke Google." -ForegroundColor Green }
+        '3' { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("9.9.9.9","149.112.112.112") }; Write-Host "`n[+] DNS diubah ke Quad9." -ForegroundColor Green }
+        '4' { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ResetServerAddresses }; Write-Host "`n[+] DNS dikembalikan ke Otomatis (DHCP)." -ForegroundColor Green }
+        '5' { return }
+    }
+    Clear-DnsClientCache
+    Write-Host "[+] Cache DNS berhasil dibersihkan." -ForegroundColor Green
+    Read-Host "`nTekan Enter untuk kembali..."
+}
+
+function Invoke-Presets {
+    Clear-Host; Write-Host "========== AUTOMATION PRESETS ==========" -ForegroundColor Cyan
+    Write-Host "1. Standard Setup`n2. Gamer Setup`n3. Developer Setup`n4. Minimalist Setup`n5. Kembali" -ForegroundColor Green
+    $choice = Read-Host "`nPilih Preset (1-5)"
+    if ($choice -eq '5' -or $choice -eq '') { return }
+    Write-Host "`n[+] Memulai proses otomatisasi..." -ForegroundColor Yellow
+    Start-Sleep -Seconds 1
+    switch ($choice) {
+        '1' { $apps = @('Google.Chrome', '7zip.7zip', 'VideoLAN.VLC'); $tweaks = $true }
+        '2' { $apps = @('Valve.Steam', 'Discord.Discord', 'OBSProject.OBSStudio'); $tweaks = $true; Set-ItemProperty -Path "HKCU:\Software\Microsoft\GameBar" -Name "AutoGameModeEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
+        '3' { $apps = @('Microsoft.VisualStudioCode', 'Git.Git', 'Python.Python.3.12', 'Microsoft.PowerToys'); $tweaks = $false }
+        '4' { $apps = @(); $tweaks = $true }
+    }
+    if ($tweaks) { Backup-RegistryTweaks; Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" -Name "VisualFXSetting" -Value 2 -Type DWord; Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 0 -Type DWord }
+    if ($apps.Count -gt 0) {
+        $i = 0
+        foreach ($app in $apps) { $i++; $percent = [math]::Round(($i / $apps.Count) * 100); Write-Progress -Activity "Menginstal Aplikasi" -Status "Installing $app" -PercentComplete $percent; winget install --id $app --accept-source-agreements --accept-package-agreements --silent | Out-Null }
+        Write-Progress -Activity "Menginstal Aplikasi" -Completed
+    }
+    Write-Host "`n[+] PRESET BERHASIL DITERAPKAN!" -ForegroundColor Green; Read-Host "`nTekan Enter..."
+}
+
 function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v2.1.0" Height="600" Width="900"
+        Title="Panduan PowerShell - Control Panel v2.2.0" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
@@ -204,6 +360,11 @@ function Show-GUI {
             <Button x:Name="BtnDebloater" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🧹 Debloater" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Hapus Bloatware" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
             <Button x:Name="BtnTweaks" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="⚙️ Tweaks" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Privasi &amp; Performa" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
             <Button x:Name="BtnEventLog" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="📝 Event Log" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Analisis Error Sistem" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
+            <Button x:Name="BtnInstall" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="📦 Install Apps" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Winget Mega List" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
+            <Button x:Name="BtnBackup" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="💾 App Backup" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Export/Import Apps" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
+            <Button x:Name="BtnUpdate" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🔄 Update Mgr" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Kontrol Windows Update" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
+            <Button x:Name="BtnDNS" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🌍 DNS Switcher" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Percepat Internet" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
+            <Button x:Name="BtnPresets" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="⚡ Presets" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Setup Cepat" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
         </WrapPanel>
         <Border Grid.Row="2" Background="#2D2D30"><TextBlock x:Name="TxtStatus" Text="Ready." FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Gray"/></Border>
     </Grid>
@@ -219,49 +380,40 @@ function Show-GUI {
     $btnDebloater = $window.FindName("BtnDebloater")
     $btnTweaks = $window.FindName("BtnTweaks")
     $btnEventLog = $window.FindName("BtnEventLog")
+    $btnInstall = $window.FindName("BtnInstall")
+    $btnBackup = $window.FindName("BtnBackup")
+    $btnUpdate = $window.FindName("BtnUpdate")
+    $btnDNS = $window.FindName("BtnDNS")
+    $btnPresets = $window.FindName("BtnPresets")
     $txtStatus = $window.FindName("TxtStatus")
 
-    $btnMaintenance.Add_Click({ 
-        $txtStatus.Text = "Menjalankan Maintenance..."
-        $s = (Get-Command Invoke-Maintenance).ScriptBlock.ToString()
-        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; Invoke-Maintenance }"))
-        Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 -Verb RunAs 
-    })
+    function Start-FunctionWindow($funcName, $isAdmin = $false) {
+        $s = (Get-Command $funcName).ScriptBlock.ToString()
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; $funcName }"))
+        $args = @("-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64)
+        if ($isAdmin) { Start-Process powershell -ArgumentList $args -Verb RunAs } else { Start-Process powershell -ArgumentList $args }
+    }
 
-    $btnAudit.Add_Click({ 
-        $txtStatus.Text = "Menjalankan System Audit..."
-        $s = (Get-Command Invoke-SystemAudit).ScriptBlock.ToString()
-        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; Invoke-SystemAudit }"))
-        Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 
-    })
-
-    $btnNetwork.Add_Click({ 
-        $txtStatus.Text = "Menjalankan Network Diagnostics..."
-        $s = (Get-Command Invoke-NetworkDiagnostics).ScriptBlock.ToString()
-        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; Invoke-NetworkDiagnostics }"))
-        Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 
-    })
-
-    $btnDebloater.Add_Click({ 
-        $txtStatus.Text = "Menjalankan Debloater..."
-        $s = (Get-Command Invoke-WindowsDebloater).ScriptBlock.ToString()
-        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; Invoke-WindowsDebloater }"))
-        Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 -Verb RunAs 
-    })
-
-    $btnTweaks.Add_Click({ 
-        $txtStatus.Text = "Menjalankan System Tweaks..."
+    $btnMaintenance.Add_Click({ $txtStatus.Text = "Menjalankan Maintenance..."; Start-FunctionWindow "Invoke-Maintenance" $true })
+    $btnAudit.Add_Click({ $txtStatus.Text = "Menjalankan System Audit..."; Start-FunctionWindow "Invoke-SystemAudit" $false })
+    $btnNetwork.Add_Click({ $txtStatus.Text = "Menjalankan Network Diagnostics..."; Start-FunctionWindow "Invoke-NetworkDiagnostics" $false })
+    $btnDebloater.Add_Click({ $txtStatus.Text = "Menjalankan Debloater..."; Start-FunctionWindow "Invoke-WindowsDebloater" $true })
+    $btnTweaks.Add_Click({ $txtStatus.Text = "Menjalankan System Tweaks..."; 
         $s1 = (Get-Command Backup-RegistryTweaks).ScriptBlock.ToString()
         $s2 = (Get-Command Invoke-SystemTweaks).ScriptBlock.ToString()
         $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s1 ; $s2 ; Invoke-SystemTweaks }"))
-        Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 -Verb RunAs 
+        Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 -Verb RunAs 
     })
-
-    $btnEventLog.Add_Click({ 
-        $txtStatus.Text = "Menjalankan Event Log Analyzer..."
-        $s = (Get-Command Invoke-EventLogAnalyzer).ScriptBlock.ToString()
-        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s ; Invoke-EventLogAnalyzer }"))
-        Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 
+    $btnEventLog.Add_Click({ $txtStatus.Text = "Menjalankan Event Log Analyzer..."; Start-FunctionWindow "Invoke-EventLogAnalyzer" $false })
+    $btnInstall.Add_Click({ $txtStatus.Text = "Menjalankan App Installer..."; Start-FunctionWindow "Invoke-WingetAppInstaller" $false })
+    $btnBackup.Add_Click({ $txtStatus.Text = "Menjalankan App Backup..."; Start-FunctionWindow "Invoke-AppBackup" $false })
+    $btnUpdate.Add_Click({ $txtStatus.Text = "Menjalankan Update Manager..."; Start-FunctionWindow "Invoke-UpdateManager" $true })
+    $btnDNS.Add_Click({ $txtStatus.Text = "Menjalankan DNS Switcher..."; Start-FunctionWindow "Invoke-DnsSwitcher" $true })
+    $btnPresets.Add_Click({ $txtStatus.Text = "Menjalankan Presets..."; 
+        $s1 = (Get-Command Backup-RegistryTweaks).ScriptBlock.ToString()
+        $s2 = (Get-Command Invoke-Presets).ScriptBlock.ToString()
+        $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes("& { $s1 ; $s2 ; Invoke-Presets }"))
+        Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64 -Verb RunAs 
     })
 
     $window.ShowDialog() | Out-Null
