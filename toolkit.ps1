@@ -79,162 +79,48 @@ function Invoke-BackupUserProfile {
 # ==========================================
 function Invoke-WingetAppInstaller {
     $apps = @(
-        # Browsers
         [PSCustomObject]@{ Cat='Browsers'; Name='Brave'; Id='Brave.Brave' },
         [PSCustomObject]@{ Cat='Browsers'; Name='Chrome'; Id='Google.Chrome' },
-        [PSCustomObject]@{ Cat='Browsers'; Name='Chromium'; Id='Hibbiki.Chromium' },
         [PSCustomObject]@{ Cat='Browsers'; Name='Edge'; Id='Microsoft.Edge' },
         [PSCustomObject]@{ Cat='Browsers'; Name='Firefox'; Id='Mozilla.Firefox' },
-        [PSCustomObject]@{ Cat='Browsers'; Name='Firefox ESR'; Id='Mozilla.Firefox.ESR' },
-        [PSCustomObject]@{ Cat='Browsers'; Name='Floorp'; Id='Ablaze.Floorp' },
-        [PSCustomObject]@{ Cat='Browsers'; Name='LibreWolf'; Id='LibreWolf.LibreWolf' },
-        [PSCustomObject]@{ Cat='Browsers'; Name='Mullvad Browser'; Id='Mullvad.MullvadBrowser' },
-        [PSCustomObject]@{ Cat='Browsers'; Name='Opera GX'; Id='Opera.OperaGX' },
         [PSCustomObject]@{ Cat='Browsers'; Name='Tor Browser'; Id='TorProject.TorBrowser' },
-        [PSCustomObject]@{ Cat='Browsers'; Name='Ungoogled Chromium'; Id='eloston.ungoogled-chromium' },
         [PSCustomObject]@{ Cat='Browsers'; Name='Vivaldi'; Id='Vivaldi.Vivaldi' },
-        [PSCustomObject]@{ Cat='Browsers'; Name='Waterfox'; Id='Waterfox.Waterfox' },
-        [PSCustomObject]@{ Cat='Browsers'; Name='Zen Browser'; Id='Zen-Team.Zen-Browser' },
-
-        # Communications
-        [PSCustomObject]@{ Cat='Communications'; Name='Betterbird'; Id='Betterbird.Betterbird' },
         [PSCustomObject]@{ Cat='Communications'; Name='Discord'; Id='Discord.Discord' },
-        [PSCustomObject]@{ Cat='Communications'; Name='Element'; Id='Element.Element' },
-        [PSCustomObject]@{ Cat='Communications'; Name='Proton Mail'; Id='Proton.ProtonMail' },
-        [PSCustomObject]@{ Cat='Communications'; Name='Signal'; Id='OpenWhisperSystems.Signal' },
-        [PSCustomObject]@{ Cat='Communications'; Name='Slack'; Id='SlackTechnologies.Slack' },
-        [PSCustomObject]@{ Cat='Communications'; Name='Teams'; Id='Microsoft.Teams' },
-        [PSCustomObject]@{ Cat='Communications'; Name='Telegram'; Id='Telegram.TelegramDesktop' },
-        [PSCustomObject]@{ Cat='Communications'; Name='Viber'; Id='Viber.Viber' },
-        [PSCustomObject]@{ Cat='Communications'; Name='WhatsApp'; Id='WhatsApp.WhatsApp' },
         [PSCustomObject]@{ Cat='Communications'; Name='Zoom'; Id='Zoom.Zoom' },
-
-        # Development
-        [PSCustomObject]@{ Cat='Development'; Name='Bruno'; Id='Bruno.Bruno' },
-        [PSCustomObject]@{ Cat='Development'; Name='CMake'; Id='Kitware.CMake' },
-        [PSCustomObject]@{ Cat='Development'; Name='Docker Desktop'; Id='Docker.DockerDesktop' },
-        [PSCustomObject]@{ Cat='Development'; Name='Git'; Id='Git.Git' },
-        [PSCustomObject]@{ Cat='Development'; Name='GitHub CLI'; Id='GitHub.cli' },
-        [PSCustomObject]@{ Cat='Development'; Name='GitHub Desktop'; Id='GitHub.GitHubDesktop' },
-        [PSCustomObject]@{ Cat='Development'; Name='Go'; Id='GoLang.Go' },
-        [PSCustomObject]@{ Cat='Development'; Name='JetBrains Toolbox'; Id='JetBrains.Toolbox' },
-        [PSCustomObject]@{ Cat='Development'; Name='Lazygit'; Id='JesseDuffield.lazygit' },
-        [PSCustomObject]@{ Cat='Development'; Name='Neovim'; Id='Neovim.Neovim' },
-        [PSCustomObject]@{ Cat='Development'; Name='Node.js'; Id='OpenJS.NodeJS' },
-        [PSCustomObject]@{ Cat='Development'; Name='Node.js LTS'; Id='OpenJS.NodeJS.LTS' },
-        [PSCustomObject]@{ Cat='Development'; Name='Postman'; Id='Postman.Postman' },
-        [PSCustomObject]@{ Cat='Development'; Name='Python 3'; Id='Python.Python.3.12' },
-        [PSCustomObject]@{ Cat='Development'; Name='Ruby'; Id='RubyInstallerTeam.Ruby' },
-        [PSCustomObject]@{ Cat='Development'; Name='Rust'; Id='Rustlang.Rustup' },
-        [PSCustomObject]@{ Cat='Development'; Name='Sublime Text'; Id='SublimeHQ.SublimeText.4' },
-        [PSCustomObject]@{ Cat='Development'; Name='Unity Game Engine'; Id='Unity.UnityHub' },
-        [PSCustomObject]@{ Cat='Development'; Name='Visual Studio 2022'; Id='Microsoft.VisualStudio.2022.Community' },
+        [PSCustomObject]@{ Cat='Communications'; Name='Telegram'; Id='Telegram.TelegramDesktop' },
+        [PSCustomObject]@{ Cat='Communications'; Name='WhatsApp'; Id='WhatsApp.WhatsApp' },
         [PSCustomObject]@{ Cat='Development'; Name='VS Code'; Id='Microsoft.VisualStudioCode' },
-        [PSCustomObject]@{ Cat='Development'; Name='Zed'; Id='ZedIndustries.Zed' },
-
-        # Document
-        [PSCustomObject]@{ Cat='Document'; Name='Adobe Acrobat Reader'; Id='Adobe.Acrobat.Reader.64-bit' },
-        [PSCustomObject]@{ Cat='Document'; Name='Foxit PDF Reader'; Id='Foxit.FoxitReader' },
-        [PSCustomObject]@{ Cat='Document'; Name='Joplin'; Id='Joplin.Joplin' },
+        [PSCustomObject]@{ Cat='Development'; Name='Git'; Id='Git.Git' },
+        [PSCustomObject]@{ Cat='Development'; Name='Python 3'; Id='Python.Python.3.12' },
+        [PSCustomObject]@{ Cat='Development'; Name='Node.js'; Id='OpenJS.NodeJS' },
         [PSCustomObject]@{ Cat='Document'; Name='LibreOffice'; Id='TheDocumentFoundation.LibreOffice' },
-        [PSCustomObject]@{ Cat='Document'; Name='Obsidian'; Id='Obsidian.Obsidian' },
-        [PSCustomObject]@{ Cat='Document'; Name='ONLYOFFICE Desktop'; Id='ONLYOFFICE.DesktopEditors' },
-        [PSCustomObject]@{ Cat='Document'; Name='PDF24 Creator'; Id='PDF24.PDF24Creator' },
-        [PSCustomObject]@{ Cat='Document'; Name='Sumatra PDF'; Id='SumatraPDF.SumatraPDF' },
-        [PSCustomObject]@{ Cat='Document'; Name='Zotero'; Id='DigitalScholar.Zotero' },
-
-        # Games
-        [PSCustomObject]@{ Cat='Games'; Name='Battle.net'; Id='Blizzard.BattleNet' },
-        [PSCustomObject]@{ Cat='Games'; Name='EA App'; Id='ElectronicArts.EADesktop' },
-        [PSCustomObject]@{ Cat='Games'; Name='Epic Games Launcher'; Id='EpicGames.EpicGamesLauncher' },
-        [PSCustomObject]@{ Cat='Games'; Name='GeForce NOW'; Id='Nvidia.GeForceNow' },
-        [PSCustomObject]@{ Cat='Games'; Name='GOG Galaxy'; Id='GOG.Galaxy' },
-        [PSCustomObject]@{ Cat='Games'; Name='Heroic Games Launcher'; Id='HeroicGamesLauncher.HeroicGamesLauncher' },
-        [PSCustomObject]@{ Cat='Games'; Name='Playnite'; Id='Playnite.Playnite' },
-        [PSCustomObject]@{ Cat='Games'; Name='Prism Launcher'; Id='PrismLauncher.PrismLauncher' },
+        [PSCustomObject]@{ Cat='Document'; Name='ONLYOFFICE'; Id='ONLYOFFICE.DesktopEditors' },
+        [PSCustomObject]@{ Cat='Document'; Name='Adobe Acrobat Reader'; Id='Adobe.Acrobat.Reader.64-bit' },
         [PSCustomObject]@{ Cat='Games'; Name='Steam'; Id='Valve.Steam' },
-        [PSCustomObject]@{ Cat='Games'; Name='Ubisoft Connect'; Id='Ubisoft.Connect' },
-
-        # Microsoft Tools
-        [PSCustomObject]@{ Cat='Microsoft'; Name='Autoruns'; Id='Microsoft.Sysinternals.Autoruns' },
-        [PSCustomObject]@{ Cat='Microsoft'; Name='.NET Runtime 8'; Id='Microsoft.DotNet.Runtime.8' },
-        [PSCustomObject]@{ Cat='Microsoft'; Name='OneDrive'; Id='Microsoft.OneDrive' },
-        [PSCustomObject]@{ Cat='Microsoft'; Name='PowerShell'; Id='Microsoft.PowerShell' },
+        [PSCustomObject]@{ Cat='Games'; Name='Epic Games'; Id='EpicGames.EpicGamesLauncher' },
         [PSCustomObject]@{ Cat='Microsoft'; Name='PowerToys'; Id='Microsoft.PowerToys' },
-        [PSCustomObject]@{ Cat='Microsoft'; Name='Process Explorer'; Id='Microsoft.Sysinternals.ProcessExplorer' },
-        [PSCustomObject]@{ Cat='Microsoft'; Name='Process Monitor'; Id='Microsoft.Sysinternals.ProcessMonitor' },
         [PSCustomObject]@{ Cat='Microsoft'; Name='Windows Terminal'; Id='Microsoft.WindowsTerminal' },
-        [PSCustomObject]@{ Cat='Microsoft'; Name='Visual C++ 2015-2022'; Id='Microsoft.VCRedist.2015+.x64' },
-
-        # Multimedia
-        [PSCustomObject]@{ Cat='Multimedia'; Name='Audacity'; Id='Audacity.Audacity' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='Blender'; Id='BlenderFoundation.Blender' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='Calibre'; Id='calibre.calibre' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='GIMP'; Id='GIMP.GIMP' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='HandBrake'; Id='HandBrake.HandBrake' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='ImageGlass'; Id='DuongDieuPhap.ImageGlass' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='IrfanView'; Id='IrfanSkiljan.IrfanView' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='iTunes'; Id='Apple.iTunes' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='K-Lite Codec Standard'; Id='CodecGuide.K-LiteCodecPack.Standard' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='Notepad++'; Id='Notepad++.Notepad++' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='OBS Studio'; Id='OBSProject.OBSStudio' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='Paint.NET'; Id='dotPDN.PaintDotNet' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='ShareX'; Id='ShareX.ShareX' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='VLC'; Id='VideoLAN.VLC' },
         [PSCustomObject]@{ Cat='Multimedia'; Name='Spotify'; Id='Spotify.Spotify' },
-        [PSCustomObject]@{ Cat='Multimedia'; Name='VLC Media Player'; Id='VideoLAN.VLC' },
-
-        # Pro Tools
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='Advanced IP Scanner'; Id='Famatech.AdvancedIPScanner' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='Cinebench R23'; Id='Maxon.CinebenchR23' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='CPU-Z'; Id='CPUID.CPU-Z' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='Display Driver Uninstaller'; Id='Wagnardsoft.DisplayDriverUninstaller' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='GPU-Z'; Id='TechPowerUp.GPU-Z' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='HWiNFO'; Id='REALiX.HWiNFO' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='HWMonitor'; Id='CPUID.HWMonitor' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='Mullvad VPN'; Id='Mullvad.MullvadVPN' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='Nmap'; Id='Insecure.Nmap' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='PuTTY'; Id='PuTTY.PuTTY' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='Ventoy'; Id='Ventoy.Ventoy' },
-        [PSCustomObject]@{ Cat='Pro Tools'; Name='WinSCP'; Id='WinSCP.WinSCP' },
+        [PSCustomObject]@{ Cat='Multimedia'; Name='OBS Studio'; Id='OBSProject.OBSStudio' },
         [PSCustomObject]@{ Cat='Pro Tools'; Name='Wireshark'; Id='WiresharkFoundation.Wireshark' },
-
-        # Utilities
-        [PSCustomObject]@{ Cat='Utilities'; Name='1Password'; Id='AgileBits.1Password' },
+        [PSCustomObject]@{ Cat='Pro Tools'; Name='Nmap'; Id='Insecure.Nmap' },
         [PSCustomObject]@{ Cat='Utilities'; Name='7-Zip'; Id='7zip.7zip' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='AnyDesk'; Id='AnyDeskSoftwareGmbH.AnyDesk' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='AutoHotkey'; Id='AutoHotkey.AutoHotkey' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='Bitwarden'; Id='Bitwarden.Bitwarden' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='Bulk Crap Uninstaller'; Id='Klocman.BulkCrapUninstaller' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='Crystal Disk Info'; Id='CrystalDewWorld.CrystalDiskInfo' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='Dropbox'; Id='Dropbox.Dropbox' },
+        [PSCustomObject]@{ Cat='Utilities'; Name='WinRAR'; Id='RARLab.WinRAR' },
         [PSCustomObject]@{ Cat='Utilities'; Name='Everything'; Id='voidtools.Everything' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='Files'; Id='FilesCommunity.Files' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='Google Drive'; Id='Google.Drive' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='Internet Download Manager'; Id='Tonec.InternetDownloadManager' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='KeePassXC'; Id='KeePassXCTeam.KeePassXC' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='MSI Afterburner'; Id='Guru3D.Afterburner' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='NanaZip'; Id='M2Team.NanaZip' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='qBittorrent'; Id='qBittorrent.qBittorrent' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='Revo Uninstaller'; Id='RevoUninstaller.RevoUninstaller' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='Rufus'; Id='Rufus.Rufus' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='Tailscale'; Id='tailscale.tailscale' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='TeamViewer'; Id='TeamViewer.TeamViewer' },
-        [PSCustomObject]@{ Cat='Utilities'; Name='WinRAR'; Id='RARLab.WinRAR' }
+        [PSCustomObject]@{ Cat='Utilities'; Name='Rufus'; Id='Rufus.Rufus' }
     )
 
     $categories = $apps.Cat | Sort-Object -Unique
 
     do {
         Clear-Host
-        Write-Host "========== WINGET APP INSTALLER (MEGA LIST) ==========" -ForegroundColor Cyan
+        Write-Host "========== WINGET APP INSTALLER ==========" -ForegroundColor Cyan
         Write-Host "Pilih Kategori Aplikasi:" -ForegroundColor Yellow
-        for ($i = 0; $i -lt $categories.Count; $i++) {
-            Write-Host " $($i + 1). $($categories[$i])"
-        }
+        for ($i = 0; $i -lt $categories.Count; $i++) { Write-Host " $($i + 1). $($categories[$i])" }
         Write-Host " 0. Kembali ke Menu Utama" -ForegroundColor Red
         
         $catChoice = Read-Host "`nMasukkan nomor kategori"
-        
         if ($catChoice -eq '0') { return }
         
         $selectedCatIndex = [int]$catChoice - 1
@@ -245,20 +131,16 @@ function Invoke-WingetAppInstaller {
             Clear-Host
             Write-Host "========== $($selectedCat.ToUpper()) ==========" -ForegroundColor Cyan
             Write-Host "Pilih aplikasi yang ingin diinstal (pisahkan dengan koma, misal: 1,2):" -ForegroundColor Yellow
-            for ($j = 0; $j -lt $filteredApps.Count; $j++) {
-                Write-Host " $($j + 1). $($filteredApps[$j].Name)"
-            }
+            for ($j = 0; $j -lt $filteredApps.Count; $j++) { Write-Host " $($j + 1). $($filteredApps[$j].Name)" }
             Write-Host " 0. Batal"
             
             $appChoice = Read-Host "`nMasukkan nomor aplikasi"
-            
             if ($appChoice -ne '0' -and $appChoice -ne '') {
                 $selectedIndices = $appChoice -split ',' | ForEach-Object { $_.Trim() }
                 foreach ($idx in $selectedIndices) {
                     $appIndex = [int]$idx - 1
                     if ($appIndex -ge 0 -and $appIndex -lt $filteredApps.Count) {
-                        $appId = $filteredApps[$appIndex].Id
-                        $appName = $filteredApps[$appIndex].Name
+                        $appId = $filteredApps[$appIndex].Id; $appName = $filteredApps[$appIndex].Name
                         Write-Host "`n[+] Menginstal $appName..." -ForegroundColor Green
                         winget install --id $appId --accept-source-agreements --accept-package-agreements --silent
                     }
@@ -270,7 +152,7 @@ function Invoke-WingetAppInstaller {
 }
 
 # ==========================================
-# FUNGSI 6-7: DEBLOATER & RESTORE
+# 6-7. DEBLOATER & RESTORE
 # ==========================================
 function Invoke-WindowsDebloater {
     Clear-Host; Write-Host "========== WINDOWS DEBLOATER ==========" -ForegroundColor Cyan
@@ -291,24 +173,80 @@ function Invoke-CreateRestorePoint {
 }
 
 # ==========================================
-# FUNGSI 8-10: TWEAKS, FIXES, UPDATES
+# 8. SYSTEM TWEAKS (CTT STYLE - MULTI SELECT)
 # ==========================================
 function Invoke-SystemTweaks {
-    Clear-Host; Write-Host "========== SYSTEM TWEAKS ==========" -ForegroundColor Cyan
+    Clear-Host
+    Write-Host "========== SYSTEM TWEAKS (CTT STYLE) ==========" -ForegroundColor Cyan
     Backup-RegistryTweaks
-    Write-Host "`n1. Disable Telemetry`n2. Optimize Visual Effects`n3. Show File Extensions`n4. Disable Game Bar`n5. Apply ALL`n6. Kembali" -ForegroundColor Yellow
-    $choice = Read-Host "`nPilih (1-6)"
-    switch ($choice) {
-        '1' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Start_TrackDocs" -Value 0 -Type DWord; Write-Host "[+] Telemetry off." -ForegroundColor Green }
-        '2' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" -Name "VisualFXSetting" -Value 2 -Type DWord; Write-Host "[+] Visual Effects optimized." -ForegroundColor Green }
-        '3' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 0 -Type DWord; Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -Value 1 -Type DWord; Write-Host "[+] Extensions shown." -ForegroundColor Green }
-        '4' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\GameBar" -Name "AutoGameModeEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Write-Host "[+] Game Bar off." -ForegroundColor Green }
-        '5' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Start_TrackDocs" -Value 0 -Type DWord; Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" -Name "VisualFXSetting" -Value 2 -Type DWord; Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 0 -Type DWord; Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -Value 1 -Type DWord; Set-ItemProperty -Path "HKCU:\Software\Microsoft\GameBar" -Name "AutoGameModeEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Write-Host "[+] All tweaks applied." -ForegroundColor Green }
-        '6' { return }
+
+    $tweaks = @(
+        [PSCustomObject]@{ Id=1; Cat='Essential'; Name='Disable Telemetry'; Action='Telemetry' },
+        [PSCustomObject]@{ Id=2; Cat='Essential'; Name='Disable Activity History'; Action='Activity' },
+        [PSCustomObject]@{ Id=3; Cat='Essential'; Name='Disable Consumer Features (Tips/Suggestions)'; Action='Consumer' },
+        [PSCustomObject]@{ Id=4; Cat='Essential'; Name='Disable Location Tracking'; Action='Location' },
+        [PSCustomObject]@{ Id=5; Cat='Essential'; Name='Disable Hibernation (Hemat Disk)'; Action='Hibernate' },
+        [PSCustomObject]@{ Id=6; Cat='Essential'; Name='Enable End Task With Right Click'; Action='EndTask' },
+        [PSCustomObject]@{ Id=7; Cat='Essential'; Name='Show File Extensions'; Action='FileExt' },
+        [PSCustomObject]@{ Id=8; Cat='Essential'; Name='Show Hidden Files'; Action='Hidden' },
+        [PSCustomObject]@{ Id=9; Cat='Essential'; Name='Create System Restore Point'; Action='Restore' },
+        [PSCustomObject]@{ Id=10; Cat='Essential'; Name='Run Disk Cleanup'; Action='Cleanup' },
+
+        [PSCustomObject]@{ Id=11; Cat='Advanced'; Name='Disable Background Apps'; Action='BgApps' },
+        [PSCustomObject]@{ Id=12; Cat='Advanced'; Name='Disable Storage Sense'; Action='Storage' },
+        [PSCustomObject]@{ Id=13; Cat='Advanced'; Name='Disable Bing Search in Start Menu'; Action='Bing' },
+        [PSCustomObject]@{ Id=14; Cat='Advanced'; Name='Disable Game Bar'; Action='GameBar' },
+        [PSCustomObject]@{ Id=15; Cat='Advanced'; Name='Enable Ultimate Performance Power Plan'; Action='UltimatePerf' }
+    )
+
+    $essential = $tweaks | Where-Object { $_.Cat -eq 'Essential' }
+    $advanced = $tweaks | Where-Object { $_.Cat -eq 'Advanced' }
+
+    Write-Host "`n[ Essential Tweaks ]" -ForegroundColor Green
+    foreach ($t in $essential) { Write-Host " $($t.Id). $($t.Name)" }
+
+    Write-Host "`n[ Advanced Tweaks - CAUTION ]" -ForegroundColor Red
+    foreach ($t in $advanced) { Write-Host " $($t.Id). $($t.Name)" }
+
+    Write-Host "`n===================================================" -ForegroundColor Cyan
+    Write-Host "Pilih nomor tweak (pisahkan dengan koma, misal: 1,5,11), atau 'x' batal." -ForegroundColor Yellow
+    $inputTweaks = Read-Host "Pilihan Anda"
+
+    if ($inputTweaks -eq 'x' -or $inputTweaks -eq '') { return }
+
+    $selected = $inputTweaks -split ',' | ForEach-Object { $_.Trim() }
+
+    foreach ($num in $selected) {
+        $t = $tweaks | Where-Object { $_.Id -eq $num }
+        if ($t) {
+            Write-Host " -> Menerapkan: $($t.Name)..." -ForegroundColor Yellow
+            switch ($t.Action) {
+                'Telemetry' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
+                'Activity' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "EnableActivityFeed" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
+                'Consumer' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsConsumerFeatures" -Value 1 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
+                'Location' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableLocation" -Value 1 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
+                'Hibernate' { powercfg -h off; Write-Host "    Berhasil (Hibernasi dimatikan)." -ForegroundColor Green }
+                'EndTask' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings" -Name "TaskbarEndTask" -Value 1 -Type DWord -Force -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
+                'FileExt' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 0 -Type DWord; Write-Host "    Berhasil." -ForegroundColor Green }
+                'Hidden' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -Value 1 -Type DWord; Write-Host "    Berhasil." -ForegroundColor Green }
+                'Restore' { Invoke-CreateRestorePoint }
+                'Cleanup' { Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -NoNewWindow -Wait; Write-Host "    Berhasil." -ForegroundColor Green }
+                'BgApps' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Name "GlobalUserDisabled" -Value 1 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
+                'Storage' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy" -Name "01" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
+                'Bing' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search" -Name "BingSearchEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
+                'GameBar' { Set-ItemProperty -Path "HKCU:\Software\Microsoft\GameBar" -Name "AutoGameModeEnabled" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Write-Host "    Berhasil." -ForegroundColor Green }
+                'UltimatePerf' { powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61; Write-Host "    Berhasil (Ultimate Performance Plan ditambahkan)." -ForegroundColor Green }
+            }
+        }
     }
-    Read-Host "`nTekan Enter..."
+
+    Write-Host "`n[+] Selesai menerapkan tweaks. Beberapa perubahan mungkin butuh restart." -ForegroundColor Cyan
+    Read-Host "Tekan Enter untuk kembali ke menu..."
 }
 
+# ==========================================
+# 9-10. FIXES & UPDATES
+# ==========================================
 function Invoke-OneClickFixes {
     Clear-Host; Write-Host "========== ONE-CLICK FIXES ==========" -ForegroundColor Cyan
     Write-Host "1. Reset Network`n2. Reset Update Cache`n3. Repair System (SFC/DISM)`n4. Kembali" -ForegroundColor Yellow
@@ -339,7 +277,7 @@ function Invoke-UpdateManager {
 }
 
 # ==========================================
-# 11-12. FUNGSI LAMA: PRESETS & APP BACKUP
+# 11-12. PRESETS & APP BACKUP
 # ==========================================
 function Invoke-Presets {
     Clear-Host; Write-Host "========== AUTOMATION PRESETS ==========" -ForegroundColor Cyan
@@ -386,20 +324,13 @@ function Invoke-EventLogAnalyzer {
         Write-Host "[+] Memindai Event Log (7 Hari Terakhir)..." -ForegroundColor Yellow
         $events = Get-WinEvent -FilterHashtable @{LogName='System','Application'; Level=1,2; StartTime=(Get-Date).AddDays(-7)} -ErrorAction SilentlyContinue
         
-        if (-not $events) { 
-            Write-Host "`n[+] Luar biasa! Tidak ada Error/Critical di log sistem minggu ini." -ForegroundColor Green 
-            Read-Host "`nTekan Enter untuk kembali..."
-            return
-        }
+        if (-not $events) { Write-Host "`n[+] Luar biasa! Tidak ada Error/Critical di log sistem minggu ini." -ForegroundColor Green; Read-Host "`nTekan Enter untuk kembali..."; return }
 
         $summary = $events | Group-Object ProviderName | Sort-Object Count -Descending | Select-Object -First 10
         Write-Host "`n[!] Ditemukan $($events.Count) error. Berikut Top 10 Penyebab:" -ForegroundColor Red
         
         $i = 0
-        $summary | ForEach-Object {
-            $i++
-            Write-Host "[$i] $($_.Name) ($($_.Count) kali)" -ForegroundColor Gray
-        }
+        $summary | ForEach-Object { $i++; Write-Host "[$i] $($_.Name) ($($_.Count) kali)" -ForegroundColor Gray }
         
         Write-Host "===================================================" -ForegroundColor Cyan
         Write-Host "Ketik nomor untuk melihat detail & saran perbaikan, atau 'x' untuk kembali." -ForegroundColor Yellow
@@ -422,7 +353,6 @@ function Invoke-EventLogAnalyzer {
             }
             
             Write-Host "`n[💡] SARAN PERBAIKAN:" -ForegroundColor Yellow
-            
             $fixAction = $null
             switch -Wildcard ($provider) {
                 "*DistributedCOM*" { Write-Host "Error ini (Event ID 10016) SANGAT UMUM di Windows dan biasanya aman untuk diabaikan." -ForegroundColor Green }
@@ -489,16 +419,11 @@ function Invoke-StartupManager {
             Write-Host "    Loc  : $($_.Location)" -ForegroundColor DarkGray
         }
 
-        if ($startupItems.Count -eq 0) {
-            Write-Host " -> Tidak ada item startup yang terdeteksi." -ForegroundColor Yellow
-            Read-Host "`nTekan Enter untuk kembali..."
-            return
-        }
+        if ($startupItems.Count -eq 0) { Write-Host " -> Tidak ada item startup yang terdeteksi." -ForegroundColor Yellow; Read-Host "`nTekan Enter untuk kembali..."; return }
 
         Write-Host "===================================================" -ForegroundColor Cyan
         Write-Host "Ketik nomor untuk mengelola, atau 'x' untuk kembali." -ForegroundColor Yellow
         $choice = Read-Host "Pilih"
-
         if ($choice -eq 'x' -or $choice -eq '') { return }
 
         $selectedItem = $startupItems[$choice - 1]
@@ -515,19 +440,13 @@ function Invoke-StartupManager {
 
             switch ($action) {
                 '1' {
-                    try {
-                        Remove-ItemProperty -Path $selectedItem.Location -Name $selectedItem.Name -ErrorAction Stop
-                        Write-Host "`n[+] Berhasil menghapus '$($selectedItem.Name)' dari startup." -ForegroundColor Green
-                    } catch {
-                        Write-Host "`n[!] Gagal menghapus. Anda mungkin butuh hak Admin." -ForegroundColor Red
-                    }
+                    try { Remove-ItemProperty -Path $selectedItem.Location -Name $selectedItem.Name -ErrorAction Stop; Write-Host "`n[+] Berhasil menghapus '$($selectedItem.Name)' dari startup." -ForegroundColor Green } 
+                    catch { Write-Host "`n[!] Gagal menghapus. Anda mungkin butuh hak Admin." -ForegroundColor Red }
                     Read-Host "`nTekan Enter..."
                 }
                 '2' {
                     $exePath = $selectedItem.Command
-                    if ($exePath -match '^"([^"]+)"') { $exePath = $matches[1] }
-                    elseif ($exePath -match '^(\S+\.exe)') { $exePath = $matches[1] }
-                    
+                    if ($exePath -match '^"([^"]+)"') { $exePath = $matches[1] } elseif ($exePath -match '^(\S+\.exe)') { $exePath = $matches[1] }
                     if (Test-Path $exePath) {
                         $sig = Get-AuthenticodeSignature -FilePath $exePath
                         Write-Host "`n[+] Status Signature: $($sig.Status)" -ForegroundColor $(if ($sig.Status -eq 'Valid') { 'Green' } else { 'Red' })
@@ -537,17 +456,12 @@ function Invoke-StartupManager {
                 }
                 '3' {
                     $exePath = $selectedItem.Command
-                    if ($exePath -match '^"([^"]+)"') { $exePath = $matches[1] }
-                    elseif ($exePath -match '^(\S+\.exe)') { $exePath = $matches[1] }
-                    
+                    if ($exePath -match '^"([^"]+)"') { $exePath = $matches[1] } elseif ($exePath -match '^(\S+\.exe)') { $exePath = $matches[1] }
                     if (Test-Path $exePath) { Start-Process explorer.exe -ArgumentList "/select,`"$exePath`"" } else { Write-Host "`n[!] File tidak ditemukan." -ForegroundColor Red; Read-Host "Tekan Enter..." }
                 }
                 '4' { }
             }
-        } else {
-            Write-Host "`n[!] Nomor tidak valid." -ForegroundColor Red
-            Start-Sleep -Seconds 1
-        }
+        } else { Write-Host "`n[!] Nomor tidak valid." -ForegroundColor Red; Start-Sleep -Seconds 1 }
     } while ($true)
 }
 
@@ -565,13 +479,8 @@ function Invoke-DnsSwitcher {
     Write-Host "4. Reset ke Otomatis (DHCP)"
     Write-Host "5. Batal"
     $choice = Read-Host "`nPilih (1-5)"
-
     $adapters = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
-    if (-not $adapters) {
-        Write-Host "`n[!] Tidak ada koneksi internet aktif." -ForegroundColor Red
-        Read-Host "Tekan Enter..."; return
-    }
-
+    if (-not $adapters) { Write-Host "`n[!] Tidak ada koneksi internet aktif." -ForegroundColor Red; Read-Host "Tekan Enter..."; return }
     switch ($choice) {
         '1' { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("1.1.1.1","1.0.0.1") }; Write-Host "`n[+] DNS diubah ke Cloudflare." -ForegroundColor Green }
         '2' { foreach ($a in $adapters) { Set-DnsClientServerAddress -InterfaceIndex $a.ifIndex -ServerAddresses ("8.8.8.8","8.8.4.4") }; Write-Host "`n[+] DNS diubah ke Google." -ForegroundColor Green }
@@ -585,12 +494,12 @@ function Invoke-DnsSwitcher {
 }
 
 # ==========================================
-# MENU UTAMA (v1.9.9)
+# MENU UTAMA (v1.10.0)
 # ==========================================
 function Show-Menu {
     Clear-Host
     Write-Host "===================================================" -ForegroundColor Cyan
-    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.9.9      " -ForegroundColor Cyan
+    Write-Host "      PANDUAN POWERSHELL - CONTROL PANEL v1.10.0     " -ForegroundColor Cyan
     Write-Host "===================================================" -ForegroundColor Cyan
     Write-Host " 1. Maintenance PC (Bersihkan & Optimasi)" -ForegroundColor Green
     Write-Host " 2. System Audit (Cek Hardware & OS)" -ForegroundColor Magenta
@@ -599,7 +508,7 @@ function Show-Menu {
     Write-Host " 5. Install Aplikasi Populer (Winget - MEGA LIST)" -ForegroundColor Yellow
     Write-Host " 6. Windows Debloater (Hapus Bloatware)" -ForegroundColor Yellow
     Write-Host " 7. Buat System Restore Point" -ForegroundColor Yellow
-    Write-Host " 8. System Tweaks (Privasi & Performa)" -ForegroundColor Cyan
+    Write-Host " 8. System Tweaks (CTT STYLE - Multi Select)" -ForegroundColor Cyan
     Write-Host " 9. One-Click Fixes (Perbaikan Sistem)" -ForegroundColor Cyan
     Write-Host "10. Windows Update Manager" -ForegroundColor Cyan
     Write-Host "11. AUTOMATION PRESETS (Setup Cepat)" -ForegroundColor Magenta

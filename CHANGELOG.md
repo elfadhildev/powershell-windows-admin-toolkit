@@ -40,3 +40,6 @@
 ## [1.9.9] - 2026-10-25
 ### Added
 - **Mega Winget List:** Menambahkan lebih dari 100 aplikasi populer (Browsers, Communications, Development, Document, Games, Microsoft, Multimedia, Pro Tools, Utilities) ke dalam menu instalasi (Opsi 5) agar setara dengan Chris Titus WinUtil.
+## [1.10.0] - 2026-10-25
+### Added
+- **System Tweaks (CTT Style):** Merombak total Opsi 8. Sekarang mendukung multi-select (bisa pilih beberapa tweak sekaligus) dan dibagi menjadi kategori Essential dan Advanced Tweaks seperti di Chris Titus WinUtil.
