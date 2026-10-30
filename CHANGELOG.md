@@ -86,3 +86,8 @@
 - **Full GUI Experience:** Mengubah hampir semua fungsi menjadi GUI (Checkbox & MessageBox).
 - **Deep Clean Maintenance:** Fitur pembersihan mendalam (Temp, DNS, Disk Cleanup, DISM WinSxS, SFC) di dalam GUI interaktif.
 - **Install Apps GUI:** Menambahkan 40 aplikasi populer dengan sistem Checkbox.
+## [3.1.0] - 2026-10-25
+### Added
+- **Tabbed GUI (CTT Style):** Tweaks dan Install Apps sekarang dikategorikan ke dalam Tab (Privasi, Performa, Browsers, Dev, dll) agar rapi dan tidak perlu scroll panjang.
+- **Premium Dark UI:** Semua kotak dialog (DNS, Update, Backup) diganti dengan jendela WPF kustom yang mendukung Dark Mode, bukan lagi MessageBox putih kaku.
+- **Fixed Pester & Debloater:** Mengembalikan fungsi CLI yang hilang agar test otomatis lulus dan Debloater tidak error.
