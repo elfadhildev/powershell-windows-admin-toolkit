@@ -56,10 +56,9 @@ function Invoke-EventLogAnalyzer {
 }
 
 # ==========================================
-# DATA GLOBAL: TWEAKS (Essential & Advanced)
+# DATA GLOBAL: TWEAKS
 # ==========================================
 $Global:TweakList = @(
-    # Essential Tweaks (18)
     [PSCustomObject]@{ Id=1; Cat='Essential'; Name='Activity History - Disable'; Action='Activity' },
     [PSCustomObject]@{ Id=2; Cat='Essential'; Name='BitLocker - Disable'; Action='BitLocker' },
     [PSCustomObject]@{ Id=3; Cat='Essential'; Name='ConsumerFeatures - Disable'; Action='Consumer' },
@@ -78,8 +77,6 @@ $Global:TweakList = @(
     [PSCustomObject]@{ Id=16; Cat='Essential'; Name='Temporary Files - Remove'; Action='TempFiles' },
     [PSCustomObject]@{ Id=17; Cat='Essential'; Name='Widgets - Remove'; Action='Widgets' },
     [PSCustomObject]@{ Id=18; Cat='Essential'; Name='Windows Platform Binary Table (WPBT) - Disable'; Action='WPBT' },
-
-    # Advanced Tweaks - CAUTION (20)
     [PSCustomObject]@{ Id=19; Cat='Advanced'; Name='Adobe URL Block List - Enable'; Action='AdobeBlock' },
     [PSCustomObject]@{ Id=20; Cat='Advanced'; Name='Background Apps - Disable'; Action='BgApps' },
     [PSCustomObject]@{ Id=21; Cat='Advanced'; Name='Brave Browser - Debloat'; Action='BraveDebloat' },
@@ -103,45 +100,37 @@ $Global:TweakList = @(
 )
 
 # ==========================================
-# DATA GLOBAL: APPS (Aplikasi Populer)
+# DATA GLOBAL: APPS
 # ==========================================
 $Global:AppList = @(
-    # Browsers (5)
     [PSCustomObject]@{ Id=1; Cat='Browsers'; Name='Brave'; Pkg='Brave.Brave' }
     [PSCustomObject]@{ Id=2; Cat='Browsers'; Name='Chrome'; Pkg='Google.Chrome' }
     [PSCustomObject]@{ Id=3; Cat='Browsers'; Name='Edge'; Pkg='Microsoft.Edge' }
     [PSCustomObject]@{ Id=4; Cat='Browsers'; Name='Firefox'; Pkg='Mozilla.Firefox' }
     [PSCustomObject]@{ Id=5; Cat='Browsers'; Name='Tor Browser'; Pkg='TorProject.TorBrowser' }
-    # Communications (5)
     [PSCustomObject]@{ Id=6; Cat='Comms'; Name='Discord'; Pkg='Discord.Discord' }
     [PSCustomObject]@{ Id=7; Cat='Comms'; Name='Zoom'; Pkg='Zoom.Zoom' }
     [PSCustomObject]@{ Id=8; Cat='Comms'; Name='Telegram'; Pkg='Telegram.TelegramDesktop' }
     [PSCustomObject]@{ Id=9; Cat='Comms'; Name='WhatsApp'; Pkg='WhatsApp.WhatsApp' }
     [PSCustomObject]@{ Id=10; Cat='Comms'; Name='Slack'; Pkg='SlackTechnologies.Slack' }
-    # Development (5)
     [PSCustomObject]@{ Id=11; Cat='Dev'; Name='VS Code'; Pkg='Microsoft.VisualStudioCode' }
     [PSCustomObject]@{ Id=12; Cat='Dev'; Name='Git'; Pkg='Git.Git' }
     [PSCustomObject]@{ Id=13; Cat='Dev'; Name='Python 3'; Pkg='Python.Python.3.12' }
     [PSCustomObject]@{ Id=14; Cat='Dev'; Name='Node.js'; Pkg='OpenJS.NodeJS' }
     [PSCustomObject]@{ Id=15; Cat='Dev'; Name='Docker Desktop'; Pkg='Docker.DockerDesktop' }
-    # Document (3)
     [PSCustomObject]@{ Id=16; Cat='Doc'; Name='LibreOffice'; Pkg='TheDocumentFoundation.LibreOffice' }
     [PSCustomObject]@{ Id=17; Cat='Doc'; Name='Adobe Acrobat'; Pkg='Adobe.Acrobat.Reader.64-bit' }
     [PSCustomObject]@{ Id=18; Cat='Doc'; Name='OnlyOffice'; Pkg='ONLYOFFICE.DesktopEditors' }
-    # Games (3)
     [PSCustomObject]@{ Id=19; Cat='Games'; Name='Steam'; Pkg='Valve.Steam' }
     [PSCustomObject]@{ Id=20; Cat='Games'; Name='Epic Games'; Pkg='EpicGames.EpicGamesLauncher' }
     [PSCustomObject]@{ Id=21; Cat='Games'; Name='Battle.net'; Pkg='Blizzard.BattleNet' }
-    # Multimedia (3)
     [PSCustomObject]@{ Id=22; Cat='Media'; Name='VLC'; Pkg='VideoLAN.VLC' }
     [PSCustomObject]@{ Id=23; Cat='Media'; Name='Spotify'; Pkg='Spotify.Spotify' }
     [PSCustomObject]@{ Id=24; Cat='Media'; Name='OBS Studio'; Pkg='OBSProject.OBSStudio' }
-    # Utilities (4)
     [PSCustomObject]@{ Id=25; Cat='Utils'; Name='7-Zip'; Pkg='7zip.7zip' }
     [PSCustomObject]@{ Id=26; Cat='Utils'; Name='WinRAR'; Pkg='RARLab.WinRAR' }
     [PSCustomObject]@{ Id=27; Cat='Utils'; Name='Everything'; Pkg='voidtools.Everything' }
     [PSCustomObject]@{ Id=28; Cat='Utils'; Name='PowerToys'; Pkg='Microsoft.PowerToys' }
-    # Pro Tools (4)
     [PSCustomObject]@{ Id=29; Cat='Pro Tools'; Name='Wireshark'; Pkg='WiresharkFoundation.Wireshark' }
     [PSCustomObject]@{ Id=30; Cat='Pro Tools'; Name='Nmap'; Pkg='Insecure.Nmap' }
     [PSCustomObject]@{ Id=31; Cat='Pro Tools'; Name='PuTTY'; Pkg='PuTTY.PuTTY' }
@@ -149,36 +138,30 @@ $Global:AppList = @(
 )
 
 # ==========================================
-# DATA GLOBAL: DEBLOATER (Kategori Lengkap)
+# DATA GLOBAL: DEBLOATER
 # ==========================================
 $Global:DebloatList = @(
-    # Microsoft Apps
     [PSCustomObject]@{ Id=1; Cat='Microsoft Apps'; Name='Feedback Hub'; Pkg='Microsoft.WindowsFeedbackHub' }
     [PSCustomObject]@{ Id=2; Cat='Microsoft Apps'; Name='Get Help'; Pkg='Microsoft.GetHelp' }
     [PSCustomObject]@{ Id=3; Cat='Microsoft Apps'; Name='Microsoft 365'; Pkg='Microsoft.MicrosoftOfficeHub' }
     [PSCustomObject]@{ Id=4; Cat='Microsoft Apps'; Name='Microsoft Teams'; Pkg='Microsoft.Teams' }
     [PSCustomObject]@{ Id=5; Cat='Microsoft Apps'; Name='Outlook for Windows'; Pkg='Microsoft.OutlookForWindows' }
     [PSCustomObject]@{ Id=6; Cat='Microsoft Apps'; Name='Cortana'; Pkg='Microsoft.549981C3F5F10' }
-    # Microsoft Ecosystem
     [PSCustomObject]@{ Id=7; Cat='Microsoft Ecosystem'; Name='Mobile Devices'; Pkg='MicrosoftWindows.CrossDevice' }
     [PSCustomObject]@{ Id=8; Cat='Microsoft Ecosystem'; Name='Phone Link'; Pkg='Microsoft.YourPhone' }
-    # Bing & Web Services
     [PSCustomObject]@{ Id=9; Cat='Bing & Web Services'; Name='Bing Search'; Pkg='Microsoft.BingSearch' }
     [PSCustomObject]@{ Id=10; Cat='Bing & Web Services'; Name='Copilot'; Pkg='Microsoft.Copilot' }
     [PSCustomObject]@{ Id=11; Cat='Bing & Web Services'; Name='News'; Pkg='Microsoft.BingNews' }
     [PSCustomObject]@{ Id=12; Cat='Bing & Web Services'; Name='Start Experiences App'; Pkg='Microsoft.StartExperiencesApp' }
     [PSCustomObject]@{ Id=13; Cat='Bing & Web Services'; Name='Weather'; Pkg='Microsoft.BingWeather' }
-    # Developer Tools
     [PSCustomObject]@{ Id=14; Cat='Developer Tools'; Name='Dev Home'; Pkg='Microsoft.Windows.DevHome' }
     [PSCustomObject]@{ Id=15; Cat='Developer Tools'; Name='Power Automate'; Pkg='Microsoft.PowerAutomateDesktop' }
-    # Xbox & Gaming
     [PSCustomObject]@{ Id=16; Cat='Xbox & Gaming'; Name='Solitaire Collection'; Pkg='Microsoft.MicrosoftSolitaireCollection' }
     [PSCustomObject]@{ Id=17; Cat='Xbox & Gaming'; Name='Xbox App'; Pkg='Microsoft.XboxApp' }
     [PSCustomObject]@{ Id=18; Cat='Xbox & Gaming'; Name='Xbox Game Bar'; Pkg='Microsoft.XboxGamingOverlay' }
     [PSCustomObject]@{ Id=19; Cat='Xbox & Gaming'; Name='Xbox Identity Provider'; Pkg='Microsoft.XboxIdentityProvider' }
     [PSCustomObject]@{ Id=20; Cat='Xbox & Gaming'; Name='Xbox Speech To Text Overlay'; Pkg='Microsoft.XboxSpeechToTextOverlay' }
     [PSCustomObject]@{ Id=21; Cat='Xbox & Gaming'; Name='Xbox TCUI'; Pkg='Microsoft.Xbox.TCUI' }
-    # Utilities & Productivity
     [PSCustomObject]@{ Id=22; Cat='Utilities & Productivity'; Name='Calculator'; Pkg='Microsoft.WindowsCalculator' }
     [PSCustomObject]@{ Id=23; Cat='Utilities & Productivity'; Name='Camera'; Pkg='Microsoft.WindowsCamera' }
     [PSCustomObject]@{ Id=24; Cat='Utilities & Productivity'; Name='Clipchamp'; Pkg='Clipchamp.Clipchamp' }
@@ -609,6 +592,43 @@ function Show-UpdateGUI {
     $window.ShowDialog() | Out-Null
 }
 
+# ==========================================
+# FUNGSI GUI: CUSTOM DIALOG (DIPULIHKAN)
+# ==========================================
+function Show-CustomDialog($title, $message, $buttons) {
+    $xaml = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="$title" Height="250" Width="450"
+        WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White" WindowStyle="ToolWindow">
+    <Grid Margin="20">
+        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="$message" FontSize="14" TextWrapping="Wrap" VerticalAlignment="Center"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+"@
+    foreach ($b in $buttons) {
+        $xaml += "<Button Name='Btn_$($b.Value)' Content='$($b.Label)' Width='100' Height='35' Margin='10,0' Background='#0078D7' Foreground='White' FontWeight='Bold'/>"
+    }
+    $xaml += "</StackPanel></Grid></Window>"
+    
+    $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xaml))
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+    
+    $resultBag = @{ Value = $null }
+
+    foreach ($b in $buttons) {
+        $btn = $window.FindName("Btn_$($b.Value)")
+        $val = $b.Value
+        $btn.Add_Click({ 
+            $resultBag.Value = $val
+            $window.Close() 
+        }.GetNewClosure())
+    }
+    
+    $window.ShowDialog() | Out-Null
+    return $resultBag.Value
+}
+
 function Show-BackupGUI {
     $res = Show-CustomDialog "App Backup Manager" "Simpan daftar aplikasi Anda ke file (Export)`natau Instal ulang dari file backup (Import)?" @([PSCustomObject]@{Label='Export Aplikasi';Value='EXP'}, [PSCustomObject]@{Label='Import Aplikasi';Value='IMP'})
     $backupFile = "$env:USERPROFILE\Desktop\MyAppsBackup.json"
@@ -630,7 +650,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.2.5" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.2.6" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>

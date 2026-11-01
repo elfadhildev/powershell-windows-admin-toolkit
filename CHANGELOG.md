@@ -130,3 +130,6 @@
 ### Fixed
 - **Install Applications Kosong:** Mendefinisikan kembali variabel `$Global:AppList` yang sempat hilang pada v3.2.4. Variabel ini sekarang berisi 32 aplikasi populer dengan kategori lengkap (Browsers, Comms, Dev, Doc, Games, Media, Utils, Pro Tools).
 - **Scope Variabel:** Memastikan `$Global:TweakList`, `$Global:AppList`, dan `$Global:DebloatList` berada pada scope global (`$Global:`) yang dapat dibaca oleh fungsi-fungsi GUI.
+## [3.2.6] - 2026-11-01
+### Fixed
+- **App Backup Error:** Mengembalikan fungsi `Show-CustomDialog` yang tidak sengaja terhapus pada versi v3.2.5, sehingga tombol App Backup bisa berfungsi normal.
