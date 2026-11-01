@@ -22,7 +22,7 @@
 
 **PowerShell Windows Admin Toolkit** is a modern, lightweight, and fully graphical (GUI) administration utility built entirely on PowerShell and WPF (Windows Presentation Foundation). 
 
-Inspired by industry-standard tools like *Chris Titus WinUtil*, this toolkit was redesigned from the ground up to provide a safer, more categorized, and visually appealing Dark Mode interface. Whether you are an IT professional, a system administrator, or an everyday user, this tool puts enterprise-grade system maintenance right at your fingertips.
+Inspired by modern system administration suites, this toolkit was designed from the ground up to provide a safer, more categorized, and visually appealing Dark Mode interface. Whether you are an IT professional, a system administrator, or an everyday user, this tool puts enterprise-grade system maintenance right at your fingertips.
 
 > ⚠️ **Disclaimer:** Always create a **System Restore Point** (available in Option 8) before applying system-level tweaks or debloating. Use at your own risk.
 
