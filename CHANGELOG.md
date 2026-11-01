@@ -136,3 +136,6 @@
 ## [3.2.7] - 2026-11-01
 ### Fixed
 - **Maintenance Job Error:** Memperbaiki error `Cannot bind argument to parameter 'Job' because it is null` pada Deep Clean Maintenance. Job dan Timer sekarang disimpan di scope `$script:` sehingga tidak hilang saat event handler WPF berjalan.
+## [3.2.8] - 2026-11-01
+### Fixed
+- **Auto-Close Terminal:** Menghapus parameter `-NoExit` pada fungsi `Show-SimpleCLI`. Sekarang, jendela terminal System Audit, Network, dan Event Log akan otomatis tertutup saat pengguna menekan Enter, dan kembali ke menu GUI utama.

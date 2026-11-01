@@ -179,7 +179,7 @@ $Global:DebloatList = @(
 )
 
 # ==========================================
-# FUNGSI GUI: DEEP CLEAN MAINTENANCE (STABLE)
+# FUNGSI GUI: DEEP CLEAN MAINTENANCE
 # ==========================================
 function Show-MaintenanceGUI {
     [xml]$xaml = @"
@@ -216,7 +216,6 @@ function Show-MaintenanceGUI {
         $btnRun.IsEnabled = $false
         $txtLog.Clear()
         
-        # ScriptBlock yang akan dijalankan di background
         $script = {
             param($t, $d, $c, $di, $s)
             if ($t) {
@@ -248,14 +247,12 @@ function Show-MaintenanceGUI {
             Write-Output "`n[V] SEMUA PROSES PEMBERSIHAN SELESAI!"
         }
 
-        # SIMPAN JOB DAN TIMER DI SCOPE $SCRIPT AGAR TIDAK HILANG
         $script:MaintJob = Start-Job -ScriptBlock $script -ArgumentList $chkTemp.IsChecked, $chkDNS.IsChecked, $chkCleanmgr.IsChecked, $chkDISM.IsChecked, $chkSFC.IsChecked
 
         $script:MaintTimer = New-Object System.Windows.Threading.DispatcherTimer
         $script:MaintTimer.Interval = [TimeSpan]::FromSeconds(1)
         
         $script:MaintTimer.Add_Tick({
-            # Cek null sebelum memproses
             if ($null -ne $script:MaintJob) {
                 $out = Receive-Job -Job $script:MaintJob -Keep
                 if ($out) { 
@@ -672,11 +669,16 @@ function Show-BackupGUI {
     elseif ($res -eq 'IMP') { if (Test-Path $backupFile) { Start-Process powershell -ArgumentList "-NoExit", "-Command", "winget import -i '$backupFile' --accept-source-agreements --accept-package-agreements" } else { Show-CustomDialog "Gagal" "File backup tidak ditemukan di Desktop." @([PSCustomObject]@{Label='OK';Value='OK'}) } }
 }
 
+# ==========================================
+# FUNGSI EKSEKUSI TERMINAL (FIXED: Auto Close Window)
+# ==========================================
 function Show-SimpleCLI($title, $funcName) {
     $body = (Get-Command $funcName).ScriptBlock.ToString()
     $cmd = "& { function $funcName { $body } ; $funcName }"
     $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($cmd))
-    Start-Process powershell -ArgumentList "-NoExit", "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64
+    
+    # -NoExit DIHAPUS agar jendela langsung tertutup saat selesai
+    Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64
 }
 
 # ==========================================
@@ -686,7 +688,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.2.7" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.2.8" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
