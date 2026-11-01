@@ -100,7 +100,7 @@ $Global:TweakList = @(
 )
 
 # ==========================================
-# DATA GLOBAL: APPS (231 Apps)
+# DATA GLOBAL: APPS
 # ==========================================
 $Global:AppList = @(
     [PSCustomObject]@{ Id=1; Cat='Browsers'; Name='Brave'; Pkg='Brave.Brave' }
@@ -868,7 +868,7 @@ function Show-SimpleCLI($title, $funcName) {
 }
 
 # ==========================================
-# FUNGSI GUI BARU: ONE-CLICK FIXES
+# FUNGSI GUI: ONE-CLICK FIXES
 # ==========================================
 function Show-FixesGUI {
     $xaml = @"
@@ -912,25 +912,48 @@ function Show-FixesGUI {
 }
 
 # ==========================================
-# FUNGSI GUI BARU: STARTUP MANAGER
+# FUNGSI GUI BARU: STARTUP MANAGER (DEEP SCAN)
 # ==========================================
 function Show-StartupGUI {
     $startupItems = @()
-    $regPaths = @("HKCU:\Software\Microsoft\Windows\CurrentVersion\Run", "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run")
     
+    # 1. Registry
+    $regPaths = @("HKCU:\Software\Microsoft\Windows\CurrentVersion\Run", "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run")
     foreach ($path in $regPaths) {
         if (Test-Path $path) {
             $props = Get-ItemProperty -Path $path
             $props.PSObject.Properties | Where-Object { $_.Name -notmatch '^PS' } | ForEach-Object {
-                $startupItems += [PSCustomObject]@{ Id = [guid]::NewGuid().ToString("N"); Name = $_.Name; Command = $_.Value; Location = $path }
+                $startupItems += [PSCustomObject]@{ Id = [guid]::NewGuid().ToString("N"); Name = $_.Name; Type = "Registry"; Value = $_.Value; Location = $path }
             }
         }
+    }
+
+    # 2. Folders
+    $folders = @("$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup", "$env:ProgramData\Microsoft\Windows\Start Menu\Programs\Startup")
+    foreach ($folder in $folders) {
+        if (Test-Path $folder) {
+            $files = Get-ChildItem -Path $folder -File -ErrorAction SilentlyContinue
+            foreach ($file in $files) {
+                $startupItems += [PSCustomObject]@{ Id = [guid]::NewGuid().ToString("N"); Name = $file.Name; Type = "Folder"; Value = $file.FullName; Location = $folder }
+            }
+        }
+    }
+
+    # 3. Task Scheduler (Logon/Boot, non-Microsoft)
+    $tasks = Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object { 
+        $_.State -ne "Disabled" -and
+        $_.TaskPath -notmatch "^\\Microsoft\\" -and
+        $_.Triggers -ne $null -and
+        ($_.Triggers | Where-Object { $_.CimClass.CimClassName -match "Logon|Boot" })
+    }
+    foreach ($task in $tasks) {
+        $startupItems += [PSCustomObject]@{ Id = [guid]::NewGuid().ToString("N"); Name = $task.TaskName; Type = "Task"; Value = $task.TaskPath; Location = "Task Scheduler" }
     }
 
     $xamlStr = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Startup Manager" Height="600" Width="700"
+        Title="Startup Manager (Deep Scan)" Height="700" Width="700"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid Margin="15">
         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
@@ -939,8 +962,8 @@ function Show-StartupGUI {
             <StackPanel Margin="10">
 "@
     foreach ($item in $startupItems) {
-        $safeName = $item.Name -replace '&', '&amp;'
-        $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$safeName' Tag='$($item.Id)' Foreground='White' Margin='0,8,0,8'/>"
+        $safeName = "[$($item.Type)] $($item.Name)" -replace '&', '&amp;'
+        $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$safeName' Foreground='White' Margin='0,8,0,8'/>"
     }
     $xamlStr += @"
             </StackPanel>
@@ -956,11 +979,22 @@ function Show-StartupGUI {
     $btnDisable.Add_Click({
         $btnDisable.Content = "DISABLING..."
         $btnDisable.IsEnabled = $false
+        
+        $disabledDir = "$env:USERPROFILE\Desktop\Toolkit_Disabled_Startup"
+        if (-not (Test-Path $disabledDir)) { New-Item -Path $disabledDir -ItemType Directory -Force | Out-Null }
+
         foreach ($item in $startupItems) {
             $chk = $window.FindName("Chk_$($item.Id)")
             if ($chk.IsChecked -eq $true) {
                 try {
-                    Remove-ItemProperty -Path $item.Location -Name $item.Name -ErrorAction Stop
+                    if ($item.Type -eq "Registry") {
+                        Remove-ItemProperty -Path $item.Location -Name $item.Name -ErrorAction Stop
+                    } elseif ($item.Type -eq "Folder") {
+                        Move-Item -Path $item.Value -Destination $disabledDir -Force -ErrorAction Stop
+                    } elseif ($item.Type -eq "Task") {
+                        # Value is TaskPath, Name is TaskName
+                        Disable-ScheduledTask -TaskName $item.Name -TaskPath $item.Value -ErrorAction Stop | Out-Null
+                    }
                 } catch { }
             }
         }
@@ -972,7 +1006,7 @@ function Show-StartupGUI {
 }
 
 # ==========================================
-# FUNGSI GUI BARU: AUTOMATION PRESETS
+# FUNGSI GUI: AUTOMATION PRESETS
 # ==========================================
 function Show-PresetsGUI {
     $xaml = @"
@@ -1020,7 +1054,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.4.0" Height="800" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.4.1" Height="800" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>

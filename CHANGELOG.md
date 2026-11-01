@@ -147,3 +147,8 @@
 - **One-Click Fixes:** Menambahkan menu perbaikan darurat (Reset Network, Reset Update Cache, Repair System SFC/DISM).
 - **Startup Manager:** GUI untuk melihat dan menghapus program yang berjalan otomatis saat startup.
 - **Automation Presets:** Instalasi aplikasi secara massal dengan satu klik (Standard, Gamer, Developer).
+## [3.4.1] - 2026-11-01
+### Added
+- **Deep Startup Manager:** Startup Manager kini mendeteksi aplikasi dari 3 sumber: Registry, Startup Folder, dan Task Scheduler. Item yang dinonaktifkan diberi label asal (contoh: [Registry], [Folder], [Task]).
+### Fixed
+- **Safe Disable:** Menonaktifkan item dari Folder akan memindahkannya ke folder aman di Desktop. Menonaktifkan Task akan menggunakan perintah `Disable-ScheduledTask` (tidak menghapus), sehingga sistem tetap aman.
