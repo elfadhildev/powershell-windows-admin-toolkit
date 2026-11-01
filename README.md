@@ -1,6 +1,6 @@
 <div align="center">
 
-# <img width="736" height="736" alt="download (1)" src="https://github.com/user-attachments/assets/a802de28-c342-410c-9f50-6496302beeae" />
+# <img width="150" height="150" alt="download (1)" src="https://github.com/user-attachments/assets/a802de28-c342-410c-9f50-6496302beeae" />
  PowerShell Windows Admin Toolkit
 
 **The Ultimate All-in-One GUI Toolkit for Windows 10 & 11 Management.**
