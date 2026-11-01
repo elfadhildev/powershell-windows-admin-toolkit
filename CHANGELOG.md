@@ -156,3 +156,7 @@
 ### Added
 - **Startup Manager Enable Feature:** Menambahkan fitur untuk mengaktifkan kembali (Enable) Task Scheduler yang sebelumnya telah dinonaktifkan. Pengguna tidak perlu membuka Task Scheduler secara manual.
 - **Tampilan Status:** Daftar Task Scheduler kini menampilkan status (Disabled) agar pengguna tahu tugas mana yang sedang mati.
+## [3.5.1] - 2026-11-01
+### Added
+- **Restore Point Revert Feature:** Menambahkan Tab "Kembalikan (Restore)" di dalam menu Restore Point. Pengguna dapat melihat daftar Restore Point yang ada dan mengembalikan sistem ke titik tersebut.
+- **Buka System Restore Windows:** Menambahkan tombol untuk membuka antarmuka bawaan Windows (rstrui.exe) sebagai opsi alternatif.

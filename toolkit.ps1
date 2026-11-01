@@ -100,7 +100,7 @@ $Global:TweakList = @(
 )
 
 # ==========================================
-# DATA GLOBAL: APPS (231 Apps)
+# DATA GLOBAL: APPS
 # ==========================================
 $Global:AppList = @(
     [PSCustomObject]@{ Id=1; Cat='Browsers'; Name='Brave'; Pkg='Brave.Brave' }
@@ -912,7 +912,7 @@ function Show-FixesGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: STARTUP MANAGER (DEEP SCAN + ENABLE/DISABLE)
+# FUNGSI GUI: STARTUP MANAGER
 # ==========================================
 function Show-StartupGUI {
     $startupItems = @()
@@ -1071,13 +1071,220 @@ function Show-PresetsGUI {
 }
 
 # ==========================================
+# FUNGSI GUI BARU: USER PROFILE BACKUP
+# ==========================================
+function Show-UserBackupGUI {
+    $xaml = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="User Profile Backup" Height="550" Width="600"
+        WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
+    <Grid Margin="15">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="Tentukan Folder Tujuan Backup:" FontSize="14" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBox Name="TxtPath" Text="D:\Backup_PC" Background="#2D2D30" Foreground="White" Height="30" Margin="0,0,0,15"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+            <TextBlock Text="Folder yang akan di-backup:" FontSize="12" Foreground="Gray" Margin="0,0,0,5"/>
+            <TextBlock Text="Documents, Pictures, Desktop, Downloads, Music, Videos, AppData\Roaming, AppData\Local\Packages" FontSize="12" Foreground="LightGray" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <TextBox Grid.Row="2" Name="TxtLog" Background="#111111" Foreground="Lime" FontFamily="Consolas" Margin="0,10" IsReadOnly="True" VerticalScrollBarVisibility="Auto" Text="Siap melakukan backup..."/>
+        
+        <Button Grid.Row="3" Name="BtnStart" Content="MULAI BACKUP PROFIL" Width="250" Height="40" Background="#0078D7" Foreground="White" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center"/>
+    </Grid>
+</Window>
+"@
+    $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xaml))
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+    $btnStart = $window.FindName("BtnStart")
+    $txtLog = $window.FindName("TxtLog")
+    $txtPath = $window.FindName("TxtPath")
+
+    $btnStart.Add_Click({
+        $btnStart.IsEnabled = $false
+        $txtLog.Clear()
+        $targetDrive = $txtPath.Text
+        $dateStamp = Get-Date -Format "yyyy-MM-dd_HHmmss"
+        $destinationFolder = Join-Path -Path $targetDrive -ChildPath "Backup_$dateStamp"
+        
+        $script = {
+            param($dest, $profile)
+            if (-not (Test-Path $dest)) { New-Item -Path $dest -ItemType Directory -Force | Out-Null }
+            $logFile = Join-Path -Path $dest -ChildPath "Backup_Log.txt"
+            $folders = @("Documents", "Pictures", "Desktop", "Downloads", "Music", "Videos", "AppData\Roaming", "AppData\Local\Packages")
+            $exclude = @("Cache", "Temp", "CrashDumps", "GPUCache", "Microsoft\Windows\INetCache")
+
+            foreach ($folder in $folders) {
+                $src = Join-Path -Path $profile -ChildPath $folder
+                $dst = Join-Path -Path $dest -ChildPath $folder
+                if (Test-Path $src) {
+                    Write-Output "[+] Backup: $folder ..."
+                    robocopy $src $dst /MIR /R:1 /W:1 /XD $exclude /LOG+:$logFile /NP /NJH /NJS | Out-Null
+                    Write-Output "    -> Selesai."
+                } else {
+                    Write-Output "[~] Skip: $folder (Tidak ditemukan)"
+                }
+            }
+            Write-Output "`n[V] BACKUP SELESAI! Log: $logFile"
+        }
+
+        $script:BackupJob = Start-Job -ScriptBlock $script -ArgumentList $destinationFolder, $env:USERPROFILE
+
+        $script:BackupTimer = New-Object System.Windows.Threading.DispatcherTimer
+        $script:BackupTimer.Interval = [TimeSpan]::FromSeconds(1)
+        
+        $script:BackupTimer.Add_Tick({
+            if ($null -ne $script:BackupJob) {
+                $out = Receive-Job -Job $script:BackupJob -Keep
+                if ($out) { 
+                    $txtLog.Text = $out -join "`r`n"
+                    $txtLog.ScrollToEnd() 
+                }
+                if ($script:BackupJob.State -ne 'Running') {
+                    $script:BackupTimer.Stop()
+                    $btnStart.IsEnabled = $true
+                    Remove-Job -Job $script:BackupJob -Force
+                    $script:BackupJob = $null
+                }
+            }
+        })
+        
+        $script:BackupTimer.Start()
+    })
+
+    $window.ShowDialog() | Out-Null
+}
+
+# ==========================================
+# FUNGSI GUI BARU: SYSTEM RESTORE POINT (CREATE & REVERT)
+# ==========================================
+function Show-RestorePointGUI {
+    $xaml = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="System Restore Point" Height="600" Width="700"
+        WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
+    <Grid Margin="15">
+        <TabControl Name="TabMain" Background="#1E1E1E" BorderBrush="#3F3F46">
+            
+            <!-- TAB CREATE -->
+            <TabItem Header="Buat Restore Point" Background="#2D2D30" Foreground="White">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Buat System Restore Point sebelum melakukan Tweaks." FontSize="14" Foreground="Gray" Margin="0,0,0,15"/>
+                    <StackPanel Grid.Row="1">
+                        <TextBlock Text="Fitur ini sangat disarankan agar Anda bisa mengembalikan PC ke kondisi ini jika terjadi masalah." TextWrapping="Wrap" Foreground="LightGray"/>
+                    </StackPanel>
+                    <Button Grid.Row="2" Name="BtnCreate" Content="BUAT RESTORE POINT SEKARANG" Width="250" Height="45" Background="#107C10" Foreground="White" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center"/>
+                </Grid>
+            </TabItem>
+
+            <!-- TAB RESTORE -->
+            <TabItem Header="Kembalikan (Restore)" Background="#2D2D30" Foreground="White">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Pilih Restore Point yang ingin dikembalikan:" FontSize="14" Foreground="Gray" Margin="0,0,0,10"/>
+                    
+                    <ListBox Grid.Row="1" Name="LstRestorePoints" Background="#111111" Foreground="White" BorderBrush="#3F3F46" Margin="0,0,0,15">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Description}" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding CreationTime}" FontSize="12" Foreground="Gray" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Name="BtnRevert" Content="KEMBALIKAN SISTEM" Width="200" Height="45" Background="#D83B01" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,0,10,0"/>
+                        <Button Name="BtnOpenNative" Content="Buka System Restore Windows" Width="200" Height="45" Background="#2D2D30" Foreground="White" FontWeight="Bold" FontSize="14"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+    </Grid>
+</Window>
+"@
+    $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xaml))
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+    
+    $btnCreate = $window.FindName("BtnCreate")
+    $lstRestorePoints = $window.FindName("LstRestorePoints")
+    $btnRevert = $window.FindName("BtnRevert")
+    $btnOpenNative = $window.FindName("BtnOpenNative")
+
+    # Refresh List Restore Points
+    $refreshList = {
+        $points = Get-ComputerRestorePoint -ErrorAction SilentlyContinue | Sort-Object CreationTime -Descending
+        $lstRestorePoints.ItemsSource = $points
+    }
+    & $refreshList
+
+    # Action: Create
+    $btnCreate.Add_Click({
+        $btnCreate.Content = "Membuat Restore Point..."
+        $btnCreate.IsEnabled = $false
+        
+        try {
+            if ((Get-ComputerRestorePoint).Count -eq $null) { 
+                Enable-ComputerRestore -Drive "C:\" -ErrorAction Stop 
+            }
+            Checkpoint-Computer -Description "Toolkit Restore Point - $(Get-Date -Format 'yyyy-MM-dd HH:mm')" -RestorePointType "MODIFY_SETTINGS" -ErrorAction Stop
+            [System.Windows.MessageBox]::Show("Restore Point berhasil dibuat!", "Sukses", "OK", "Information") | Out-Null
+            & $refreshList # Refresh daftar setelah dibuat
+        } catch {
+            [System.Windows.MessageBox]::Show("Gagal membuat Restore Point: `n$($_.Exception.Message)", "Error", "OK", "Error") | Out-Null
+        }
+        
+        $btnCreate.Content = "BUAT RESTORE POINT SEKARANG"
+        $btnCreate.IsEnabled = $true
+    })
+
+    # Action: Revert
+    $btnRevert.Add_Click({
+        if ($null -eq $lstRestorePoints.SelectedItem) {
+            [System.Windows.MessageBox]::Show("Pilih Restore Point terlebih dahulu dari daftar!", "Peringatan", "OK", "Warning") | Out-Null
+            return
+        }
+
+        $seqNum = $lstRestorePoints.SelectedItem.SequenceNumber
+        $desc = $lstRestorePoints.SelectedItem.Description
+        
+        $confirm = [System.Windows.MessageBox]::Show("Anda akan mengembalikan sistem ke: `n'$desc'`n`nPC akan di-restart secara otomatis.`nLanjutkan?", "Konfirmasi Restore", "YesNo", "Warning")
+        
+        if ($confirm -eq 'Yes') {
+            try {
+                Restore-Computer -RestorePoint $seqNum -Confirm:$false -ErrorAction Stop
+                [System.Windows.MessageBox]::Show("Perintah restore berhasil dijalankan. PC akan restart dalam beberapa detik.", "Restoring System", "OK", "Information") | Out-Null
+            } catch {
+                [System.Windows.MessageBox]::Show("Gagal me-restore: `n$($_.Exception.Message)", "Error", "OK", "Error") | Out-Null
+            }
+        }
+    })
+
+    # Action: Open Native UI
+    $btnOpenNative.Add_Click({
+        Start-Process "rstrui.exe"
+        $window.Close()
+    })
+
+    $window.ShowDialog() | Out-Null
+}
+
+# ==========================================
 # MENU UTAMA GUI (Tiles)
 # ==========================================
 function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.4.2" Height="800" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.5.1" Height="850" Width="1000"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
@@ -1091,6 +1298,8 @@ function Show-GUI {
             <Button x:Name="BtnEventLog" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="📝 Event Log" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Analisis Error Sistem" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
             <Button x:Name="BtnInstall" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="📦 Install Apps" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Winget Mega List" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
             <Button x:Name="BtnBackup" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="💾 App Backup" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Export/Import Apps" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
+            <Button x:Name="BtnUserBackup" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🗂️ User Backup" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Backup Data Profil" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
+            <Button x:Name="BtnRestore" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🛡️ Restore Point" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Buat &amp; Kembalikan" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
             <Button x:Name="BtnUpdate" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🔄 Update Mgr" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Kontrol Windows Update" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
             <Button x:Name="BtnDNS" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🌍 DNS Switcher" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Percepat Internet" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
             <Button x:Name="BtnFixes" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🚑 One-Click Fixes" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Perbaikan Darurat" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
@@ -1112,6 +1321,8 @@ function Show-GUI {
     $btnEventLog = $window.FindName("BtnEventLog")
     $btnInstall = $window.FindName("BtnInstall")
     $btnBackup = $window.FindName("BtnBackup")
+    $btnUserBackup = $window.FindName("BtnUserBackup")
+    $btnRestore = $window.FindName("BtnRestore")
     $btnUpdate = $window.FindName("BtnUpdate")
     $btnDNS = $window.FindName("BtnDNS")
     $btnFixes = $window.FindName("BtnFixes")
@@ -1123,6 +1334,8 @@ function Show-GUI {
     $btnInstall.Add_Click({ Show-AppsGUI })
     $btnDebloater.Add_Click({ Show-DebloaterGUI })
     $btnBackup.Add_Click({ Show-BackupGUI })
+    $btnUserBackup.Add_Click({ Show-UserBackupGUI })
+    $btnRestore.Add_Click({ Show-RestorePointGUI })
     $btnUpdate.Add_Click({ Show-UpdateGUI })
     $btnDNS.Add_Click({ Show-DnsGUI })
     $btnFixes.Add_Click({ Show-FixesGUI })
