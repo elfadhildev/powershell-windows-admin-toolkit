@@ -56,7 +56,7 @@ function Invoke-EventLogAnalyzer {
 }
 
 # ==========================================
-# DATA GLOBAL: TWEAKS (Tidak Diubah)
+# DATA GLOBAL: TWEAKS
 # ==========================================
 $Global:TweakList = @(
     [PSCustomObject]@{ Id=1; Cat='Essential'; Name='Activity History - Disable'; Action='Activity' },
@@ -100,10 +100,9 @@ $Global:TweakList = @(
 )
 
 # ==========================================
-# DATA GLOBAL: APPS (MEGA UPDATE - 150+ Apps)
+# DATA GLOBAL: APPS (231 Apps)
 # ==========================================
 $Global:AppList = @(
-    # Browsers
     [PSCustomObject]@{ Id=1; Cat='Browsers'; Name='Brave'; Pkg='Brave.Brave' }
     [PSCustomObject]@{ Id=2; Cat='Browsers'; Name='Chrome'; Pkg='Google.Chrome' }
     [PSCustomObject]@{ Id=3; Cat='Browsers'; Name='Chromium'; Pkg='Hibbiki.Chromium' }
@@ -120,7 +119,6 @@ $Global:AppList = @(
     [PSCustomObject]@{ Id=14; Cat='Browsers'; Name='Waterfox'; Pkg='Waterfox.Waterfox' }
     [PSCustomObject]@{ Id=15; Cat='Browsers'; Name='Zen Browser'; Pkg='Zen-Team.Zen-Browser' }
 
-    # Communications
     [PSCustomObject]@{ Id=16; Cat='Comms'; Name='Betterbird'; Pkg='Betterbird.Betterbird' }
     [PSCustomObject]@{ Id=17; Cat='Comms'; Name='Chatterino'; Pkg='Chatterino.Chatterino' }
     [PSCustomObject]@{ Id=18; Cat='Comms'; Name='Discord'; Pkg='Discord.Discord' }
@@ -138,7 +136,6 @@ $Global:AppList = @(
     [PSCustomObject]@{ Id=30; Cat='Comms'; Name='WhatsApp Desktop'; Pkg='WhatsApp.WhatsApp' }
     [PSCustomObject]@{ Id=31; Cat='Comms'; Name='Zoom'; Pkg='Zoom.Zoom' }
 
-    # Development
     [PSCustomObject]@{ Id=32; Cat='Dev'; Name='Bruno'; Pkg='Bruno.Bruno' }
     [PSCustomObject]@{ Id=33; Cat='Dev'; Name='ChatGPT Desktop'; Pkg='lencx.ChatGPT' }
     [PSCustomObject]@{ Id=34; Cat='Dev'; Name='Claude Desktop'; Pkg='Anthropic.Claude' }
@@ -180,7 +177,6 @@ $Global:AppList = @(
     [PSCustomObject]@{ Id=70; Cat='Dev'; Name='Yarn'; Pkg='Yarn.Yarn' }
     [PSCustomObject]@{ Id=71; Cat='Dev'; Name='Zed'; Pkg='ZedIndustries.Zed' }
 
-    # Document
     [PSCustomObject]@{ Id=72; Cat='Doc'; Name='Adobe Acrobat'; Pkg='Adobe.Acrobat.Reader.64-bit' }
     [PSCustomObject]@{ Id=73; Cat='Doc'; Name='Foxit PDF Reader'; Pkg='Foxit.FoxitReader' }
     [PSCustomObject]@{ Id=74; Cat='Doc'; Name='Joplin'; Pkg='Joplin.Joplin' }
@@ -199,7 +195,6 @@ $Global:AppList = @(
     [PSCustomObject]@{ Id=87; Cat='Doc'; Name='Xournal++'; Pkg='Xournal++.Xournal++' }
     [PSCustomObject]@{ Id=88; Cat='Doc'; Name='Zotero'; Pkg='DigitalScholar.Zotero' }
 
-    # Games
     [PSCustomObject]@{ Id=89; Cat='Games'; Name='Battle.net'; Pkg='Blizzard.BattleNet' }
     [PSCustomObject]@{ Id=90; Cat='Games'; Name='Cemu'; Pkg='Cemu.Cemu' }
     [PSCustomObject]@{ Id=91; Cat='Games'; Name='EA App'; Pkg='ElectronicArts.EADesktop' }
@@ -218,7 +213,6 @@ $Global:AppList = @(
     [PSCustomObject]@{ Id=104; Cat='Games'; Name='Ubisoft Connect'; Pkg='Ubisoft.Connect' }
     [PSCustomObject]@{ Id=105; Cat='Games'; Name='Virtual Desktop'; Pkg='VirtualDesktop.VirtualDesktop' }
 
-    # Microsoft Tools
     [PSCustomObject]@{ Id=106; Cat='Microsoft Tools'; Name='Autoruns'; Pkg='Microsoft.Sysinternals.Autoruns' }
     [PSCustomObject]@{ Id=107; Cat='Microsoft Tools'; Name='DISMTools'; Pkg='CodingWonders.DISMTools' }
     [PSCustomObject]@{ Id=108; Cat='Microsoft Tools'; Name='.NET Desktop Runtime 6'; Pkg='Microsoft.DotNet.DesktopRuntime.6' }
@@ -237,7 +231,6 @@ $Global:AppList = @(
     [PSCustomObject]@{ Id=121; Cat='Microsoft Tools'; Name='Visual C++ 2015-2022 (x86)'; Pkg='Microsoft.VCRedist.2015+.x86' }
     [PSCustomObject]@{ Id=122; Cat='Microsoft Tools'; Name='Visual C++ 2015-2022 (x64)'; Pkg='Microsoft.VCRedist.2015+.x64' }
 
-    # Multimedia
     [PSCustomObject]@{ Id=123; Cat='Multimedia'; Name='AIMP'; Pkg='AIMP.AIMP' }
     [PSCustomObject]@{ Id=124; Cat='Multimedia'; Name='Audacity'; Pkg='Audacity.Audacity' }
     [PSCustomObject]@{ Id=125; Cat='Multimedia'; Name='Blender'; Pkg='BlenderFoundation.Blender' }
@@ -260,7 +253,6 @@ $Global:AppList = @(
     [PSCustomObject]@{ Id=142; Cat='Multimedia'; Name='ShareX'; Pkg='ShareX.ShareX' }
     [PSCustomObject]@{ Id=143; Cat='Multimedia'; Name='VLC'; Pkg='VideoLAN.VLC' }
 
-    # Pro Tools
     [PSCustomObject]@{ Id=144; Cat='Pro Tools'; Name='Advanced IP Scanner'; Pkg='Famatech.AdvancedIPScanner' }
     [PSCustomObject]@{ Id=145; Cat='Pro Tools'; Name='Angry IP Scanner'; Pkg='angryip.angryipscanner' }
     [PSCustomObject]@{ Id=146; Cat='Pro Tools'; Name='Cinebench R23'; Pkg='Maxon.CinebenchR23' }
@@ -281,7 +273,6 @@ $Global:AppList = @(
     [PSCustomObject]@{ Id=161; Cat='Pro Tools'; Name='WireGuard'; Pkg='WireGuard.WireGuard' }
     [PSCustomObject]@{ Id=162; Cat='Pro Tools'; Name='Wireshark'; Pkg='WiresharkFoundation.Wireshark' }
 
-    # Selfhosted
     [PSCustomObject]@{ Id=163; Cat='Selfhosted'; Name='Jellyfin Media Player'; Pkg='Jellyfin.JellyfinMediaPlayer' }
     [PSCustomObject]@{ Id=164; Cat='Selfhosted'; Name='Jellyfin Server'; Pkg='Jellyfin.Server' }
     [PSCustomObject]@{ Id=165; Cat='Selfhosted'; Name='Kodi Media Center'; Pkg='XBMCFoundation.Kodi' }
@@ -295,7 +286,6 @@ $Global:AppList = @(
     [PSCustomObject]@{ Id=173; Cat='Selfhosted'; Name='Syncthing'; Pkg='Syncthing.Syncthing' }
     [PSCustomObject]@{ Id=174; Cat='Selfhosted'; Name='SyncTrayzor'; Pkg='SyncTrayzor.SyncTrayzor' }
 
-    # Utilities
     [PSCustomObject]@{ Id=175; Cat='Utilities'; Name='1Password'; Pkg='AgileBits.1Password' }
     [PSCustomObject]@{ Id=176; Cat='Utilities'; Name='7-Zip'; Pkg='7zip.7zip' }
     [PSCustomObject]@{ Id=177; Cat='Utilities'; Name='AB Download Manager'; Pkg='AmirHosseinAbdolmotallebi.ABDownloadManager' }
@@ -585,7 +575,7 @@ function Show-TweaksGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: TABBED APPS (GUI Dinamis untuk 231 Apps)
+# FUNGSI GUI: TABBED APPS
 # ==========================================
 function Show-AppsGUI {
     $categories = $Global:AppList.Cat | Sort-Object -Unique
@@ -649,13 +639,11 @@ function Show-DebloaterGUI {
     <Grid Margin="15">
         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         
-        <!-- Tombol Aksi Atas -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,0,0,10">
             <Button Name="BtnSelectAll" Content="Select All" Width="100" Height="30" Background="#0078D7" Foreground="White" FontWeight="Bold" Margin="0,0,10,0"/>
             <Button Name="BtnClearSel" Content="Clear Selection" Width="100" Height="30" Background="#2D2D30" Foreground="White" FontWeight="Bold"/>
         </StackPanel>
 
-        <!-- Tab Kategori -->
         <TabControl Grid.Row="1" Name="TabMain" Background="#1E1E1E" BorderBrush="#3F3F46">
 "@
     foreach ($cat in $categories) {
@@ -671,7 +659,6 @@ function Show-DebloaterGUI {
     $xamlStr += @"
         </TabControl>
         
-        <!-- Tombol Uninstall -->
         <Button Grid.Row="2" Name="BtnRemove" Content="UNINSTALL SELECTED" Width="250" Height="40" Background="#D83B01" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,15,0,0" HorizontalAlignment="Center"/>
     </Grid>
 </Window>
@@ -682,19 +669,8 @@ function Show-DebloaterGUI {
     $btnSelectAll = $window.FindName("BtnSelectAll")
     $btnClearSel = $window.FindName("BtnClearSel")
 
-    $btnSelectAll.Add_Click({
-        foreach ($item in $Global:DebloatList) {
-            $chk = $window.FindName("Chk_$($item.Id)")
-            if ($chk) { $chk.IsChecked = $true }
-        }
-    })
-
-    $btnClearSel.Add_Click({
-        foreach ($item in $Global:DebloatList) {
-            $chk = $window.FindName("Chk_$($item.Id)")
-            if ($chk) { $chk.IsChecked = $false }
-        }
-    })
+    $btnSelectAll.Add_Click({ foreach ($item in $Global:DebloatList) { $chk = $window.FindName("Chk_$($item.Id)"); if ($chk) { $chk.IsChecked = $true } } })
+    $btnClearSel.Add_Click({ foreach ($item in $Global:DebloatList) { $chk = $window.FindName("Chk_$($item.Id)"); if ($chk) { $chk.IsChecked = $false } } })
 
     $btnRemove.Add_Click({
         $btnRemove.Content = "UNINSTALLING..."
@@ -884,15 +860,157 @@ function Show-BackupGUI {
     elseif ($res -eq 'IMP') { if (Test-Path $backupFile) { Start-Process powershell -ArgumentList "-NoExit", "-Command", "winget import -i '$backupFile' --accept-source-agreements --accept-package-agreements" } else { Show-CustomDialog "Gagal" "File backup tidak ditemukan di Desktop." @([PSCustomObject]@{Label='OK';Value='OK'}) } }
 }
 
-# ==========================================
-# FUNGSI EKSEKUSI TERMINAL (Auto Close Window)
-# ==========================================
 function Show-SimpleCLI($title, $funcName) {
     $body = (Get-Command $funcName).ScriptBlock.ToString()
     $cmd = "& { function $funcName { $body } ; $funcName }"
     $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($cmd))
-    
     Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64
+}
+
+# ==========================================
+# FUNGSI GUI BARU: ONE-CLICK FIXES
+# ==========================================
+function Show-FixesGUI {
+    $xaml = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="One-Click Fixes" Height="400" Width="500"
+        WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
+    <Grid Margin="20">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Pilih Perbaikan Darurat (Troubleshooting):" FontSize="16" FontWeight="Bold" Margin="0,0,0,15" Foreground="LightCoral"/>
+        <StackPanel Grid.Row="1">
+            <Button Name="BtnFixNet" Content="Reset Network Stack (Winsock &amp; TCP/IP)" Height="45" Margin="0,5" Background="#2D2D30" Foreground="White" FontWeight="Bold" HorizontalAlignment="Stretch"/>
+            <Button Name="BtnFixUpd" Content="Reset Windows Update Cache" Height="45" Margin="0,5" Background="#2D2D30" Foreground="White" FontWeight="Bold" HorizontalAlignment="Stretch"/>
+            <Button Name="BtnFixSfc" Content="Repair System Files (SFC &amp; DISM) - *Lama*" Height="45" Margin="0,5" Background="#107C10" Foreground="White" FontWeight="Bold" HorizontalAlignment="Stretch"/>
+            <Button Name="BtnCancel" Content="Batal" Height="35" Margin="0,20,0,0" Background="#D83B01" Foreground="White" HorizontalAlignment="Right" Width="100"/>
+        </StackPanel>
+    </Grid>
+</Window>
+"@
+    $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xaml))
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+    $btnFixNet = $window.FindName("BtnFixNet")
+    $btnFixUpd = $window.FindName("BtnFixUpd")
+    $btnFixSfc = $window.FindName("BtnFixSfc")
+    $btnCancel = $window.FindName("BtnCancel")
+
+    $btnFixNet.Add_Click({
+        $window.Close()
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "Write-Host 'Resetting Network Stack...' -ForegroundColor Cyan; netsh winsock reset; netsh int ip reset; ipconfig /flushdns; Write-Host 'Selesai. Silakan restart PC.' -ForegroundColor Green; Read-Host 'Tekan Enter...'" -Verb RunAs
+    })
+    $btnFixUpd.Add_Click({
+        $window.Close()
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "Write-Host 'Resetting Windows Update Cache...' -ForegroundColor Cyan; Stop-Service -Name wuauserv, cryptSvc, bits, msiserver -Force -ErrorAction SilentlyContinue; Remove-Item -Path 'C:\Windows\SoftwareDistribution\*' -Recurse -Force -ErrorAction SilentlyContinue; Start-Service -Name wuauserv, cryptSvc, bits, msiserver -ErrorAction SilentlyContinue; Write-Host 'Selesai.' -ForegroundColor Green; Read-Host 'Tekan Enter...'" -Verb RunAs
+    })
+    $btnFixSfc.Add_Click({
+        $window.Close()
+        Start-Process powershell -ArgumentList "-NoExit", "-Command", "Write-Host 'Menjalankan SFC Scannow...' -ForegroundColor Cyan; Start-Process cmd -ArgumentList '/c sfc /scannow' -Wait -NoNewWindow; Write-Host 'Menjalankan DISM...' -ForegroundColor Cyan; Start-Process cmd -ArgumentList '/c DISM /Online /Cleanup-Image /RestoreHealth' -Wait -NoNewWindow; Write-Host 'Selesai.' -ForegroundColor Green; Read-Host 'Tekan Enter...'" -Verb RunAs
+    })
+    $btnCancel.Add_Click({ $window.Close() })
+    $window.ShowDialog() | Out-Null
+}
+
+# ==========================================
+# FUNGSI GUI BARU: STARTUP MANAGER
+# ==========================================
+function Show-StartupGUI {
+    $startupItems = @()
+    $regPaths = @("HKCU:\Software\Microsoft\Windows\CurrentVersion\Run", "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run")
+    
+    foreach ($path in $regPaths) {
+        if (Test-Path $path) {
+            $props = Get-ItemProperty -Path $path
+            $props.PSObject.Properties | Where-Object { $_.Name -notmatch '^PS' } | ForEach-Object {
+                $startupItems += [PSCustomObject]@{ Id = [guid]::NewGuid().ToString("N"); Name = $_.Name; Command = $_.Value; Location = $path }
+            }
+        }
+    }
+
+    $xamlStr = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Startup Manager" Height="600" Width="700"
+        WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
+    <Grid Margin="15">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Pilih aplikasi yang ingin dinonaktifkan (dihapus dari startup):" FontSize="14" Margin="0,0,0,10" Foreground="Gray"/>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10">
+"@
+    foreach ($item in $startupItems) {
+        $safeName = $item.Name -replace '&', '&amp;'
+        $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$safeName' Tag='$($item.Id)' Foreground='White' Margin='0,8,0,8'/>"
+    }
+    $xamlStr += @"
+            </StackPanel>
+        </ScrollViewer>
+        <Button Grid.Row="2" Name="BtnDisable" Content="DISABLE SELECTED" Width="250" Height="40" Background="#D83B01" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,15,0,0" HorizontalAlignment="Center"/>
+    </Grid>
+</Window>
+"@
+    $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xamlStr))
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+    $btnDisable = $window.FindName("BtnDisable")
+
+    $btnDisable.Add_Click({
+        $btnDisable.Content = "DISABLING..."
+        $btnDisable.IsEnabled = $false
+        foreach ($item in $startupItems) {
+            $chk = $window.FindName("Chk_$($item.Id)")
+            if ($chk.IsChecked -eq $true) {
+                try {
+                    Remove-ItemProperty -Path $item.Location -Name $item.Name -ErrorAction Stop
+                } catch { }
+            }
+        }
+        $btnDisable.Content = "SELESAI!"
+        Start-Sleep -Seconds 1
+        $window.Close()
+    })
+    $window.ShowDialog() | Out-Null
+}
+
+# ==========================================
+# FUNGSI GUI BARU: AUTOMATION PRESETS
+# ==========================================
+function Show-PresetsGUI {
+    $xaml = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Automation Presets" Height="400" Width="500"
+        WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
+    <Grid Margin="20">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Pilih Preset Instalasi Otomatis:" FontSize="16" FontWeight="Bold" Margin="0,0,0,15" Foreground="LightGreen"/>
+        <StackPanel Grid.Row="1">
+            <Button Name="BtnStandard" Content="Standard Setup (Chrome, 7-Zip, VLC)" Height="45" Margin="0,5" Background="#2D2D30" Foreground="White" FontWeight="Bold" HorizontalAlignment="Stretch"/>
+            <Button Name="BtnGamer" Content="Gamer Setup (Steam, Discord, OBS Studio)" Height="45" Margin="0,5" Background="#2D2D30" Foreground="White" FontWeight="Bold" HorizontalAlignment="Stretch"/>
+            <Button Name="BtnDeveloper" Content="Developer Setup (VS Code, Git, Python, Docker)" Height="45" Margin="0,5" Background="#2D2D30" Foreground="White" FontWeight="Bold" HorizontalAlignment="Stretch"/>
+            <Button Name="BtnCancel" Content="Batal" Height="35" Margin="0,20,0,0" Background="#D83B01" Foreground="White" HorizontalAlignment="Right" Width="100"/>
+        </StackPanel>
+    </Grid>
+</Window>
+"@
+    $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xaml))
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+    $btnStandard = $window.FindName("BtnStandard")
+    $btnGamer = $window.FindName("BtnGamer")
+    $btnDeveloper = $window.FindName("BtnDeveloper")
+    $btnCancel = $window.FindName("BtnCancel")
+
+    $installApps = {
+        param($apps)
+        foreach ($app in $apps) {
+            Start-Process powershell -ArgumentList "-NoExit", "-Command", "winget install --id $app --accept-source-agreements --accept-package-agreements"
+        }
+    }
+
+    $btnStandard.Add_Click({ $window.Close(); & $installApps @("Google.Chrome", "7zip.7zip", "VideoLAN.VLC") })
+    $btnGamer.Add_Click({ $window.Close(); & $installApps @("Valve.Steam", "Discord.Discord", "OBSProject.OBSStudio") })
+    $btnDeveloper.Add_Click({ $window.Close(); & $installApps @("Microsoft.VisualStudioCode", "Git.Git", "Python.Python.3.12", "Docker.DockerDesktop") })
+    $btnCancel.Add_Click({ $window.Close() })
+    $window.ShowDialog() | Out-Null
 }
 
 # ==========================================
@@ -902,7 +1020,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.3.0" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.4.0" Height="800" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
@@ -918,6 +1036,9 @@ function Show-GUI {
             <Button x:Name="BtnBackup" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="💾 App Backup" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Export/Import Apps" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
             <Button x:Name="BtnUpdate" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🔄 Update Mgr" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Kontrol Windows Update" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
             <Button x:Name="BtnDNS" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🌍 DNS Switcher" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Percepat Internet" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
+            <Button x:Name="BtnFixes" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🚑 One-Click Fixes" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Perbaikan Darurat" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
+            <Button x:Name="BtnStartup" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🚀 Startup Manager" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Kelola Autostart" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
+            <Button x:Name="BtnPresets" Width="200" Height="100" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="⚡ Automation Presets" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/><TextBlock Text="Setup Instalasi Cepat" FontSize="12" Foreground="Gray" HorizontalAlignment="Center" Margin="0,5,0,0"/></StackPanel></Button>
         </WrapPanel>
         <Border Grid.Row="2" Background="#2D2D30"><TextBlock x:Name="TxtStatus" Text="Ready." FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Gray"/></Border>
     </Grid>
@@ -936,6 +1057,9 @@ function Show-GUI {
     $btnBackup = $window.FindName("BtnBackup")
     $btnUpdate = $window.FindName("BtnUpdate")
     $btnDNS = $window.FindName("BtnDNS")
+    $btnFixes = $window.FindName("BtnFixes")
+    $btnStartup = $window.FindName("BtnStartup")
+    $btnPresets = $window.FindName("BtnPresets")
 
     $btnMaintenance.Add_Click({ Show-MaintenanceGUI })
     $btnTweaks.Add_Click({ Show-TweaksGUI })
@@ -944,6 +1068,9 @@ function Show-GUI {
     $btnBackup.Add_Click({ Show-BackupGUI })
     $btnUpdate.Add_Click({ Show-UpdateGUI })
     $btnDNS.Add_Click({ Show-DnsGUI })
+    $btnFixes.Add_Click({ Show-FixesGUI })
+    $btnStartup.Add_Click({ Show-StartupGUI })
+    $btnPresets.Add_Click({ Show-PresetsGUI })
     
     $btnAudit.Add_Click({ Show-SimpleCLI "System Audit" "Invoke-SystemAudit" })
     $btnNetwork.Add_Click({ Show-SimpleCLI "Network Diagnostics" "Invoke-NetworkDiagnostics" })

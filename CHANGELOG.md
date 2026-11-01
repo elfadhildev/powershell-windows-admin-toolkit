@@ -142,3 +142,8 @@
 ## [3.3.0] - 2026-11-01
 ### Added
 - **Mega App List Expansion:** Menambahkan lebih dari 150 aplikasi baru dari referensi gambar (total 231 aplikasi) ke dalam menu Install Apps, dikelompokkan ke dalam 10 kategori (Browsers, Comms, Dev, Doc, Games, Microsoft Tools, Multimedia, Pro Tools, Selfhosted, Utilities).
+## [3.4.0] - 2026-11-01
+### Added
+- **One-Click Fixes:** Menambahkan menu perbaikan darurat (Reset Network, Reset Update Cache, Repair System SFC/DISM).
+- **Startup Manager:** GUI untuk melihat dan menghapus program yang berjalan otomatis saat startup.
+- **Automation Presets:** Instalasi aplikasi secara massal dengan satu klik (Standard, Gamer, Developer).
