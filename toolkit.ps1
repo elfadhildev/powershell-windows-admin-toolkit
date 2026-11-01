@@ -483,18 +483,30 @@ function Show-MaintenanceGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: TABBED TWEAKS
+# FUNGSI GUI: TABBED TWEAKS (UPDATED WITH RECOMMENDATIONS)
 # ==========================================
 function Show-TweaksGUI {
     $categories = $Global:TweakList.Cat | Sort-Object -Unique
     $xamlStr = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="System Tweaks" Height="700" Width="600"
+        Title="System Tweaks" Height="750" Width="650"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid Margin="15">
-        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-        <TabControl Grid.Row="0" Name="TabMain" Background="#1E1E1E" BorderBrush="#3F3F46">
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        
+        <!-- Recommended Selections -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock Text="Recommended Selections:" FontSize="14" Foreground="LightBlue" FontWeight="Bold" Margin="0,0,0,5"/>
+            <WrapPanel>
+                <Button Name="BtnStd" Content="Standard" Width="100" Height="30" Background="#2D2D30" Foreground="White" FontWeight="Bold" Margin="0,0,10,0"/>
+                <Button Name="BtnMin" Content="Minimal" Width="100" Height="30" Background="#2D2D30" Foreground="White" FontWeight="Bold" Margin="0,0,10,0"/>
+                <Button Name="BtnAdv" Content="Advanced" Width="100" Height="30" Background="#2D2D30" Foreground="White" FontWeight="Bold" Margin="0,0,10,0"/>
+                <Button Name="BtnClr" Content="Clear" Width="100" Height="30" Background="#D83B01" Foreground="White" FontWeight="Bold"/>
+            </WrapPanel>
+        </StackPanel>
+
+        <TabControl Grid.Row="1" Name="TabMain" Background="#1E1E1E" BorderBrush="#3F3F46">
 "@
     foreach ($cat in $categories) {
         $safeCat = $cat -replace '&', '&amp;'
@@ -508,14 +520,59 @@ function Show-TweaksGUI {
     }
     $xamlStr += @"
         </TabControl>
-        <Button Grid.Row="1" Name="BtnApply" Content="APPLY SELECTED TWEAKS" Width="250" Height="40" Background="#0078D7" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,15,0,0" HorizontalAlignment="Center"/>
+        <Button Grid.Row="2" Name="BtnApply" Content="APPLY SELECTED TWEAKS" Width="250" Height="40" Background="#0078D7" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,15,0,0" HorizontalAlignment="Center"/>
     </Grid>
 </Window>
 "@
     $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xamlStr))
     $window = [Windows.Markup.XamlReader]::Load($reader)
+    
+    $btnStd = $window.FindName("BtnStd")
+    $btnMin = $window.FindName("BtnMin")
+    $btnAdv = $window.FindName("BtnAdv")
+    $btnClr = $window.FindName("BtnClr")
     $btnApply = $window.FindName("BtnApply")
 
+    # --- LOGIKA RECOMMENDED BUTTONS ---
+    
+    # 1. Minimal (Paling Aman: Telemetry, Activity, TempFiles)
+    $btnMin.Add_Click({
+        foreach ($t in $Global:TweakList) {
+            $chk = $window.FindName("Chk_$($t.Id)")
+            if ($chk) {
+                # Id 1(Activity), 15(Telemetry), 16(TempFiles)
+                if ($t.Id -in @(1, 15, 16)) { $chk.IsChecked = $true } else { $chk.IsChecked = $false }
+            }
+        }
+    })
+
+    # 2. Standard (Semua Essential)
+    $btnStd.Add_Click({
+        foreach ($t in $Global:TweakList) {
+            $chk = $window.FindName("Chk_$($t.Id)")
+            if ($chk) {
+                if ($t.Cat -eq 'Essential') { $chk.IsChecked = $true } else { $chk.IsChecked = $false }
+            }
+        }
+    })
+
+    # 3. Advanced (Semua Essential + Advanced)
+    $btnAdv.Add_Click({
+        foreach ($t in $Global:TweakList) {
+            $chk = $window.FindName("Chk_$($t.Id)")
+            if ($chk) { $chk.IsChecked = $true }
+        }
+    })
+
+    # 4. Clear (Uncheck All)
+    $btnClr.Add_Click({
+        foreach ($t in $Global:TweakList) {
+            $chk = $window.FindName("Chk_$($t.Id)")
+            if ($chk) { $chk.IsChecked = $false }
+        }
+    })
+
+    # --- LOGIKA APPLY ---
     $btnApply.Add_Click({
         $btnApply.Content = "APPLYING..."
         $btnApply.IsEnabled = $false
@@ -1284,7 +1341,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.5.1" Height="850" Width="1000"
+        Title="Panduan PowerShell - Control Panel v3.5.2" Height="850" Width="1000"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>

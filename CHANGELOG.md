@@ -160,3 +160,6 @@
 ### Added
 - **Restore Point Revert Feature:** Menambahkan Tab "Kembalikan (Restore)" di dalam menu Restore Point. Pengguna dapat melihat daftar Restore Point yang ada dan mengembalikan sistem ke titik tersebut.
 - **Buka System Restore Windows:** Menambahkan tombol untuk membuka antarmuka bawaan Windows (rstrui.exe) sebagai opsi alternatif.
+## [3.5.2] - 2026-11-01
+### Added
+- **Tweaks Recommendations:** Menambahkan tombol "Standard", "Minimal", "Advanced", dan "Clear" pada menu Tweaks. Memudahkan user untuk memilih preset optimasi yang diinginkan dengan satu klik.
