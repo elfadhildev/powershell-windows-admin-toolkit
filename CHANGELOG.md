@@ -126,3 +126,7 @@
 ### Fixed
 - **XAML EntityName Error:** Meng-escape karakter `&` menjadi `&amp;` pada nama kategori Debloater (`Bing & Web Services`, `Xbox & Gaming`, `Utilities & Productivity`) dan nama item.
 - **Tweaks Panel Kosong:** Memastikan `$Global:TweakList` terdefinisi dengan benar dan tersedia di dalam fungsi `Show-TweaksGUI` sebelum loop pembuatan CheckBox.
+## [3.2.5] - 2026-11-01
+### Fixed
+- **Install Applications Kosong:** Mendefinisikan kembali variabel `$Global:AppList` yang sempat hilang pada v3.2.4. Variabel ini sekarang berisi 32 aplikasi populer dengan kategori lengkap (Browsers, Comms, Dev, Doc, Games, Media, Utils, Pro Tools).
+- **Scope Variabel:** Memastikan `$Global:TweakList`, `$Global:AppList`, dan `$Global:DebloatList` berada pada scope global (`$Global:`) yang dapat dibaca oleh fungsi-fungsi GUI.

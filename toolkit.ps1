@@ -56,59 +56,7 @@ function Invoke-EventLogAnalyzer {
 }
 
 # ==========================================
-# DATA DEBLOATER MEGA LIST (Kategori Lengkap)
-# ==========================================
-$Global:DebloatList = @(
-    # Microsoft Apps
-    [PSCustomObject]@{ Id=1; Cat='Microsoft Apps'; Name='Feedback Hub'; Pkg='Microsoft.WindowsFeedbackHub' }
-    [PSCustomObject]@{ Id=2; Cat='Microsoft Apps'; Name='Get Help'; Pkg='Microsoft.GetHelp' }
-    [PSCustomObject]@{ Id=3; Cat='Microsoft Apps'; Name='Microsoft 365'; Pkg='Microsoft.MicrosoftOfficeHub' }
-    [PSCustomObject]@{ Id=4; Cat='Microsoft Apps'; Name='Microsoft Teams'; Pkg='Microsoft.Teams' }
-    [PSCustomObject]@{ Id=5; Cat='Microsoft Apps'; Name='Outlook for Windows'; Pkg='Microsoft.OutlookForWindows' }
-    [PSCustomObject]@{ Id=6; Cat='Microsoft Apps'; Name='Cortana'; Pkg='Microsoft.549981C3F5F10' }
-    
-    # Microsoft Ecosystem
-    [PSCustomObject]@{ Id=7; Cat='Microsoft Ecosystem'; Name='Mobile Devices'; Pkg='MicrosoftWindows.CrossDevice' }
-    [PSCustomObject]@{ Id=8; Cat='Microsoft Ecosystem'; Name='Phone Link'; Pkg='Microsoft.YourPhone' }
-
-    # Bing & Web Services
-    [PSCustomObject]@{ Id=9; Cat='Bing & Web Services'; Name='Bing Search'; Pkg='Microsoft.BingSearch' }
-    [PSCustomObject]@{ Id=10; Cat='Bing & Web Services'; Name='Copilot'; Pkg='Microsoft.Copilot' }
-    [PSCustomObject]@{ Id=11; Cat='Bing & Web Services'; Name='News'; Pkg='Microsoft.BingNews' }
-    [PSCustomObject]@{ Id=12; Cat='Bing & Web Services'; Name='Start Experiences App'; Pkg='Microsoft.StartExperiencesApp' }
-    [PSCustomObject]@{ Id=13; Cat='Bing & Web Services'; Name='Weather'; Pkg='Microsoft.BingWeather' }
-
-    # Developer Tools
-    [PSCustomObject]@{ Id=14; Cat='Developer Tools'; Name='Dev Home'; Pkg='Microsoft.Windows.DevHome' }
-    [PSCustomObject]@{ Id=15; Cat='Developer Tools'; Name='Power Automate'; Pkg='Microsoft.PowerAutomateDesktop' }
-
-    # Xbox & Gaming
-    [PSCustomObject]@{ Id=16; Cat='Xbox & Gaming'; Name='Solitaire Collection'; Pkg='Microsoft.MicrosoftSolitaireCollection' }
-    [PSCustomObject]@{ Id=17; Cat='Xbox & Gaming'; Name='Xbox App'; Pkg='Microsoft.XboxApp' }
-    [PSCustomObject]@{ Id=18; Cat='Xbox & Gaming'; Name='Xbox Game Bar'; Pkg='Microsoft.XboxGamingOverlay' }
-    [PSCustomObject]@{ Id=19; Cat='Xbox & Gaming'; Name='Xbox Identity Provider'; Pkg='Microsoft.XboxIdentityProvider' }
-    [PSCustomObject]@{ Id=20; Cat='Xbox & Gaming'; Name='Xbox Speech To Text Overlay'; Pkg='Microsoft.XboxSpeechToTextOverlay' }
-    [PSCustomObject]@{ Id=21; Cat='Xbox & Gaming'; Name='Xbox TCUI'; Pkg='Microsoft.Xbox.TCUI' }
-
-    # Utilities & Productivity
-    [PSCustomObject]@{ Id=22; Cat='Utilities & Productivity'; Name='Calculator'; Pkg='Microsoft.WindowsCalculator' }
-    [PSCustomObject]@{ Id=23; Cat='Utilities & Productivity'; Name='Camera'; Pkg='Microsoft.WindowsCamera' }
-    [PSCustomObject]@{ Id=24; Cat='Utilities & Productivity'; Name='Clipchamp'; Pkg='Clipchamp.Clipchamp' }
-    [PSCustomObject]@{ Id=25; Cat='Utilities & Productivity'; Name='Clock'; Pkg='Microsoft.WindowsAlarms' }
-    [PSCustomObject]@{ Id=26; Cat='Utilities & Productivity'; Name='Media Player'; Pkg='Microsoft.ZuneMusic' }
-    [PSCustomObject]@{ Id=27; Cat='Utilities & Productivity'; Name='Movies & TV'; Pkg='Microsoft.ZuneVideo' }
-    [PSCustomObject]@{ Id=28; Cat='Utilities & Productivity'; Name='Notepad'; Pkg='Microsoft.WindowsNotepad' }
-    [PSCustomObject]@{ Id=29; Cat='Utilities & Productivity'; Name='Paint'; Pkg='Microsoft.Paint' }
-    [PSCustomObject]@{ Id=30; Cat='Utilities & Productivity'; Name='Photos'; Pkg='Microsoft.Windows.Photos' }
-    [PSCustomObject]@{ Id=31; Cat='Utilities & Productivity'; Name='Quick Assist'; Pkg='MicrosoftCorporationII.QuickAssist' }
-    [PSCustomObject]@{ Id=32; Cat='Utilities & Productivity'; Name='Snipping Tool'; Pkg='Microsoft.ScreenSketch' }
-    [PSCustomObject]@{ Id=33; Cat='Utilities & Productivity'; Name='Sound Recorder'; Pkg='Microsoft.WindowsSoundRecorder' }
-    [PSCustomObject]@{ Id=34; Cat='Utilities & Productivity'; Name='Sticky Notes'; Pkg='Microsoft.MicrosoftStickyNotes' }
-    [PSCustomObject]@{ Id=35; Cat='Utilities & Productivity'; Name='To Do'; Pkg='Microsoft.Todos' }
-)
-
-# ==========================================
-# DATA TWEAKS MEGA LIST (Escaped Ampersands)
+# DATA GLOBAL: TWEAKS (Essential & Advanced)
 # ==========================================
 $Global:TweakList = @(
     # Essential Tweaks (18)
@@ -131,7 +79,7 @@ $Global:TweakList = @(
     [PSCustomObject]@{ Id=17; Cat='Essential'; Name='Widgets - Remove'; Action='Widgets' },
     [PSCustomObject]@{ Id=18; Cat='Essential'; Name='Windows Platform Binary Table (WPBT) - Disable'; Action='WPBT' },
 
-    # Advanced Tweaks - CAUTION (20) - Ampersands Escaped!
+    # Advanced Tweaks - CAUTION (20)
     [PSCustomObject]@{ Id=19; Cat='Advanced'; Name='Adobe URL Block List - Enable'; Action='AdobeBlock' },
     [PSCustomObject]@{ Id=20; Cat='Advanced'; Name='Background Apps - Disable'; Action='BgApps' },
     [PSCustomObject]@{ Id=21; Cat='Advanced'; Name='Brave Browser - Debloat'; Action='BraveDebloat' },
@@ -152,6 +100,99 @@ $Global:TweakList = @(
     [PSCustomObject]@{ Id=36; Cat='Advanced'; Name='Teredo - Disable'; Action='Teredo' },
     [PSCustomObject]@{ Id=37; Cat='Advanced'; Name='Visual Effects - Set to Best Performance'; Action='VisualFX' },
     [PSCustomObject]@{ Id=38; Cat='Advanced'; Name='Windows AI - Disable And Remove'; Action='WindowsAI' }
+)
+
+# ==========================================
+# DATA GLOBAL: APPS (Aplikasi Populer)
+# ==========================================
+$Global:AppList = @(
+    # Browsers (5)
+    [PSCustomObject]@{ Id=1; Cat='Browsers'; Name='Brave'; Pkg='Brave.Brave' }
+    [PSCustomObject]@{ Id=2; Cat='Browsers'; Name='Chrome'; Pkg='Google.Chrome' }
+    [PSCustomObject]@{ Id=3; Cat='Browsers'; Name='Edge'; Pkg='Microsoft.Edge' }
+    [PSCustomObject]@{ Id=4; Cat='Browsers'; Name='Firefox'; Pkg='Mozilla.Firefox' }
+    [PSCustomObject]@{ Id=5; Cat='Browsers'; Name='Tor Browser'; Pkg='TorProject.TorBrowser' }
+    # Communications (5)
+    [PSCustomObject]@{ Id=6; Cat='Comms'; Name='Discord'; Pkg='Discord.Discord' }
+    [PSCustomObject]@{ Id=7; Cat='Comms'; Name='Zoom'; Pkg='Zoom.Zoom' }
+    [PSCustomObject]@{ Id=8; Cat='Comms'; Name='Telegram'; Pkg='Telegram.TelegramDesktop' }
+    [PSCustomObject]@{ Id=9; Cat='Comms'; Name='WhatsApp'; Pkg='WhatsApp.WhatsApp' }
+    [PSCustomObject]@{ Id=10; Cat='Comms'; Name='Slack'; Pkg='SlackTechnologies.Slack' }
+    # Development (5)
+    [PSCustomObject]@{ Id=11; Cat='Dev'; Name='VS Code'; Pkg='Microsoft.VisualStudioCode' }
+    [PSCustomObject]@{ Id=12; Cat='Dev'; Name='Git'; Pkg='Git.Git' }
+    [PSCustomObject]@{ Id=13; Cat='Dev'; Name='Python 3'; Pkg='Python.Python.3.12' }
+    [PSCustomObject]@{ Id=14; Cat='Dev'; Name='Node.js'; Pkg='OpenJS.NodeJS' }
+    [PSCustomObject]@{ Id=15; Cat='Dev'; Name='Docker Desktop'; Pkg='Docker.DockerDesktop' }
+    # Document (3)
+    [PSCustomObject]@{ Id=16; Cat='Doc'; Name='LibreOffice'; Pkg='TheDocumentFoundation.LibreOffice' }
+    [PSCustomObject]@{ Id=17; Cat='Doc'; Name='Adobe Acrobat'; Pkg='Adobe.Acrobat.Reader.64-bit' }
+    [PSCustomObject]@{ Id=18; Cat='Doc'; Name='OnlyOffice'; Pkg='ONLYOFFICE.DesktopEditors' }
+    # Games (3)
+    [PSCustomObject]@{ Id=19; Cat='Games'; Name='Steam'; Pkg='Valve.Steam' }
+    [PSCustomObject]@{ Id=20; Cat='Games'; Name='Epic Games'; Pkg='EpicGames.EpicGamesLauncher' }
+    [PSCustomObject]@{ Id=21; Cat='Games'; Name='Battle.net'; Pkg='Blizzard.BattleNet' }
+    # Multimedia (3)
+    [PSCustomObject]@{ Id=22; Cat='Media'; Name='VLC'; Pkg='VideoLAN.VLC' }
+    [PSCustomObject]@{ Id=23; Cat='Media'; Name='Spotify'; Pkg='Spotify.Spotify' }
+    [PSCustomObject]@{ Id=24; Cat='Media'; Name='OBS Studio'; Pkg='OBSProject.OBSStudio' }
+    # Utilities (4)
+    [PSCustomObject]@{ Id=25; Cat='Utils'; Name='7-Zip'; Pkg='7zip.7zip' }
+    [PSCustomObject]@{ Id=26; Cat='Utils'; Name='WinRAR'; Pkg='RARLab.WinRAR' }
+    [PSCustomObject]@{ Id=27; Cat='Utils'; Name='Everything'; Pkg='voidtools.Everything' }
+    [PSCustomObject]@{ Id=28; Cat='Utils'; Name='PowerToys'; Pkg='Microsoft.PowerToys' }
+    # Pro Tools (4)
+    [PSCustomObject]@{ Id=29; Cat='Pro Tools'; Name='Wireshark'; Pkg='WiresharkFoundation.Wireshark' }
+    [PSCustomObject]@{ Id=30; Cat='Pro Tools'; Name='Nmap'; Pkg='Insecure.Nmap' }
+    [PSCustomObject]@{ Id=31; Cat='Pro Tools'; Name='PuTTY'; Pkg='PuTTY.PuTTY' }
+    [PSCustomObject]@{ Id=32; Cat='Pro Tools'; Name='WinSCP'; Pkg='WinSCP.WinSCP' }
+)
+
+# ==========================================
+# DATA GLOBAL: DEBLOATER (Kategori Lengkap)
+# ==========================================
+$Global:DebloatList = @(
+    # Microsoft Apps
+    [PSCustomObject]@{ Id=1; Cat='Microsoft Apps'; Name='Feedback Hub'; Pkg='Microsoft.WindowsFeedbackHub' }
+    [PSCustomObject]@{ Id=2; Cat='Microsoft Apps'; Name='Get Help'; Pkg='Microsoft.GetHelp' }
+    [PSCustomObject]@{ Id=3; Cat='Microsoft Apps'; Name='Microsoft 365'; Pkg='Microsoft.MicrosoftOfficeHub' }
+    [PSCustomObject]@{ Id=4; Cat='Microsoft Apps'; Name='Microsoft Teams'; Pkg='Microsoft.Teams' }
+    [PSCustomObject]@{ Id=5; Cat='Microsoft Apps'; Name='Outlook for Windows'; Pkg='Microsoft.OutlookForWindows' }
+    [PSCustomObject]@{ Id=6; Cat='Microsoft Apps'; Name='Cortana'; Pkg='Microsoft.549981C3F5F10' }
+    # Microsoft Ecosystem
+    [PSCustomObject]@{ Id=7; Cat='Microsoft Ecosystem'; Name='Mobile Devices'; Pkg='MicrosoftWindows.CrossDevice' }
+    [PSCustomObject]@{ Id=8; Cat='Microsoft Ecosystem'; Name='Phone Link'; Pkg='Microsoft.YourPhone' }
+    # Bing & Web Services
+    [PSCustomObject]@{ Id=9; Cat='Bing & Web Services'; Name='Bing Search'; Pkg='Microsoft.BingSearch' }
+    [PSCustomObject]@{ Id=10; Cat='Bing & Web Services'; Name='Copilot'; Pkg='Microsoft.Copilot' }
+    [PSCustomObject]@{ Id=11; Cat='Bing & Web Services'; Name='News'; Pkg='Microsoft.BingNews' }
+    [PSCustomObject]@{ Id=12; Cat='Bing & Web Services'; Name='Start Experiences App'; Pkg='Microsoft.StartExperiencesApp' }
+    [PSCustomObject]@{ Id=13; Cat='Bing & Web Services'; Name='Weather'; Pkg='Microsoft.BingWeather' }
+    # Developer Tools
+    [PSCustomObject]@{ Id=14; Cat='Developer Tools'; Name='Dev Home'; Pkg='Microsoft.Windows.DevHome' }
+    [PSCustomObject]@{ Id=15; Cat='Developer Tools'; Name='Power Automate'; Pkg='Microsoft.PowerAutomateDesktop' }
+    # Xbox & Gaming
+    [PSCustomObject]@{ Id=16; Cat='Xbox & Gaming'; Name='Solitaire Collection'; Pkg='Microsoft.MicrosoftSolitaireCollection' }
+    [PSCustomObject]@{ Id=17; Cat='Xbox & Gaming'; Name='Xbox App'; Pkg='Microsoft.XboxApp' }
+    [PSCustomObject]@{ Id=18; Cat='Xbox & Gaming'; Name='Xbox Game Bar'; Pkg='Microsoft.XboxGamingOverlay' }
+    [PSCustomObject]@{ Id=19; Cat='Xbox & Gaming'; Name='Xbox Identity Provider'; Pkg='Microsoft.XboxIdentityProvider' }
+    [PSCustomObject]@{ Id=20; Cat='Xbox & Gaming'; Name='Xbox Speech To Text Overlay'; Pkg='Microsoft.XboxSpeechToTextOverlay' }
+    [PSCustomObject]@{ Id=21; Cat='Xbox & Gaming'; Name='Xbox TCUI'; Pkg='Microsoft.Xbox.TCUI' }
+    # Utilities & Productivity
+    [PSCustomObject]@{ Id=22; Cat='Utilities & Productivity'; Name='Calculator'; Pkg='Microsoft.WindowsCalculator' }
+    [PSCustomObject]@{ Id=23; Cat='Utilities & Productivity'; Name='Camera'; Pkg='Microsoft.WindowsCamera' }
+    [PSCustomObject]@{ Id=24; Cat='Utilities & Productivity'; Name='Clipchamp'; Pkg='Clipchamp.Clipchamp' }
+    [PSCustomObject]@{ Id=25; Cat='Utilities & Productivity'; Name='Clock'; Pkg='Microsoft.WindowsAlarms' }
+    [PSCustomObject]@{ Id=26; Cat='Utilities & Productivity'; Name='Media Player'; Pkg='Microsoft.ZuneMusic' }
+    [PSCustomObject]@{ Id=27; Cat='Utilities & Productivity'; Name='Movies & TV'; Pkg='Microsoft.ZuneVideo' }
+    [PSCustomObject]@{ Id=28; Cat='Utilities & Productivity'; Name='Notepad'; Pkg='Microsoft.WindowsNotepad' }
+    [PSCustomObject]@{ Id=29; Cat='Utilities & Productivity'; Name='Paint'; Pkg='Microsoft.Paint' }
+    [PSCustomObject]@{ Id=30; Cat='Utilities & Productivity'; Name='Photos'; Pkg='Microsoft.Windows.Photos' }
+    [PSCustomObject]@{ Id=31; Cat='Utilities & Productivity'; Name='Quick Assist'; Pkg='MicrosoftCorporationII.QuickAssist' }
+    [PSCustomObject]@{ Id=32; Cat='Utilities & Productivity'; Name='Snipping Tool'; Pkg='Microsoft.ScreenSketch' }
+    [PSCustomObject]@{ Id=33; Cat='Utilities & Productivity'; Name='Sound Recorder'; Pkg='Microsoft.WindowsSoundRecorder' }
+    [PSCustomObject]@{ Id=34; Cat='Utilities & Productivity'; Name='Sticky Notes'; Pkg='Microsoft.MicrosoftStickyNotes' }
+    [PSCustomObject]@{ Id=35; Cat='Utilities & Productivity'; Name='To Do'; Pkg='Microsoft.Todos' }
 )
 
 # ==========================================
@@ -310,6 +351,58 @@ function Show-TweaksGUI {
 }
 
 # ==========================================
+# FUNGSI GUI: TABBED APPS
+# ==========================================
+function Show-AppsGUI {
+    $categories = $Global:AppList.Cat | Sort-Object -Unique
+    $xamlStr = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Install Applications" Height="700" Width="600"
+        WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
+    <Grid Margin="15">
+        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TabControl Grid.Row="0" Name="TabMain" Background="#1E1E1E" BorderBrush="#3F3F46">
+"@
+    foreach ($cat in $categories) {
+        $safeCat = $cat -replace '&', '&amp;'
+        $xamlStr += "<TabItem Header='$safeCat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10'>"
+        $items = $Global:AppList | Where-Object { $_.Cat -eq $cat }
+        foreach ($item in $items) {
+            $safeName = $item.Name -replace '&', '&amp;'
+            $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$safeName' Foreground='White' Margin='0,8,0,8'/>"
+        }
+        $xamlStr += "</StackPanel></ScrollViewer></TabItem>"
+    }
+    $xamlStr += @"
+        </TabControl>
+        <Button Grid.Row="1" Name="BtnInstall" Content="INSTALL SELECTED APPS" Width="250" Height="40" Background="#0078D7" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,15,0,0" HorizontalAlignment="Center"/>
+    </Grid>
+</Window>
+"@
+    $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xamlStr))
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+    $btnInstall = $window.FindName("BtnInstall")
+
+    $btnInstall.Add_Click({
+        $btnInstall.Content = "INSTALLING... (Cek Terminal)"
+        $btnInstall.IsEnabled = $false
+        $selected = @()
+        foreach ($app in $Global:AppList) {
+            $chk = $window.FindName("Chk_$($app.Id)")
+            if ($chk.IsChecked -eq $true) { $selected += $app.Pkg }
+        }
+        if ($selected.Count -gt 0) {
+            foreach ($pkg in $selected) {
+                Start-Process powershell -ArgumentList "-NoExit", "-Command", "winget install --id $pkg --accept-source-agreements --accept-package-agreements"
+            }
+        }
+        $window.Close()
+    })
+    $window.ShowDialog() | Out-Null
+}
+
+# ==========================================
 # FUNGSI GUI: DEBLOATER (KATEGORI & TOMBOL SELECT)
 # ==========================================
 function Show-DebloaterGUI {
@@ -386,58 +479,6 @@ function Show-DebloaterGUI {
         }
         $btnRemove.Content = "SELESAI DIBERSIHKAN!"
         Start-Sleep -Seconds 1
-        $window.Close()
-    })
-    $window.ShowDialog() | Out-Null
-}
-
-# ==========================================
-# FUNGSI GUI: TABBED APPS
-# ==========================================
-function Show-AppsGUI {
-    $categories = $Global:AppList.Cat | Sort-Object -Unique
-    $xamlStr = @"
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Install Applications" Height="700" Width="600"
-        WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
-    <Grid Margin="15">
-        <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-        <TabControl Grid.Row="0" Name="TabMain" Background="#1E1E1E" BorderBrush="#3F3F46">
-"@
-    foreach ($cat in $categories) {
-        $safeCat = $cat -replace '&', '&amp;'
-        $xamlStr += "<TabItem Header='$safeCat' Background='#2D2D30' Foreground='White'><ScrollViewer VerticalScrollBarVisibility='Auto'><StackPanel Margin='10'>"
-        $items = $Global:AppList | Where-Object { $_.Cat -eq $cat }
-        foreach ($item in $items) {
-            $safeName = $item.Name -replace '&', '&amp;'
-            $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$safeName' Foreground='White' Margin='0,8,0,8'/>"
-        }
-        $xamlStr += "</StackPanel></ScrollViewer></TabItem>"
-    }
-    $xamlStr += @"
-        </TabControl>
-        <Button Grid.Row="1" Name="BtnInstall" Content="INSTALL SELECTED APPS" Width="250" Height="40" Background="#0078D7" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,15,0,0" HorizontalAlignment="Center"/>
-    </Grid>
-</Window>
-"@
-    $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xamlStr))
-    $window = [Windows.Markup.XamlReader]::Load($reader)
-    $btnInstall = $window.FindName("BtnInstall")
-
-    $btnInstall.Add_Click({
-        $btnInstall.Content = "INSTALLING... (Cek Terminal)"
-        $btnInstall.IsEnabled = $false
-        $selected = @()
-        foreach ($app in $Global:AppList) {
-            $chk = $window.FindName("Chk_$($app.Id)")
-            if ($chk.IsChecked -eq $true) { $selected += $app.Pkg }
-        }
-        if ($selected.Count -gt 0) {
-            foreach ($pkg in $selected) {
-                Start-Process powershell -ArgumentList "-NoExit", "-Command", "winget install --id $pkg --accept-source-agreements --accept-package-agreements"
-            }
-        }
         $window.Close()
     })
     $window.ShowDialog() | Out-Null
@@ -589,7 +630,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.2.4" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.2.5" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
