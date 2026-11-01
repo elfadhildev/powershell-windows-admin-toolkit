@@ -100,7 +100,7 @@ $Global:TweakList = @(
 )
 
 # ==========================================
-# DATA GLOBAL: APPS
+# DATA GLOBAL: APPS (231 Apps)
 # ==========================================
 $Global:AppList = @(
     [PSCustomObject]@{ Id=1; Cat='Browsers'; Name='Brave'; Pkg='Brave.Brave' }
@@ -912,7 +912,7 @@ function Show-FixesGUI {
 }
 
 # ==========================================
-# FUNGSI GUI BARU: STARTUP MANAGER (DEEP SCAN)
+# FUNGSI GUI: STARTUP MANAGER (DEEP SCAN + ENABLE/DISABLE)
 # ==========================================
 function Show-StartupGUI {
     $startupItems = @()
@@ -923,7 +923,7 @@ function Show-StartupGUI {
         if (Test-Path $path) {
             $props = Get-ItemProperty -Path $path
             $props.PSObject.Properties | Where-Object { $_.Name -notmatch '^PS' } | ForEach-Object {
-                $startupItems += [PSCustomObject]@{ Id = [guid]::NewGuid().ToString("N"); Name = $_.Name; Type = "Registry"; Value = $_.Value; Location = $path }
+                $startupItems += [PSCustomObject]@{ Id = [guid]::NewGuid().ToString("N"); Name = $_.Name; Type = "Registry"; Value = $_.Value; Location = $path; State = "Enabled"; DisplayName = "[Registry] $($_.Name)" }
             }
         }
     }
@@ -934,47 +934,51 @@ function Show-StartupGUI {
         if (Test-Path $folder) {
             $files = Get-ChildItem -Path $folder -File -ErrorAction SilentlyContinue
             foreach ($file in $files) {
-                $startupItems += [PSCustomObject]@{ Id = [guid]::NewGuid().ToString("N"); Name = $file.Name; Type = "Folder"; Value = $file.FullName; Location = $folder }
+                $startupItems += [PSCustomObject]@{ Id = [guid]::NewGuid().ToString("N"); Name = $file.Name; Type = "Folder"; Value = $file.FullName; Location = $folder; State = "Enabled"; DisplayName = "[Folder] $($file.Name)" }
             }
         }
     }
 
-    # 3. Task Scheduler (Logon/Boot, non-Microsoft)
+    # 3. Task Scheduler (Logon/Boot, non-Microsoft, ALL STATES)
     $tasks = Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object { 
-        $_.State -ne "Disabled" -and
         $_.TaskPath -notmatch "^\\Microsoft\\" -and
         $_.Triggers -ne $null -and
         ($_.Triggers | Where-Object { $_.CimClass.CimClassName -match "Logon|Boot" })
     }
     foreach ($task in $tasks) {
-        $startupItems += [PSCustomObject]@{ Id = [guid]::NewGuid().ToString("N"); Name = $task.TaskName; Type = "Task"; Value = $task.TaskPath; Location = "Task Scheduler" }
+        $stateStr = if ($task.State -eq 'Disabled') { ' (Disabled)' } else { '' }
+        $startupItems += [PSCustomObject]@{ Id = [guid]::NewGuid().ToString("N"); Name = $task.TaskName; Type = "Task"; Value = $task.TaskPath; Location = "Task Scheduler"; State = $task.State; DisplayName = "[Task] $($task.TaskName)$stateStr" }
     }
 
     $xamlStr = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Startup Manager (Deep Scan)" Height="700" Width="700"
+        Title="Startup Manager (Deep Scan)" Height="700" Width="750"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid Margin="15">
         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-        <TextBlock Grid.Row="0" Text="Pilih aplikasi yang ingin dinonaktifkan (dihapus dari startup):" FontSize="14" Margin="0,0,0,10" Foreground="Gray"/>
+        <TextBlock Grid.Row="0" Text="Centang item yang ingin di-Enable/Disable:" FontSize="14" Margin="0,0,0,10" Foreground="Gray"/>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Margin="10">
 "@
     foreach ($item in $startupItems) {
-        $safeName = "[$($item.Type)] $($item.Name)" -replace '&', '&amp;'
+        $safeName = $item.DisplayName -replace '&', '&amp;'
         $xamlStr += "<CheckBox Name='Chk_$($item.Id)' Content='$safeName' Foreground='White' Margin='0,8,0,8'/>"
     }
     $xamlStr += @"
             </StackPanel>
         </ScrollViewer>
-        <Button Grid.Row="2" Name="BtnDisable" Content="DISABLE SELECTED" Width="250" Height="40" Background="#D83B01" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,15,0,0" HorizontalAlignment="Center"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+            <Button Name="BtnDisable" Content="DISABLE SELECTED" Width="200" Height="40" Background="#D83B01" Foreground="White" FontWeight="Bold" FontSize="14" Margin="0,0,10,0"/>
+            <Button Name="BtnEnable" Content="ENABLE SELECTED" Width="200" Height="40" Background="#107C10" Foreground="White" FontWeight="Bold" FontSize="14"/>
+        </StackPanel>
     </Grid>
 </Window>
 "@
     $reader = (New-Object System.Xml.XmlNodeReader ([xml]$xamlStr))
     $window = [Windows.Markup.XamlReader]::Load($reader)
     $btnDisable = $window.FindName("BtnDisable")
+    $btnEnable = $window.FindName("BtnEnable")
 
     $btnDisable.Add_Click({
         $btnDisable.Content = "DISABLING..."
@@ -991,8 +995,7 @@ function Show-StartupGUI {
                         Remove-ItemProperty -Path $item.Location -Name $item.Name -ErrorAction Stop
                     } elseif ($item.Type -eq "Folder") {
                         Move-Item -Path $item.Value -Destination $disabledDir -Force -ErrorAction Stop
-                    } elseif ($item.Type -eq "Task") {
-                        # Value is TaskPath, Name is TaskName
+                    } elseif ($item.Type -eq "Task" -and $item.State -ne 'Disabled') {
                         Disable-ScheduledTask -TaskName $item.Name -TaskPath $item.Value -ErrorAction Stop | Out-Null
                     }
                 } catch { }
@@ -1002,6 +1005,26 @@ function Show-StartupGUI {
         Start-Sleep -Seconds 1
         $window.Close()
     })
+
+    $btnEnable.Add_Click({
+        $btnEnable.Content = "ENABLING..."
+        $btnEnable.IsEnabled = $false
+
+        foreach ($item in $startupItems) {
+            $chk = $window.FindName("Chk_$($item.Id)")
+            if ($chk.IsChecked -eq $true) {
+                try {
+                    if ($item.Type -eq "Task" -and $item.State -eq 'Disabled') {
+                        Enable-ScheduledTask -TaskName $item.Name -TaskPath $item.Value -ErrorAction Stop | Out-Null
+                    }
+                } catch { }
+            }
+        }
+        $btnEnable.Content = "SELESAI!"
+        Start-Sleep -Seconds 1
+        $window.Close()
+    })
+
     $window.ShowDialog() | Out-Null
 }
 
@@ -1054,7 +1077,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.4.1" Height="800" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.4.2" Height="800" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>

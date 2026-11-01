@@ -152,3 +152,7 @@
 - **Deep Startup Manager:** Startup Manager kini mendeteksi aplikasi dari 3 sumber: Registry, Startup Folder, dan Task Scheduler. Item yang dinonaktifkan diberi label asal (contoh: [Registry], [Folder], [Task]).
 ### Fixed
 - **Safe Disable:** Menonaktifkan item dari Folder akan memindahkannya ke folder aman di Desktop. Menonaktifkan Task akan menggunakan perintah `Disable-ScheduledTask` (tidak menghapus), sehingga sistem tetap aman.
+## [3.4.2] - 2026-11-01
+### Added
+- **Startup Manager Enable Feature:** Menambahkan fitur untuk mengaktifkan kembali (Enable) Task Scheduler yang sebelumnya telah dinonaktifkan. Pengguna tidak perlu membuka Task Scheduler secara manual.
+- **Tampilan Status:** Daftar Task Scheduler kini menampilkan status (Disabled) agar pengguna tahu tugas mana yang sedang mati.
