@@ -1,6 +1,6 @@
 D<div align="center">
 
-# <img src="https://github.com/user-attachments/assets/a802de28-c342-410c-9f50-6496302beeae" width="112" height="112" alt="Toolkit Logo" />  PowerShell Windows Admin Toolkit
+# <img src="https://github.com/user-attachments/assets/a802de28-c342-410c-9f50-6496302beeae" width="87" height="87" alt="Toolkit Logo" />  PowerShell Windows Admin Toolkit
 
 **The Ultimate All-in-One GUI Toolkit for Windows 10 & 11 Management.**
 
