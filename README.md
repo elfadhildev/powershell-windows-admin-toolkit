@@ -30,10 +30,9 @@ Inspired by modern system administration suites, this toolkit was designed from 
 
 ## 📸 Screenshots
 
-*(Placeholder - Silakan ganti dengan screenshot asli dari aplikasi Anda)*
 
 <div align="center">
-  <img src="https://via.placeholder.com/800x450.png?text=Main+Menu+GUI" alt="Main Menu" width="800"/>
+  <img width="985" height="683" alt="Cuplikan layar 2026-11-01 233240" src="https://github.com/user-attachments/assets/1160e926-1b88-4be4-b6fc-175911911c70" />
   <br>
   <i>Main Control Panel Interface</i>
 </div>
