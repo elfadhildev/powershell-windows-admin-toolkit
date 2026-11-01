@@ -139,3 +139,6 @@
 ## [3.2.8] - 2026-11-01
 ### Fixed
 - **Auto-Close Terminal:** Menghapus parameter `-NoExit` pada fungsi `Show-SimpleCLI`. Sekarang, jendela terminal System Audit, Network, dan Event Log akan otomatis tertutup saat pengguna menekan Enter, dan kembali ke menu GUI utama.
+## [3.3.0] - 2026-11-01
+### Added
+- **Mega App List Expansion:** Menambahkan lebih dari 150 aplikasi baru dari referensi gambar (total 231 aplikasi) ke dalam menu Install Apps, dikelompokkan ke dalam 10 kategori (Browsers, Comms, Dev, Doc, Games, Microsoft Tools, Multimedia, Pro Tools, Selfhosted, Utilities).

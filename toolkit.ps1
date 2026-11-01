@@ -56,7 +56,7 @@ function Invoke-EventLogAnalyzer {
 }
 
 # ==========================================
-# DATA GLOBAL: TWEAKS
+# DATA GLOBAL: TWEAKS (Tidak Diubah)
 # ==========================================
 $Global:TweakList = @(
     [PSCustomObject]@{ Id=1; Cat='Essential'; Name='Activity History - Disable'; Action='Activity' },
@@ -100,41 +100,259 @@ $Global:TweakList = @(
 )
 
 # ==========================================
-# DATA GLOBAL: APPS
+# DATA GLOBAL: APPS (MEGA UPDATE - 150+ Apps)
 # ==========================================
 $Global:AppList = @(
+    # Browsers
     [PSCustomObject]@{ Id=1; Cat='Browsers'; Name='Brave'; Pkg='Brave.Brave' }
     [PSCustomObject]@{ Id=2; Cat='Browsers'; Name='Chrome'; Pkg='Google.Chrome' }
-    [PSCustomObject]@{ Id=3; Cat='Browsers'; Name='Edge'; Pkg='Microsoft.Edge' }
-    [PSCustomObject]@{ Id=4; Cat='Browsers'; Name='Firefox'; Pkg='Mozilla.Firefox' }
-    [PSCustomObject]@{ Id=5; Cat='Browsers'; Name='Tor Browser'; Pkg='TorProject.TorBrowser' }
-    [PSCustomObject]@{ Id=6; Cat='Comms'; Name='Discord'; Pkg='Discord.Discord' }
-    [PSCustomObject]@{ Id=7; Cat='Comms'; Name='Zoom'; Pkg='Zoom.Zoom' }
-    [PSCustomObject]@{ Id=8; Cat='Comms'; Name='Telegram'; Pkg='Telegram.TelegramDesktop' }
-    [PSCustomObject]@{ Id=9; Cat='Comms'; Name='WhatsApp'; Pkg='WhatsApp.WhatsApp' }
-    [PSCustomObject]@{ Id=10; Cat='Comms'; Name='Slack'; Pkg='SlackTechnologies.Slack' }
-    [PSCustomObject]@{ Id=11; Cat='Dev'; Name='VS Code'; Pkg='Microsoft.VisualStudioCode' }
-    [PSCustomObject]@{ Id=12; Cat='Dev'; Name='Git'; Pkg='Git.Git' }
-    [PSCustomObject]@{ Id=13; Cat='Dev'; Name='Python 3'; Pkg='Python.Python.3.12' }
-    [PSCustomObject]@{ Id=14; Cat='Dev'; Name='Node.js'; Pkg='OpenJS.NodeJS' }
-    [PSCustomObject]@{ Id=15; Cat='Dev'; Name='Docker Desktop'; Pkg='Docker.DockerDesktop' }
-    [PSCustomObject]@{ Id=16; Cat='Doc'; Name='LibreOffice'; Pkg='TheDocumentFoundation.LibreOffice' }
-    [PSCustomObject]@{ Id=17; Cat='Doc'; Name='Adobe Acrobat'; Pkg='Adobe.Acrobat.Reader.64-bit' }
-    [PSCustomObject]@{ Id=18; Cat='Doc'; Name='OnlyOffice'; Pkg='ONLYOFFICE.DesktopEditors' }
-    [PSCustomObject]@{ Id=19; Cat='Games'; Name='Steam'; Pkg='Valve.Steam' }
-    [PSCustomObject]@{ Id=20; Cat='Games'; Name='Epic Games'; Pkg='EpicGames.EpicGamesLauncher' }
-    [PSCustomObject]@{ Id=21; Cat='Games'; Name='Battle.net'; Pkg='Blizzard.BattleNet' }
-    [PSCustomObject]@{ Id=22; Cat='Media'; Name='VLC'; Pkg='VideoLAN.VLC' }
-    [PSCustomObject]@{ Id=23; Cat='Media'; Name='Spotify'; Pkg='Spotify.Spotify' }
-    [PSCustomObject]@{ Id=24; Cat='Media'; Name='OBS Studio'; Pkg='OBSProject.OBSStudio' }
-    [PSCustomObject]@{ Id=25; Cat='Utils'; Name='7-Zip'; Pkg='7zip.7zip' }
-    [PSCustomObject]@{ Id=26; Cat='Utils'; Name='WinRAR'; Pkg='RARLab.WinRAR' }
-    [PSCustomObject]@{ Id=27; Cat='Utils'; Name='Everything'; Pkg='voidtools.Everything' }
-    [PSCustomObject]@{ Id=28; Cat='Utils'; Name='PowerToys'; Pkg='Microsoft.PowerToys' }
-    [PSCustomObject]@{ Id=29; Cat='Pro Tools'; Name='Wireshark'; Pkg='WiresharkFoundation.Wireshark' }
-    [PSCustomObject]@{ Id=30; Cat='Pro Tools'; Name='Nmap'; Pkg='Insecure.Nmap' }
-    [PSCustomObject]@{ Id=31; Cat='Pro Tools'; Name='PuTTY'; Pkg='PuTTY.PuTTY' }
-    [PSCustomObject]@{ Id=32; Cat='Pro Tools'; Name='WinSCP'; Pkg='WinSCP.WinSCP' }
+    [PSCustomObject]@{ Id=3; Cat='Browsers'; Name='Chromium'; Pkg='Hibbiki.Chromium' }
+    [PSCustomObject]@{ Id=4; Cat='Browsers'; Name='Edge'; Pkg='Microsoft.Edge' }
+    [PSCustomObject]@{ Id=5; Cat='Browsers'; Name='Firefox'; Pkg='Mozilla.Firefox' }
+    [PSCustomObject]@{ Id=6; Cat='Browsers'; Name='Firefox ESR'; Pkg='Mozilla.Firefox.ESR' }
+    [PSCustomObject]@{ Id=7; Cat='Browsers'; Name='Floorp'; Pkg='Ablaze.Floorp' }
+    [PSCustomObject]@{ Id=8; Cat='Browsers'; Name='Helium'; Pkg='imputnet.Helium' }
+    [PSCustomObject]@{ Id=9; Cat='Browsers'; Name='LibreWolf'; Pkg='LibreWolf.LibreWolf' }
+    [PSCustomObject]@{ Id=10; Cat='Browsers'; Name='Mullvad Browser'; Pkg='Mullvad.MullvadBrowser' }
+    [PSCustomObject]@{ Id=11; Cat='Browsers'; Name='Tor Browser'; Pkg='TorProject.TorBrowser' }
+    [PSCustomObject]@{ Id=12; Cat='Browsers'; Name='Ungoogled Chromium'; Pkg='eloston.ungoogled-chromium' }
+    [PSCustomObject]@{ Id=13; Cat='Browsers'; Name='Vivaldi'; Pkg='Vivaldi.Vivaldi' }
+    [PSCustomObject]@{ Id=14; Cat='Browsers'; Name='Waterfox'; Pkg='Waterfox.Waterfox' }
+    [PSCustomObject]@{ Id=15; Cat='Browsers'; Name='Zen Browser'; Pkg='Zen-Team.Zen-Browser' }
+
+    # Communications
+    [PSCustomObject]@{ Id=16; Cat='Comms'; Name='Betterbird'; Pkg='Betterbird.Betterbird' }
+    [PSCustomObject]@{ Id=17; Cat='Comms'; Name='Chatterino'; Pkg='Chatterino.Chatterino' }
+    [PSCustomObject]@{ Id=18; Cat='Comms'; Name='Discord'; Pkg='Discord.Discord' }
+    [PSCustomObject]@{ Id=19; Cat='Comms'; Name='Dorion'; Pkg='Dorion.Dorion' }
+    [PSCustomObject]@{ Id=20; Cat='Comms'; Name='Element'; Pkg='Element.Element' }
+    [PSCustomObject]@{ Id=21; Cat='Comms'; Name='Proton Mail'; Pkg='Proton.ProtonMail' }
+    [PSCustomObject]@{ Id=22; Cat='Comms'; Name='QTox'; Pkg='Tox.QTox' }
+    [PSCustomObject]@{ Id=23; Cat='Comms'; Name='Signal'; Pkg='OpenWhisperSystems.Signal' }
+    [PSCustomObject]@{ Id=24; Cat='Comms'; Name='Slack'; Pkg='SlackTechnologies.Slack' }
+    [PSCustomObject]@{ Id=25; Cat='Comms'; Name='Teams'; Pkg='Microsoft.Teams' }
+    [PSCustomObject]@{ Id=26; Cat='Comms'; Name='TeamSpeak 3'; Pkg='TeamSpeak.TeamSpeak3' }
+    [PSCustomObject]@{ Id=27; Cat='Comms'; Name='Thunderbird'; Pkg='Mozilla.Thunderbird' }
+    [PSCustomObject]@{ Id=28; Cat='Comms'; Name='Veskop'; Pkg='Veskop.Veskop' }
+    [PSCustomObject]@{ Id=29; Cat='Comms'; Name='Viber'; Pkg='Viber.Viber' }
+    [PSCustomObject]@{ Id=30; Cat='Comms'; Name='WhatsApp Desktop'; Pkg='WhatsApp.WhatsApp' }
+    [PSCustomObject]@{ Id=31; Cat='Comms'; Name='Zoom'; Pkg='Zoom.Zoom' }
+
+    # Development
+    [PSCustomObject]@{ Id=32; Cat='Dev'; Name='Bruno'; Pkg='Bruno.Bruno' }
+    [PSCustomObject]@{ Id=33; Cat='Dev'; Name='ChatGPT Desktop'; Pkg='lencx.ChatGPT' }
+    [PSCustomObject]@{ Id=34; Cat='Dev'; Name='Claude Desktop'; Pkg='Anthropic.Claude' }
+    [PSCustomObject]@{ Id=35; Cat='Dev'; Name='Claude Code'; Pkg='Anthropic.ClaudeCode' }
+    [PSCustomObject]@{ Id=36; Cat='Dev'; Name='CMake'; Pkg='Kitware.CMake' }
+    [PSCustomObject]@{ Id=37; Cat='Dev'; Name='Codex'; Pkg='Codex.Codex' }
+    [PSCustomObject]@{ Id=38; Cat='Dev'; Name='Cursor'; Pkg='Cursor.Cursor' }
+    [PSCustomObject]@{ Id=39; Cat='Dev'; Name='Docker Desktop'; Pkg='Docker.DockerDesktop' }
+    [PSCustomObject]@{ Id=40; Cat='Dev'; Name='Fast Node Manager'; Pkg='Schniz.fnm' }
+    [PSCustomObject]@{ Id=41; Cat='Dev'; Name='Git'; Pkg='Git.Git' }
+    [PSCustomObject]@{ Id=42; Cat='Dev'; Name='Git Extensions'; Pkg='GitExtensionsTeam.GitExtensions' }
+    [PSCustomObject]@{ Id=43; Cat='Dev'; Name='GitHub CLI'; Pkg='GitHub.cli' }
+    [PSCustomObject]@{ Id=44; Cat='Dev'; Name='GitHub Desktop'; Pkg='GitHub.GitHubDesktop' }
+    [PSCustomObject]@{ Id=45; Cat='Dev'; Name='Go'; Pkg='GoLang.Go' }
+    [PSCustomObject]@{ Id=46; Cat='Dev'; Name='Amazon Corretto 21'; Pkg='Amazon.Corretto.21' }
+    [PSCustomObject]@{ Id=47; Cat='Dev'; Name='Amazon Corretto 17'; Pkg='Amazon.Corretto.17' }
+    [PSCustomObject]@{ Id=48; Cat='Dev'; Name='Amazon Corretto 8'; Pkg='Amazon.Corretto.8' }
+    [PSCustomObject]@{ Id=49; Cat='Dev'; Name='Jetbrains Toolbox'; Pkg='JetBrains.Toolbox' }
+    [PSCustomObject]@{ Id=50; Cat='Dev'; Name='Lazygit'; Pkg='JesseDuffield.lazygit' }
+    [PSCustomObject]@{ Id=51; Cat='Dev'; Name='Lua'; Pkg='Lua.Lua' }
+    [PSCustomObject]@{ Id=52; Cat='Dev'; Name='Neovim'; Pkg='Neovim.Neovim' }
+    [PSCustomObject]@{ Id=53; Cat='Dev'; Name='NodeJS'; Pkg='OpenJS.NodeJS' }
+    [PSCustomObject]@{ Id=54; Cat='Dev'; Name='NodeJS LTS'; Pkg='OpenJS.NodeJS.LTS' }
+    [PSCustomObject]@{ Id=55; Cat='Dev'; Name='pnpm'; Pkg='pnpm.pnpm' }
+    [PSCustomObject]@{ Id=56; Cat='Dev'; Name='Oh My Posh'; Pkg='JanDeDobbeleer.OhMyPosh' }
+    [PSCustomObject]@{ Id=57; Cat='Dev'; Name='Postman'; Pkg='Postman.Postman' }
+    [PSCustomObject]@{ Id=58; Cat='Dev'; Name='Python3'; Pkg='Python.Python.3.12' }
+    [PSCustomObject]@{ Id=59; Cat='Dev'; Name='Ruby'; Pkg='RubyInstallerTeam.Ruby' }
+    [PSCustomObject]@{ Id=60; Cat='Dev'; Name='Rust'; Pkg='Rustlang.Rustup' }
+    [PSCustomObject]@{ Id=61; Cat='Dev'; Name='Starship'; Pkg='Starship.Starship' }
+    [PSCustomObject]@{ Id=62; Cat='Dev'; Name='Sublime Text'; Pkg='SublimeHQ.SublimeText.4' }
+    [PSCustomObject]@{ Id=63; Cat='Dev'; Name='System Informer'; Pkg='WinsiderSS.SystemInformer' }
+    [PSCustomObject]@{ Id=64; Cat='Dev'; Name='Unity Game Engine'; Pkg='Unity.UnityHub' }
+    [PSCustomObject]@{ Id=65; Cat='Dev'; Name='uv'; Pkg='astral-sh.uv' }
+    [PSCustomObject]@{ Id=66; Cat='Dev'; Name='Vagrant'; Pkg='HashiCorp.Vagrant' }
+    [PSCustomObject]@{ Id=67; Cat='Dev'; Name='Visual Studio 2022'; Pkg='Microsoft.VisualStudio.2022.Community' }
+    [PSCustomObject]@{ Id=68; Cat='Dev'; Name='VS Code'; Pkg='Microsoft.VisualStudioCode' }
+    [PSCustomObject]@{ Id=69; Cat='Dev'; Name='VS Codium'; Pkg='VSCodium.VSCodium' }
+    [PSCustomObject]@{ Id=70; Cat='Dev'; Name='Yarn'; Pkg='Yarn.Yarn' }
+    [PSCustomObject]@{ Id=71; Cat='Dev'; Name='Zed'; Pkg='ZedIndustries.Zed' }
+
+    # Document
+    [PSCustomObject]@{ Id=72; Cat='Doc'; Name='Adobe Acrobat'; Pkg='Adobe.Acrobat.Reader.64-bit' }
+    [PSCustomObject]@{ Id=73; Cat='Doc'; Name='Foxit PDF Reader'; Pkg='Foxit.FoxitReader' }
+    [PSCustomObject]@{ Id=74; Cat='Doc'; Name='Joplin'; Pkg='Joplin.Joplin' }
+    [PSCustomObject]@{ Id=75; Cat='Doc'; Name='LibreOffice'; Pkg='TheDocumentFoundation.LibreOffice' }
+    [PSCustomObject]@{ Id=76; Cat='Doc'; Name='NAPS2'; Pkg='Cyanfish.NAPS2' }
+    [PSCustomObject]@{ Id=77; Cat='Doc'; Name='Obsidian'; Pkg='Obsidian.Obsidian' }
+    [PSCustomObject]@{ Id=78; Cat='Doc'; Name='Okular'; Pkg='KDE.Okular' }
+    [PSCustomObject]@{ Id=79; Cat='Doc'; Name='ONLYOFFICE Desktop'; Pkg='ONLYOFFICE.DesktopEditors' }
+    [PSCustomObject]@{ Id=80; Cat='Doc'; Name='PDF24 Creator'; Pkg='PDF24.PDF24Creator' }
+    [PSCustomObject]@{ Id=81; Cat='Doc'; Name='PDFgear'; Pkg='PDFgear.PDFgear' }
+    [PSCustomObject]@{ Id=82; Cat='Doc'; Name='PDFsam Basic'; Pkg='PDFsam.PDFsam' }
+    [PSCustomObject]@{ Id=83; Cat='Doc'; Name='PDF-XChange Editor'; Pkg='TrackerSoftware.PDF-XChangeEditor' }
+    [PSCustomObject]@{ Id=84; Cat='Doc'; Name='QOwnNotes'; Pkg='QOwnNotes.QOwnNotes' }
+    [PSCustomObject]@{ Id=85; Cat='Doc'; Name='Simplenote'; Pkg='Automattic.Simplenote' }
+    [PSCustomObject]@{ Id=86; Cat='Doc'; Name='Sumatra PDF'; Pkg='SumatraPDF.SumatraPDF' }
+    [PSCustomObject]@{ Id=87; Cat='Doc'; Name='Xournal++'; Pkg='Xournal++.Xournal++' }
+    [PSCustomObject]@{ Id=88; Cat='Doc'; Name='Zotero'; Pkg='DigitalScholar.Zotero' }
+
+    # Games
+    [PSCustomObject]@{ Id=89; Cat='Games'; Name='Battle.net'; Pkg='Blizzard.BattleNet' }
+    [PSCustomObject]@{ Id=90; Cat='Games'; Name='Cemu'; Pkg='Cemu.Cemu' }
+    [PSCustomObject]@{ Id=91; Cat='Games'; Name='EA App'; Pkg='ElectronicArts.EADesktop' }
+    [PSCustomObject]@{ Id=92; Cat='Games'; Name='Epic Games Launcher'; Pkg='EpicGames.EpicGamesLauncher' }
+    [PSCustomObject]@{ Id=93; Cat='Games'; Name='EmulationStation Desktop'; Pkg='EmulationStation.EmulationStation' }
+    [PSCustomObject]@{ Id=94; Cat='Games'; Name='GeForce NOW'; Pkg='Nvidia.GeForceNow' }
+    [PSCustomObject]@{ Id=95; Cat='Games'; Name='GOG Galaxy'; Pkg='GOG.Galaxy' }
+    [PSCustomObject]@{ Id=96; Cat='Games'; Name='Heroic Games Launcher'; Pkg='HeroicGamesLauncher.HeroicGamesLauncher' }
+    [PSCustomObject]@{ Id=97; Cat='Games'; Name='Itch.io'; Pkg='ItchIo.Itch' }
+    [PSCustomObject]@{ Id=98; Cat='Games'; Name='Modrinth App'; Pkg='Modrinth.ModrinthApp' }
+    [PSCustomObject]@{ Id=99; Cat='Games'; Name='CurseForge'; Pkg='Overwolf.CurseForge' }
+    [PSCustomObject]@{ Id=100; Cat='Games'; Name='Playnite'; Pkg='Playnite.Playnite' }
+    [PSCustomObject]@{ Id=101; Cat='Games'; Name='Prism Launcher'; Pkg='PrismLauncher.PrismLauncher' }
+    [PSCustomObject]@{ Id=102; Cat='Games'; Name='Roblox'; Pkg='Roblox.Roblox' }
+    [PSCustomObject]@{ Id=103; Cat='Games'; Name='Steam'; Pkg='Valve.Steam' }
+    [PSCustomObject]@{ Id=104; Cat='Games'; Name='Ubisoft Connect'; Pkg='Ubisoft.Connect' }
+    [PSCustomObject]@{ Id=105; Cat='Games'; Name='Virtual Desktop'; Pkg='VirtualDesktop.VirtualDesktop' }
+
+    # Microsoft Tools
+    [PSCustomObject]@{ Id=106; Cat='Microsoft Tools'; Name='Autoruns'; Pkg='Microsoft.Sysinternals.Autoruns' }
+    [PSCustomObject]@{ Id=107; Cat='Microsoft Tools'; Name='DISMTools'; Pkg='CodingWonders.DISMTools' }
+    [PSCustomObject]@{ Id=108; Cat='Microsoft Tools'; Name='.NET Desktop Runtime 6'; Pkg='Microsoft.DotNet.DesktopRuntime.6' }
+    [PSCustomObject]@{ Id=109; Cat='Microsoft Tools'; Name='.NET Desktop Runtime 8'; Pkg='Microsoft.DotNet.DesktopRuntime.8' }
+    [PSCustomObject]@{ Id=110; Cat='Microsoft Tools'; Name='.NET Desktop Runtime 9'; Pkg='Microsoft.DotNet.DesktopRuntime.9' }
+    [PSCustomObject]@{ Id=111; Cat='Microsoft Tools'; Name='NTLite'; Pkg='Nlitesoft.NTLite' }
+    [PSCustomObject]@{ Id=112; Cat='Microsoft Tools'; Name='NuGet'; Pkg='Microsoft.NuGet' }
+    [PSCustomObject]@{ Id=113; Cat='Microsoft Tools'; Name='OneDrive'; Pkg='Microsoft.OneDrive' }
+    [PSCustomObject]@{ Id=114; Cat='Microsoft Tools'; Name='PowerShell'; Pkg='Microsoft.PowerShell' }
+    [PSCustomObject]@{ Id=115; Cat='Microsoft Tools'; Name='PowerToys'; Pkg='Microsoft.PowerToys' }
+    [PSCustomObject]@{ Id=116; Cat='Microsoft Tools'; Name='Process Explorer'; Pkg='Microsoft.Sysinternals.ProcessExplorer' }
+    [PSCustomObject]@{ Id=117; Cat='Microsoft Tools'; Name='Process Monitor'; Pkg='Microsoft.Sysinternals.ProcessMonitor' }
+    [PSCustomObject]@{ Id=118; Cat='Microsoft Tools'; Name='RDCMan'; Pkg='Microsoft.Sysinternals.RDCMan' }
+    [PSCustomObject]@{ Id=119; Cat='Microsoft Tools'; Name='TCPView'; Pkg='Microsoft.Sysinternals.TCPView' }
+    [PSCustomObject]@{ Id=120; Cat='Microsoft Tools'; Name='Windows Terminal'; Pkg='Microsoft.WindowsTerminal' }
+    [PSCustomObject]@{ Id=121; Cat='Microsoft Tools'; Name='Visual C++ 2015-2022 (x86)'; Pkg='Microsoft.VCRedist.2015+.x86' }
+    [PSCustomObject]@{ Id=122; Cat='Microsoft Tools'; Name='Visual C++ 2015-2022 (x64)'; Pkg='Microsoft.VCRedist.2015+.x64' }
+
+    # Multimedia
+    [PSCustomObject]@{ Id=123; Cat='Multimedia'; Name='AIMP'; Pkg='AIMP.AIMP' }
+    [PSCustomObject]@{ Id=124; Cat='Multimedia'; Name='Audacity'; Pkg='Audacity.Audacity' }
+    [PSCustomObject]@{ Id=125; Cat='Multimedia'; Name='Blender'; Pkg='BlenderFoundation.Blender' }
+    [PSCustomObject]@{ Id=126; Cat='Multimedia'; Name='Calibre'; Pkg='calibre.calibre' }
+    [PSCustomObject]@{ Id=127; Cat='Multimedia'; Name='EarTrumpet'; Pkg='File-New-Project.EarTrumpet' }
+    [PSCustomObject]@{ Id=128; Cat='Multimedia'; Name='File Converter'; Pkg='Tichau.File-Converter' }
+    [PSCustomObject]@{ Id=129; Cat='Multimedia'; Name='foobar2000'; Pkg='PeterPawlowski.foobar2000' }
+    [PSCustomObject]@{ Id=130; Cat='Multimedia'; Name='GIMP'; Pkg='GIMP.GIMP' }
+    [PSCustomObject]@{ Id=131; Cat='Multimedia'; Name='HandBrake'; Pkg='HandBrake.HandBrake' }
+    [PSCustomObject]@{ Id=132; Cat='Multimedia'; Name='ImageGlass'; Pkg='DuongDieuPhap.ImageGlass' }
+    [PSCustomObject]@{ Id=133; Cat='Multimedia'; Name='IrfanView'; Pkg='IrfanSkiljan.IrfanView' }
+    [PSCustomObject]@{ Id=134; Cat='Multimedia'; Name='iTunes'; Pkg='Apple.iTunes' }
+    [PSCustomObject]@{ Id=135; Cat='Multimedia'; Name='K-Lite Codec Standard'; Pkg='CodecGuide.K-LiteCodecPack.Standard' }
+    [PSCustomObject]@{ Id=136; Cat='Multimedia'; Name='Media Player Classic'; Pkg='clsid2.mpc-hc' }
+    [PSCustomObject]@{ Id=137; Cat='Multimedia'; Name='mpv'; Pkg='mpv.net' }
+    [PSCustomObject]@{ Id=138; Cat='Multimedia'; Name='nomacs'; Pkg='nomacs.nomacs' }
+    [PSCustomObject]@{ Id=139; Cat='Multimedia'; Name='Notepad++'; Pkg='Notepad++.Notepad++' }
+    [PSCustomObject]@{ Id=140; Cat='Multimedia'; Name='OBS Studio'; Pkg='OBSProject.OBSStudio' }
+    [PSCustomObject]@{ Id=141; Cat='Multimedia'; Name='Paint.NET'; Pkg='dotPDN.PaintDotNet' }
+    [PSCustomObject]@{ Id=142; Cat='Multimedia'; Name='ShareX'; Pkg='ShareX.ShareX' }
+    [PSCustomObject]@{ Id=143; Cat='Multimedia'; Name='VLC'; Pkg='VideoLAN.VLC' }
+
+    # Pro Tools
+    [PSCustomObject]@{ Id=144; Cat='Pro Tools'; Name='Advanced IP Scanner'; Pkg='Famatech.AdvancedIPScanner' }
+    [PSCustomObject]@{ Id=145; Cat='Pro Tools'; Name='Angry IP Scanner'; Pkg='angryip.angryipscanner' }
+    [PSCustomObject]@{ Id=146; Cat='Pro Tools'; Name='Cinebench R23'; Pkg='Maxon.CinebenchR23' }
+    [PSCustomObject]@{ Id=147; Cat='Pro Tools'; Name='CPU-Z'; Pkg='CPUID.CPU-Z' }
+    [PSCustomObject]@{ Id=148; Cat='Pro Tools'; Name='Display Driver Uninstaller'; Pkg='Wagnardsoft.DisplayDriverUninstaller' }
+    [PSCustomObject]@{ Id=149; Cat='Pro Tools'; Name='GPU-Z'; Pkg='TechPowerUp.GPU-Z' }
+    [PSCustomObject]@{ Id=150; Cat='Pro Tools'; Name='gsudo'; Pkg='gerardog.gsudo' }
+    [PSCustomObject]@{ Id=151; Cat='Pro Tools'; Name='HWiNFO'; Pkg='REALiX.HWiNFO' }
+    [PSCustomObject]@{ Id=152; Cat='Pro Tools'; Name='HWMonitor'; Pkg='CPUID.HWMonitor' }
+    [PSCustomObject]@{ Id=153; Cat='Pro Tools'; Name='Mullvad VPN'; Pkg='Mullvad.MullvadVPN' }
+    [PSCustomObject]@{ Id=154; Cat='Pro Tools'; Name='Nmap'; Pkg='Insecure.Nmap' }
+    [PSCustomObject]@{ Id=155; Cat='Pro Tools'; Name='OpenVPN Connect'; Pkg='OpenVPNTechnologies.OpenVPNConnect' }
+    [PSCustomObject]@{ Id=156; Cat='Pro Tools'; Name='Proton VPN'; Pkg='Proton.ProtonVPN' }
+    [PSCustomObject]@{ Id=157; Cat='Pro Tools'; Name='PuTTY'; Pkg='PuTTY.PuTTY' }
+    [PSCustomObject]@{ Id=158; Cat='Pro Tools'; Name='Simplewall'; Pkg='Henry++.simplewall' }
+    [PSCustomObject]@{ Id=159; Cat='Pro Tools'; Name='Ventoy'; Pkg='Ventoy.Ventoy' }
+    [PSCustomObject]@{ Id=160; Cat='Pro Tools'; Name='WinSCP'; Pkg='WinSCP.WinSCP' }
+    [PSCustomObject]@{ Id=161; Cat='Pro Tools'; Name='WireGuard'; Pkg='WireGuard.WireGuard' }
+    [PSCustomObject]@{ Id=162; Cat='Pro Tools'; Name='Wireshark'; Pkg='WiresharkFoundation.Wireshark' }
+
+    # Selfhosted
+    [PSCustomObject]@{ Id=163; Cat='Selfhosted'; Name='Jellyfin Media Player'; Pkg='Jellyfin.JellyfinMediaPlayer' }
+    [PSCustomObject]@{ Id=164; Cat='Selfhosted'; Name='Jellyfin Server'; Pkg='Jellyfin.Server' }
+    [PSCustomObject]@{ Id=165; Cat='Selfhosted'; Name='Kodi Media Center'; Pkg='XBMCFoundation.Kodi' }
+    [PSCustomObject]@{ Id=166; Cat='Selfhosted'; Name='LocalSend'; Pkg='LocalSend.LocalSend' }
+    [PSCustomObject]@{ Id=167; Cat='Selfhosted'; Name='Moonlight'; Pkg='MoonlightGameStreaming.Moonlight' }
+    [PSCustomObject]@{ Id=168; Cat='Selfhosted'; Name='NetBird'; Pkg='NetBird.NetBird' }
+    [PSCustomObject]@{ Id=169; Cat='Selfhosted'; Name='Nextcloud Desktop'; Pkg='Nextcloud.NextcloudDesktop' }
+    [PSCustomObject]@{ Id=170; Cat='Selfhosted'; Name='Plex Media Server'; Pkg='Plex.PlexMediaServer' }
+    [PSCustomObject]@{ Id=171; Cat='Selfhosted'; Name='Plex Desktop'; Pkg='Plex.PlexDesktop' }
+    [PSCustomObject]@{ Id=172; Cat='Selfhosted'; Name='Sunshine'; Pkg='LizardByte.Sunshine' }
+    [PSCustomObject]@{ Id=173; Cat='Selfhosted'; Name='Syncthing'; Pkg='Syncthing.Syncthing' }
+    [PSCustomObject]@{ Id=174; Cat='Selfhosted'; Name='SyncTrayzor'; Pkg='SyncTrayzor.SyncTrayzor' }
+
+    # Utilities
+    [PSCustomObject]@{ Id=175; Cat='Utilities'; Name='1Password'; Pkg='AgileBits.1Password' }
+    [PSCustomObject]@{ Id=176; Cat='Utilities'; Name='7-Zip'; Pkg='7zip.7zip' }
+    [PSCustomObject]@{ Id=177; Cat='Utilities'; Name='AB Download Manager'; Pkg='AmirHosseinAbdolmotallebi.ABDownloadManager' }
+    [PSCustomObject]@{ Id=178; Cat='Utilities'; Name='AnyDesk'; Pkg='AnyDeskSoftwareGmbH.AnyDesk' }
+    [PSCustomObject]@{ Id=179; Cat='Utilities'; Name='AutoHotkey'; Pkg='AutoHotkey.AutoHotkey' }
+    [PSCustomObject]@{ Id=180; Cat='Utilities'; Name='Bitwarden'; Pkg='Bitwarden.Bitwarden' }
+    [PSCustomObject]@{ Id=181; Cat='Utilities'; Name='BlurAutoClicker'; Pkg='BlurAutoClicker.BlurAutoClicker' }
+    [PSCustomObject]@{ Id=182; Cat='Utilities'; Name='Bulk Crap Uninstaller'; Pkg='Klocman.BulkCrapUninstaller' }
+    [PSCustomObject]@{ Id=183; Cat='Utilities'; Name='Cloudflare WARP'; Pkg='Cloudflare.Warp' }
+    [PSCustomObject]@{ Id=184; Cat='Utilities'; Name='Crystal Disk Info'; Pkg='CrystalDewWorld.CrystalDiskInfo' }
+    [PSCustomObject]@{ Id=185; Cat='Utilities'; Name='Crystal Disk Mark'; Pkg='CrystalDewWorld.CrystalDiskMark' }
+    [PSCustomObject]@{ Id=186; Cat='Utilities'; Name='Deskflow'; Pkg='Deskflow.Deskflow' }
+    [PSCustomObject]@{ Id=187; Cat='Utilities'; Name='Dropbox'; Pkg='Dropbox.Dropbox' }
+    [PSCustomObject]@{ Id=188; Cat='Utilities'; Name='Ente Auth'; Pkg='ente-io.auth' }
+    [PSCustomObject]@{ Id=189; Cat='Utilities'; Name='Everything'; Pkg='voidtools.Everything' }
+    [PSCustomObject]@{ Id=190; Cat='Utilities'; Name='Files'; Pkg='FilesCommunity.Files' }
+    [PSCustomObject]@{ Id=191; Cat='Utilities'; Name='F.lux'; Pkg='flux.flux' }
+    [PSCustomObject]@{ Id=192; Cat='Utilities'; Name='GlazeWM'; Pkg='glzr-io.glazewm' }
+    [PSCustomObject]@{ Id=193; Cat='Utilities'; Name='Google Drive'; Pkg='Google.Drive' }
+    [PSCustomObject]@{ Id=194; Cat='Utilities'; Name='Hugo'; Pkg='Gohugoio.Hugo' }
+    [PSCustomObject]@{ Id=195; Cat='Utilities'; Name='Internet Download Manager'; Pkg='Tonec.InternetDownloadManager' }
+    [PSCustomObject]@{ Id=196; Cat='Utilities'; Name='JPEG View'; Pkg='oschwartz10612.jpegview' }
+    [PSCustomObject]@{ Id=197; Cat='Utilities'; Name='KeePassXC'; Pkg='KeePassXCTeam.KeePassXC' }
+    [PSCustomObject]@{ Id=198; Cat='Utilities'; Name='MiniTool Partition Wizard'; Pkg='MiniTool.PartitionWizard.Free' }
+    [PSCustomObject]@{ Id=199; Cat='Utilities'; Name='MSEdgeRedirect'; Pkg='rcmaehl.MSEdgeRedirect' }
+    [PSCustomObject]@{ Id=200; Cat='Utilities'; Name='MSI Afterburner'; Pkg='Guru3D.Afterburner' }
+    [PSCustomObject]@{ Id=201; Cat='Utilities'; Name='NanaZip'; Pkg='M2Team.NanaZip' }
+    [PSCustomObject]@{ Id=202; Cat='Utilities'; Name='Nilesoft Shell'; Pkg='Nilesoft.Shell' }
+    [PSCustomObject]@{ Id=203; Cat='Utilities'; Name='NVCleanstall'; Pkg='TechPowerUp.NVCleanstall' }
+    [PSCustomObject]@{ Id=204; Cat='Utilities'; Name='O&amp;O ShutUp10++'; Pkg='OO-Software.ShutUp10' }
+    [PSCustomObject]@{ Id=205; Cat='Utilities'; Name='OPAutoClicker'; Pkg='OPAutoClicker.OPAutoClicker' }
+    [PSCustomObject]@{ Id=206; Cat='Utilities'; Name='OpenRGB'; Pkg='OpenRGB.OpenRGB' }
+    [PSCustomObject]@{ Id=207; Cat='Utilities'; Name='Oracle VirtualBox'; Pkg='Oracle.VirtualBox' }
+    [PSCustomObject]@{ Id=208; Cat='Utilities'; Name='Parsec'; Pkg='Parsec.Parsec' }
+    [PSCustomObject]@{ Id=209; Cat='Utilities'; Name='PeaZip'; Pkg='GiorgioTani.PeaZip' }
+    [PSCustomObject]@{ Id=210; Cat='Utilities'; Name='Policy Plus'; Pkg='Fleex255.PolicyPlus' }
+    [PSCustomObject]@{ Id=211; Cat='Utilities'; Name='Process Lasso'; Pkg='Bitsum.ProcessLasso' }
+    [PSCustomObject]@{ Id=212; Cat='Utilities'; Name='Proton Authenticator'; Pkg='Proton.ProtonAuthenticator' }
+    [PSCustomObject]@{ Id=213; Cat='Utilities'; Name='Proton Drive'; Pkg='Proton.ProtonDrive' }
+    [PSCustomObject]@{ Id=214; Cat='Utilities'; Name='Proton Pass'; Pkg='Proton.ProtonPass' }
+    [PSCustomObject]@{ Id=215; Cat='Utilities'; Name='qBittorrent'; Pkg='qBittorrent.qBittorrent' }
+    [PSCustomObject]@{ Id=216; Cat='Utilities'; Name='Revo Uninstaller'; Pkg='RevoUninstaller.RevoUninstaller' }
+    [PSCustomObject]@{ Id=217; Cat='Utilities'; Name='Rufus'; Pkg='Rufus.Rufus' }
+    [PSCustomObject]@{ Id=218; Cat='Utilities'; Name='Snappy Driver Installer'; Pkg='GlennDelahoy.SnappyDriverInstallerOrigin' }
+    [PSCustomObject]@{ Id=219; Cat='Utilities'; Name='SignalRGB'; Pkg='WhirlwindFX.SignalRGB' }
+    [PSCustomObject]@{ Id=220; Cat='Utilities'; Name='StartAllBack'; Pkg='StartAllBack.StartAllBack' }
+    [PSCustomObject]@{ Id=221; Cat='Utilities'; Name='Tailscale'; Pkg='tailscale.tailscale' }
+    [PSCustomObject]@{ Id=222; Cat='Utilities'; Name='TeamViewer'; Pkg='TeamViewer.TeamViewer' }
+    [PSCustomObject]@{ Id=223; Cat='Utilities'; Name='TightVNC'; Pkg='GlavSoft.TightVNC' }
+    [PSCustomObject]@{ Id=224; Cat='Utilities'; Name='Total Commander'; Pkg='Ghisler.TotalCommander' }
+    [PSCustomObject]@{ Id=225; Cat='Utilities'; Name='TreeSize Free'; Pkg='JAMSoftware.TreeSize.Free' }
+    [PSCustomObject]@{ Id=226; Cat='Utilities'; Name='TranslucentTB'; Pkg='TranslucentTB.TranslucentTB' }
+    [PSCustomObject]@{ Id=227; Cat='Utilities'; Name='UniGetUI'; Pkg='MartiCliment.UniGetUI' }
+    [PSCustomObject]@{ Id=228; Cat='Utilities'; Name='WinRAR'; Pkg='RARLab.WinRAR' }
+    [PSCustomObject]@{ Id=229; Cat='Utilities'; Name='Wise Program Uninstaller'; Pkg='WiseCleaner.WiseProgramUninstaller' }
+    [PSCustomObject]@{ Id=230; Cat='Utilities'; Name='WizTree'; Pkg='AntibodySoftware.WizTree' }
+    [PSCustomObject]@{ Id=231; Cat='Utilities'; Name='HxD Hex Editor'; Pkg='MaëlHörz.HxD' }
 )
 
 # ==========================================
@@ -367,14 +585,14 @@ function Show-TweaksGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: TABBED APPS
+# FUNGSI GUI: TABBED APPS (GUI Dinamis untuk 231 Apps)
 # ==========================================
 function Show-AppsGUI {
     $categories = $Global:AppList.Cat | Sort-Object -Unique
     $xamlStr = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Install Applications" Height="700" Width="600"
+        Title="Install Applications" Height="700" Width="700"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid Margin="15">
         <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
@@ -419,7 +637,7 @@ function Show-AppsGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: DEBLOATER (KATEGORI & TOMBOL SELECT)
+# FUNGSI GUI: DEBLOATER
 # ==========================================
 function Show-DebloaterGUI {
     $categories = $Global:DebloatList.Cat | Sort-Object -Unique
@@ -464,7 +682,6 @@ function Show-DebloaterGUI {
     $btnSelectAll = $window.FindName("BtnSelectAll")
     $btnClearSel = $window.FindName("BtnClearSel")
 
-    # Event Handler: Select All
     $btnSelectAll.Add_Click({
         foreach ($item in $Global:DebloatList) {
             $chk = $window.FindName("Chk_$($item.Id)")
@@ -472,7 +689,6 @@ function Show-DebloaterGUI {
         }
     })
 
-    # Event Handler: Clear Selection
     $btnClearSel.Add_Click({
         foreach ($item in $Global:DebloatList) {
             $chk = $window.FindName("Chk_$($item.Id)")
@@ -480,7 +696,6 @@ function Show-DebloaterGUI {
         }
     })
 
-    # Event Handler: Uninstall
     $btnRemove.Add_Click({
         $btnRemove.Content = "UNINSTALLING..."
         $btnRemove.IsEnabled = $false
@@ -501,7 +716,7 @@ function Show-DebloaterGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: DNS SWITCHER (MEGA UPDATE)
+# FUNGSI GUI: DNS SWITCHER
 # ==========================================
 function Show-DnsGUI {
     $xaml = @"
@@ -563,7 +778,7 @@ function Show-DnsGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: UPDATE MANAGER (SECURITY ONLY)
+# FUNGSI GUI: UPDATE MANAGER
 # ==========================================
 function Show-UpdateGUI {
     $xaml = @"
@@ -670,14 +885,13 @@ function Show-BackupGUI {
 }
 
 # ==========================================
-# FUNGSI EKSEKUSI TERMINAL (FIXED: Auto Close Window)
+# FUNGSI EKSEKUSI TERMINAL (Auto Close Window)
 # ==========================================
 function Show-SimpleCLI($title, $funcName) {
     $body = (Get-Command $funcName).ScriptBlock.ToString()
     $cmd = "& { function $funcName { $body } ; $funcName }"
     $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($cmd))
     
-    # -NoExit DIHAPUS agar jendela langsung tertutup saat selesai
     Start-Process powershell -ArgumentList "-ExecutionPolicy", "Bypass", "-EncodedCommand", $b64
 }
 
@@ -688,7 +902,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.2.8" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.3.0" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
