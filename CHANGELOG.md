@@ -133,3 +133,6 @@
 ## [3.2.6] - 2026-11-01
 ### Fixed
 - **App Backup Error:** Mengembalikan fungsi `Show-CustomDialog` yang tidak sengaja terhapus pada versi v3.2.5, sehingga tombol App Backup bisa berfungsi normal.
+## [3.2.7] - 2026-11-01
+### Fixed
+- **Maintenance Job Error:** Memperbaiki error `Cannot bind argument to parameter 'Job' because it is null` pada Deep Clean Maintenance. Job dan Timer sekarang disimpan di scope `$script:` sehingga tidak hilang saat event handler WPF berjalan.

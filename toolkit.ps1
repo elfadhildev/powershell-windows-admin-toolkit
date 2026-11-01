@@ -179,7 +179,7 @@ $Global:DebloatList = @(
 )
 
 # ==========================================
-# FUNGSI GUI: DEEP CLEAN MAINTENANCE
+# FUNGSI GUI: DEEP CLEAN MAINTENANCE (STABLE)
 # ==========================================
 function Show-MaintenanceGUI {
     [xml]$xaml = @"
@@ -215,25 +215,65 @@ function Show-MaintenanceGUI {
     $btnRun.Add_Click({
         $btnRun.IsEnabled = $false
         $txtLog.Clear()
+        
+        # ScriptBlock yang akan dijalankan di background
         $script = {
             param($t, $d, $c, $di, $s)
-            if ($t) { Write-Output "[+] Menghapus File Sementara..."; $folders = @("$env:TEMP", "C:\Windows\Temp", "C:\Windows\Prefetch", "C:\Windows\SoftwareDistribution\Download"); foreach ($f in $folders) { if (Test-Path $f) { Get-ChildItem -Path $f -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue } }; Write-Output "    -> Selesai." }
-            if ($d) { Write-Output "[+] Membersihkan Cache DNS & IP..."; Clear-DnsClientCache; ipconfig /release | Out-Null; ipconfig /renew | Out-Null; Write-Output "    -> Selesai." }
-            if ($c) { Write-Output "[+] Menjalankan Disk Cleanup (cleanmgr)..."; Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -Wait -NoNewWindow; Write-Output "    -> Selesai." }
-            if ($di) { Write-Output "[+] Menjalankan DISM Component Cleanup (Mohon Tunggu)..."; Start-Process "Dism.exe" -ArgumentList "/online /Cleanup-Image /StartComponentCleanup" -Wait -NoNewWindow; Write-Output "    -> Selesai." }
-            if ($s) { Write-Output "[+] Menjalankan SFC Scannow (Mohon Tunggu)..."; Start-Process "sfc" -ArgumentList "/scannow" -Wait -NoNewWindow; Write-Output "    -> Selesai." }
+            if ($t) {
+                Write-Output "[+] Menghapus File Sementara..."
+                $folders = @("$env:TEMP", "C:\Windows\Temp", "C:\Windows\Prefetch", "C:\Windows\SoftwareDistribution\Download")
+                foreach ($f in $folders) { if (Test-Path $f) { Get-ChildItem -Path $f -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue } }
+                Write-Output "    -> Selesai."
+            }
+            if ($d) {
+                Write-Output "[+] Membersihkan Cache DNS & IP..."
+                Clear-DnsClientCache; ipconfig /release | Out-Null; ipconfig /renew | Out-Null
+                Write-Output "    -> Selesai."
+            }
+            if ($c) {
+                Write-Output "[+] Menjalankan Disk Cleanup (cleanmgr)..."
+                Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -Wait -NoNewWindow
+                Write-Output "    -> Selesai."
+            }
+            if ($di) {
+                Write-Output "[+] Menjalankan DISM Component Cleanup (Mohon Tunggu)..."
+                Start-Process "Dism.exe" -ArgumentList "/online /Cleanup-Image /StartComponentCleanup" -Wait -NoNewWindow
+                Write-Output "    -> Selesai."
+            }
+            if ($s) {
+                Write-Output "[+] Menjalankan SFC Scannow (Mohon Tunggu)..."
+                Start-Process "sfc" -ArgumentList "/scannow" -Wait -NoNewWindow
+                Write-Output "    -> Selesai."
+            }
             Write-Output "`n[V] SEMUA PROSES PEMBERSIHAN SELESAI!"
         }
-        $job = Start-Job -ScriptBlock $script -ArgumentList $chkTemp.IsChecked, $chkDNS.IsChecked, $chkCleanmgr.IsChecked, $chkDISM.IsChecked, $chkSFC.IsChecked
-        $timer = New-Object System.Windows.Threading.DispatcherTimer
-        $timer.Interval = [TimeSpan]::FromSeconds(1)
-        $timer.Add_Tick({
-            $out = Receive-Job -Job $job -Keep
-            if ($out) { $txtLog.Text = $out -join "`r`n"; $txtLog.ScrollToEnd() }
-            if ($job.State -ne 'Running') { $timer.Stop(); $btnRun.IsEnabled = $true; Remove-Job -Job $job -Force }
+
+        # SIMPAN JOB DAN TIMER DI SCOPE $SCRIPT AGAR TIDAK HILANG
+        $script:MaintJob = Start-Job -ScriptBlock $script -ArgumentList $chkTemp.IsChecked, $chkDNS.IsChecked, $chkCleanmgr.IsChecked, $chkDISM.IsChecked, $chkSFC.IsChecked
+
+        $script:MaintTimer = New-Object System.Windows.Threading.DispatcherTimer
+        $script:MaintTimer.Interval = [TimeSpan]::FromSeconds(1)
+        
+        $script:MaintTimer.Add_Tick({
+            # Cek null sebelum memproses
+            if ($null -ne $script:MaintJob) {
+                $out = Receive-Job -Job $script:MaintJob -Keep
+                if ($out) { 
+                    $txtLog.Text = $out -join "`r`n"
+                    $txtLog.ScrollToEnd() 
+                }
+                if ($script:MaintJob.State -ne 'Running') {
+                    $script:MaintTimer.Stop()
+                    $btnRun.IsEnabled = $true
+                    Remove-Job -Job $script:MaintJob -Force
+                    $script:MaintJob = $null
+                }
+            }
         })
-        $timer.Start()
+        
+        $script:MaintTimer.Start()
     })
+
     $window.ShowDialog() | Out-Null
 }
 
@@ -282,11 +322,7 @@ function Show-TweaksGUI {
         
         foreach ($act in $selected) {
             switch ($act) {
-                'Activity' { 
-                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "EnableActivityFeed" -Value 0 -Type DWord -ErrorAction SilentlyContinue
-                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "PublishUserActivities" -Value 0 -Type DWord -ErrorAction SilentlyContinue
-                    Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "UploadUserActivities" -Value 0 -Type DWord -ErrorAction SilentlyContinue
-                }
+                'Activity' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "EnableActivityFeed" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "PublishUserActivities" -Value 0 -Type DWord -ErrorAction SilentlyContinue; Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "UploadUserActivities" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
                 'BitLocker' { Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\BitLocker" -Name "PreventDeviceEncryption" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
                 'Consumer' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsConsumerFeatures" -Value 1 -Type DWord -ErrorAction SilentlyContinue }
                 'DeliveryOpt' { Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" -Name "DODownloadMode" -Value 0 -Type DWord -ErrorAction SilentlyContinue }
@@ -593,7 +629,7 @@ function Show-UpdateGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: CUSTOM DIALOG (DIPULIHKAN)
+# FUNGSI GUI: CUSTOM DIALOG
 # ==========================================
 function Show-CustomDialog($title, $message, $buttons) {
     $xaml = @"
@@ -650,7 +686,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.2.6" Height="700" Width="950"
+        Title="Panduan PowerShell - Control Panel v3.2.7" Height="700" Width="950"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
