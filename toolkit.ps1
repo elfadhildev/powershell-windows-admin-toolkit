@@ -387,7 +387,7 @@ $Global:DebloatList = @(
 )
 
 # ==========================================
-# FUNGSI GUI: DEEP CLEAN MAINTENANCE
+# FUNGSI GUI: DEEP CLEAN MAINTENANCE (FIXED)
 # ==========================================
 function Show-MaintenanceGUI {
     [xml]$xaml = @"
@@ -439,17 +439,17 @@ function Show-MaintenanceGUI {
             }
             if ($c) {
                 Write-Output "[+] Menjalankan Disk Cleanup (cleanmgr)..."
-                Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -Wait -NoNewWindow
+                Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -Wait -NoNewWindow | Out-Null
                 Write-Output "    -> Selesai."
             }
             if ($di) {
                 Write-Output "[+] Menjalankan DISM Component Cleanup (Mohon Tunggu)..."
-                Start-Process "Dism.exe" -ArgumentList "/online /Cleanup-Image /StartComponentCleanup" -Wait -NoNewWindow
+                Start-Process "Dism.exe" -ArgumentList "/online /Cleanup-Image /StartComponentCleanup" -Wait -NoNewWindow | Out-Null
                 Write-Output "    -> Selesai."
             }
             if ($s) {
                 Write-Output "[+] Menjalankan SFC Scannow (Mohon Tunggu)..."
-                Start-Process "sfc" -ArgumentList "/scannow" -Wait -NoNewWindow
+                Start-Process "sfc" -ArgumentList "/scannow" -Wait -NoNewWindow | Out-Null
                 Write-Output "    -> Selesai."
             }
             Write-Output "`n[V] SEMUA PROSES PEMBERSIHAN SELESAI!"
@@ -483,7 +483,7 @@ function Show-MaintenanceGUI {
 }
 
 # ==========================================
-# FUNGSI GUI: TABBED TWEAKS (UPDATED WITH RECOMMENDATIONS)
+# FUNGSI GUI: TABBED TWEAKS
 # ==========================================
 function Show-TweaksGUI {
     $categories = $Global:TweakList.Cat | Sort-Object -Unique
@@ -495,7 +495,6 @@ function Show-TweaksGUI {
     <Grid Margin="15">
         <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
         
-        <!-- Recommended Selections -->
         <StackPanel Grid.Row="0" Margin="0,0,0,10">
             <TextBlock Text="Recommended Selections:" FontSize="14" Foreground="LightBlue" FontWeight="Bold" Margin="0,0,0,5"/>
             <WrapPanel>
@@ -533,20 +532,15 @@ function Show-TweaksGUI {
     $btnClr = $window.FindName("BtnClr")
     $btnApply = $window.FindName("BtnApply")
 
-    # --- LOGIKA RECOMMENDED BUTTONS ---
-    
-    # 1. Minimal (Paling Aman: Telemetry, Activity, TempFiles)
     $btnMin.Add_Click({
         foreach ($t in $Global:TweakList) {
             $chk = $window.FindName("Chk_$($t.Id)")
             if ($chk) {
-                # Id 1(Activity), 15(Telemetry), 16(TempFiles)
                 if ($t.Id -in @(1, 15, 16)) { $chk.IsChecked = $true } else { $chk.IsChecked = $false }
             }
         }
     })
 
-    # 2. Standard (Semua Essential)
     $btnStd.Add_Click({
         foreach ($t in $Global:TweakList) {
             $chk = $window.FindName("Chk_$($t.Id)")
@@ -556,7 +550,6 @@ function Show-TweaksGUI {
         }
     })
 
-    # 3. Advanced (Semua Essential + Advanced)
     $btnAdv.Add_Click({
         foreach ($t in $Global:TweakList) {
             $chk = $window.FindName("Chk_$($t.Id)")
@@ -564,7 +557,6 @@ function Show-TweaksGUI {
         }
     })
 
-    # 4. Clear (Uncheck All)
     $btnClr.Add_Click({
         foreach ($t in $Global:TweakList) {
             $chk = $window.FindName("Chk_$($t.Id)")
@@ -572,7 +564,6 @@ function Show-TweaksGUI {
         }
     })
 
-    # --- LOGIKA APPLY ---
     $btnApply.Add_Click({
         $btnApply.Content = "APPLYING..."
         $btnApply.IsEnabled = $false
@@ -1276,14 +1267,12 @@ function Show-RestorePointGUI {
     $btnRevert = $window.FindName("BtnRevert")
     $btnOpenNative = $window.FindName("BtnOpenNative")
 
-    # Refresh List Restore Points
     $refreshList = {
         $points = Get-ComputerRestorePoint -ErrorAction SilentlyContinue | Sort-Object CreationTime -Descending
         $lstRestorePoints.ItemsSource = $points
     }
     & $refreshList
 
-    # Action: Create
     $btnCreate.Add_Click({
         $btnCreate.Content = "Membuat Restore Point..."
         $btnCreate.IsEnabled = $false
@@ -1294,7 +1283,7 @@ function Show-RestorePointGUI {
             }
             Checkpoint-Computer -Description "Toolkit Restore Point - $(Get-Date -Format 'yyyy-MM-dd HH:mm')" -RestorePointType "MODIFY_SETTINGS" -ErrorAction Stop
             [System.Windows.MessageBox]::Show("Restore Point berhasil dibuat!", "Sukses", "OK", "Information") | Out-Null
-            & $refreshList # Refresh daftar setelah dibuat
+            & $refreshList
         } catch {
             [System.Windows.MessageBox]::Show("Gagal membuat Restore Point: `n$($_.Exception.Message)", "Error", "OK", "Error") | Out-Null
         }
@@ -1303,7 +1292,6 @@ function Show-RestorePointGUI {
         $btnCreate.IsEnabled = $true
     })
 
-    # Action: Revert
     $btnRevert.Add_Click({
         if ($null -eq $lstRestorePoints.SelectedItem) {
             [System.Windows.MessageBox]::Show("Pilih Restore Point terlebih dahulu dari daftar!", "Peringatan", "OK", "Warning") | Out-Null
@@ -1325,7 +1313,6 @@ function Show-RestorePointGUI {
         }
     })
 
-    # Action: Open Native UI
     $btnOpenNative.Add_Click({
         Start-Process "rstrui.exe"
         $window.Close()
@@ -1341,7 +1328,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.5.2" Height="850" Width="1000"
+        Title="Panduan PowerShell - Control Panel v3.5.3" Height="850" Width="1000"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
