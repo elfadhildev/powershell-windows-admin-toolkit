@@ -166,3 +166,6 @@
 ## [3.5.3] - 2026-11-02
 ### Fixed
 - **Maintenance Background Job Serialization:** Memperbaiki error `Cannot process an element with node type "Text"` pada proses Maintenance. Job kini hanya mengembalikan string murni dan membuang output dari proses eksternal (`| Out-Null`), sehingga `Receive-Job` berjalan stabil tanpa crash.
+## [3.5.4] - 2026-11-02
+### Fixed
+- **Maintenance Serialization Ultimate:** Memperbaiki total error background job pada Maintenance dengan mengalihkan output native command (`*> $null`) dan menambahkan blok `try/catch` pada pembacaan Timer. GUI kini 100% stabil saat menjalankan SFC/DISM.

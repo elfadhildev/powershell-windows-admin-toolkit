@@ -387,7 +387,7 @@ $Global:DebloatList = @(
 )
 
 # ==========================================
-# FUNGSI GUI: DEEP CLEAN MAINTENANCE (FIXED)
+# FUNGSI GUI: DEEP CLEAN MAINTENANCE (ULTIMATE FIX)
 # ==========================================
 function Show-MaintenanceGUI {
     [xml]$xaml = @"
@@ -426,33 +426,39 @@ function Show-MaintenanceGUI {
         
         $script = {
             param($t, $d, $c, $di, $s)
-            if ($t) {
-                Write-Output "[+] Menghapus File Sementara..."
-                $folders = @("$env:TEMP", "C:\Windows\Temp", "C:\Windows\Prefetch", "C:\Windows\SoftwareDistribution\Download")
-                foreach ($f in $folders) { if (Test-Path $f) { Get-ChildItem -Path $f -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue } }
-                Write-Output "    -> Selesai."
+            try {
+                if ($t) {
+                    Write-Output "[+] Menghapus File Sementara..."
+                    $folders = @("$env:TEMP", "C:\Windows\Temp", "C:\Windows\Prefetch", "C:\Windows\SoftwareDistribution\Download")
+                    foreach ($f in $folders) { if (Test-Path $f) { Get-ChildItem -Path $f -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue } }
+                    Write-Output "    -> Selesai."
+                }
+                if ($d) {
+                    Write-Output "[+] Membersihkan Cache DNS & IP..."
+                    Clear-DnsClientCache
+                    & ipconfig /release *> $null
+                    & ipconfig /renew *> $null
+                    Write-Output "    -> Selesai."
+                }
+                if ($c) {
+                    Write-Output "[+] Menjalankan Disk Cleanup (cleanmgr)..."
+                    Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -Wait -WindowStyle Hidden
+                    Write-Output "    -> Selesai."
+                }
+                if ($di) {
+                    Write-Output "[+] Menjalankan DISM Component Cleanup (Mohon Tunggu)..."
+                    & Dism.exe /online /Cleanup-Image /StartComponentCleanup *> $null
+                    Write-Output "    -> Selesai."
+                }
+                if ($s) {
+                    Write-Output "[+] Menjalankan SFC Scannow (Mohon Tunggu)..."
+                    & sfc.exe /scannow *> $null
+                    Write-Output "    -> Selesai."
+                }
+                Write-Output "`n[V] SEMUA PROSES PEMBERSIHAN SELESAI!"
+            } catch {
+                Write-Output "[!] ERROR: $($_.Exception.Message)"
             }
-            if ($d) {
-                Write-Output "[+] Membersihkan Cache DNS & IP..."
-                Clear-DnsClientCache; ipconfig /release | Out-Null; ipconfig /renew | Out-Null
-                Write-Output "    -> Selesai."
-            }
-            if ($c) {
-                Write-Output "[+] Menjalankan Disk Cleanup (cleanmgr)..."
-                Start-Process cleanmgr.exe -ArgumentList "/sagerun:1" -Wait -NoNewWindow | Out-Null
-                Write-Output "    -> Selesai."
-            }
-            if ($di) {
-                Write-Output "[+] Menjalankan DISM Component Cleanup (Mohon Tunggu)..."
-                Start-Process "Dism.exe" -ArgumentList "/online /Cleanup-Image /StartComponentCleanup" -Wait -NoNewWindow | Out-Null
-                Write-Output "    -> Selesai."
-            }
-            if ($s) {
-                Write-Output "[+] Menjalankan SFC Scannow (Mohon Tunggu)..."
-                Start-Process "sfc" -ArgumentList "/scannow" -Wait -NoNewWindow | Out-Null
-                Write-Output "    -> Selesai."
-            }
-            Write-Output "`n[V] SEMUA PROSES PEMBERSIHAN SELESAI!"
         }
 
         $script:MaintJob = Start-Job -ScriptBlock $script -ArgumentList $chkTemp.IsChecked, $chkDNS.IsChecked, $chkCleanmgr.IsChecked, $chkDISM.IsChecked, $chkSFC.IsChecked
@@ -462,11 +468,16 @@ function Show-MaintenanceGUI {
         
         $script:MaintTimer.Add_Tick({
             if ($null -ne $script:MaintJob) {
-                $out = Receive-Job -Job $script:MaintJob -Keep
-                if ($out) { 
-                    $txtLog.Text = $out -join "`r`n"
-                    $txtLog.ScrollToEnd() 
+                try {
+                    $out = Receive-Job -Job $script:MaintJob -Keep -ErrorAction Stop
+                    if ($out) { 
+                        $txtLog.Text = $out -join "`r`n"
+                        $txtLog.ScrollToEnd() 
+                    }
+                } catch {
+                    $txtLog.Text += "`r`n[!] Error membaca output job: $($_.Exception.Message)"
                 }
+                
                 if ($script:MaintJob.State -ne 'Running') {
                     $script:MaintTimer.Stop()
                     $btnRun.IsEnabled = $true
@@ -1187,10 +1198,14 @@ function Show-UserBackupGUI {
         
         $script:BackupTimer.Add_Tick({
             if ($null -ne $script:BackupJob) {
-                $out = Receive-Job -Job $script:BackupJob -Keep
-                if ($out) { 
-                    $txtLog.Text = $out -join "`r`n"
-                    $txtLog.ScrollToEnd() 
+                try {
+                    $out = Receive-Job -Job $script:BackupJob -Keep -ErrorAction Stop
+                    if ($out) { 
+                        $txtLog.Text = $out -join "`r`n"
+                        $txtLog.ScrollToEnd() 
+                    }
+                } catch {
+                    $txtLog.Text += "`r`n[!] Error membaca job: $($_.Exception.Message)"
                 }
                 if ($script:BackupJob.State -ne 'Running') {
                     $script:BackupTimer.Stop()
@@ -1328,7 +1343,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Panduan PowerShell - Control Panel v3.5.3" Height="850" Width="1000"
+        Title="Panduan PowerShell - Control Panel v3.5.4" Height="850" Width="1000"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="40"/></Grid.RowDefinitions>
