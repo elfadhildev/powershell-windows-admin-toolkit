@@ -1211,15 +1211,47 @@ function Show-GUI {
 
     $Global:CB_Tweaks = @()
     $tweaksEss = @(
-        @{Name='Disable Telemetry'; Action='Telemetry'}, @{Name='Disable Activity History'; Action='Activity'},
-        @{Name='Disable Consumer Features'; Action='Consumer'}, @{Name='Disable Location Tracking'; Action='Location'},
-        @{Name='Disable Hibernation'; Action='Hibernation'}, @{Name='Show File Extensions'; Action='FileExt'},
-        @{Name='Enable Ultimate Performance'; Action='UltimatePerf'}
+        @{Name='Activity History - Disable'; Action='Activity'},
+        @{Name='BitLocker - Disable'; Action='BitLocker'},
+        @{Name='ConsumerFeatures - Disable'; Action='Consumer'},
+        @{Name='Delivery Optimization - Disable'; Action='DeliveryOpt'},
+        @{Name='Disk Cleanup - Run'; Action='DiskCleanup'},
+        @{Name='End Task With Right Click - Enable'; Action='EndTaskRightClick'},
+        @{Name='File Explorer Automatic Folder Discovery - Disable'; Action='AutoFolderDiscovery'},
+        @{Name='Hibernation - Disable'; Action='Hibernation'},
+        @{Name='Location Tracking - Disable'; Action='Location'},
+        @{Name='Microsoft Store Recommended Search Results - Disable'; Action='StoreRecommendations'},
+        @{Name='Prevent Device Companion Apps'; Action='PreventCompanion'},
+        @{Name='Restore Point - Create'; Action='RestorePoint'},
+        @{Name='Services - Set to Manual'; Action='ServicesManual'},
+        @{Name='Start Menu Previous Layout - Enable'; Action='StartMenuOld'},
+        @{Name='Telemetry - Disable'; Action='Telemetry'},
+        @{Name='Temporary Files - Remove'; Action='TempFiles'},
+        @{Name='Widgets - Remove'; Action='Widgets'},
+        @{Name='Windows Platform Binary Table (WPBT) - Disable'; Action='WPBT'}
     )
     $tweaksAdv = @(
-        @{Name='Disable Background Apps'; Action='BgApps'}, @{Name='Disable Bing Search'; Action='Bing'},
-        @{Name='Disable Game Bar'; Action='GameBar'}, @{Name='Disable Storage Sense'; Action='StorageSense'},
-        @{Name='Disable IPv6'; Action='IPv6'}
+        @{Name='Adobe URL Block List - Enable'; Action='AdobeBlock'},
+        @{Name='Background Apps - Disable'; Action='BgApps'},
+        @{Name='Brave Browser - Debloat'; Action='BraveDebloat'},
+        @{Name='Date and Time - Set Time to UTC'; Action='SetUTC'},
+        @{Name='Disable Reserved Storage'; Action='Reserved'},
+        @{Name='File Explorer Home and Gallery - Disable'; Action='ExplorerHomeGallery'},
+        @{Name='IPv6 - Disable'; Action='IPv6'},
+        @{Name='IPv6 - Set IPv4 as Preferred'; Action='PreferIPv4'},
+        @{Name='Logitech Download Assistant Auto-Install - Disable'; Action='LogitechAutoInstall'},
+        @{Name='Microsoft Edge - Debloat'; Action='EdgeDebloat'},
+        @{Name='Microsoft Edge - Remove'; Action='EdgeRemove'},
+        @{Name='Microsoft OneDrive - Remove'; Action='OneDriveRemove'},
+        @{Name='Razer Software Auto-Install - Disable'; Action='RazerAutoInstall'},
+        @{Name='RDP Unigned File Warnings - Disable'; Action='RDPWarnings'},
+        @{Name='Right-Click Menu Previous Layout - Enable'; Action='RightClickOld'},
+        @{Name='Storage Sense - Disable'; Action='StorageSense'},
+        @{Name='svchost.exe Splitting - Disable'; Action='SvcHostSplit'},
+        @{Name='System Tray Notifications and Calendar - Disable'; Action='TrayNotifications'},
+        @{Name='Teredo - Disable'; Action='Teredo'},
+        @{Name='Visual Effects - Set to Best Performance'; Action='VisualFX'},
+        @{Name='Windows AI - Disable And Remove'; Action='WindowsAI'}
     )
     $stackEss = $window.FindName('PanelEssential')
     foreach ($t in $tweaksEss) {
