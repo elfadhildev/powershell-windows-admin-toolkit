@@ -169,3 +169,8 @@
 ## [3.5.4] - 2026-11-02
 ### Fixed
 - **Maintenance Serialization Ultimate:** Memperbaiki total error background job pada Maintenance dengan mengalihkan output native command (`*> $null`) dan menambahkan blok `try/catch` pada pembacaan Timer. GUI kini 100% stabil saat menjalankan SFC/DISM.
+## [4.0.0] - 2026-11-13
+### Major Update
+- **Real-time Terminal Logging:** Menambahkan kotak log di GUI utama yang menampilkan status setiap eksekusi (berhasil/gagal) secara real-time.
+- **Debloater Fix:** Memperbaiki logika penghapusan aplikasi UWP agar benar-benar berjalan dengan `-AllUsers -Force`.
+- **Tweaks Fix:** Memindahkan eksekusi tweaks ke Background Job agar GUI tidak macet dan dapat melaporkan status.
