@@ -185,3 +185,9 @@
 - **Restored 16 Menu Options:** Semua tombol menu utama (Audit, Tweaks, Debloater, Backup, dll) kini muncul kembali dalam bentuk Tiles.
 - **Interactive Tweaks & Debloater:** Membuka dialog Checkbox baru sehingga user dapat memilih opsi mana yang ingin dijalankan (tidak berjalan otomatis).
 - **Real-time Logging Fixed:** Fungsi penulisan Log GUI diperbaiki total dari error overload, dan log kini menampilkan status asli dari Background Job secara real-time.
+## [5.0.0] - 2026-11-13
+### Major Update
+- **Single Window UI (Unified):** Menggabungkan seluruh 16 fitur ke dalam satu jendela (Tabs: Dashboard, Tweaks, Debloater).
+- **Full Categorized UI:** Tweaks (Essential, Advanced) dan Debloater (MS, Bing, Xbox, Utility) dikembalikan ke dalam format Checkbox yang rapi.
+- **Real-time Log Permanen:** Output log selalu terlihat di bawah jendela.
+- **No External Terminals:** Semua proses berjalan di dalam aplikasi.
