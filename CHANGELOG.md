@@ -174,3 +174,6 @@
 - **Real-time Terminal Logging:** Menambahkan kotak log di GUI utama yang menampilkan status setiap eksekusi (berhasil/gagal) secara real-time.
 - **Debloater Fix:** Memperbaiki logika penghapusan aplikasi UWP agar benar-benar berjalan dengan `-AllUsers -Force`.
 - **Tweaks Fix:** Memindahkan eksekusi tweaks ke Background Job agar GUI tidak macet dan dapat melaporkan status.
+## [4.0.1] - 2026-11-13
+### Fixed
+- **XAML Parsing Error:** Memperbaiki karakter `&` yang tidak di-escape menjadi `&amp;` pada teks tombol "Privasi & Performa" dan "System Log & Output", yang menyebabkan GUI gagal dimuat.
