@@ -1,4 +1,4 @@
-﻿# tests/Toolkit.Tests.ps1
+# tests/Toolkit.Tests.ps1
 Describe "Toolkit.ps1 Quality Tests" {
     BeforeAll {
         $scriptPath = Join-Path $PSScriptRoot "..\toolkit.ps1"
@@ -6,8 +6,9 @@ Describe "Toolkit.ps1 Quality Tests" {
     }
 
     It "Harus bebas dari Syntax Error" {
+        $tokens = $null
         $errors = $null
-        [System.Management.Automation.PSParser]::Tokenize($scriptContent, [ref]$errors) | Out-Null
+        $ast = [System.Management.Automation.Language.Parser]::ParseInput($scriptContent, [ref]$tokens, [ref]$errors)
         $errors.Count | Should -Be 0
     }
 
