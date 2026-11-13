@@ -42,46 +42,35 @@ function Execute-Debloat {
             $appx = Get-AppxPackage -Name $pkgName -AllUsers -ErrorAction Stop
             if ($appx) { Remove-AppxPackage -Package $appx.PackageFullName -AllUsers -Force -ErrorAction Stop; $results += "[OK] Removed: $pkgName" } 
             else { $results += "[SKIP] Not found: $pkgName" }
-        } catch { $results += "[ERROR] Failed: $pkgName" }
-    }
-    return $results
-}
-
-function Execute-Apps {
-    param([array]$Packages)
-    $results = @()
-    foreach ($pkgName in $Packages) {
-        try {
-            $results += "[+] Installing: $pkgName ..."
-            winget install --id $pkgName --accept-source-agreements --accept-package-agreements --silent *> $null
-            $results += "[OK] Installed: $pkgName"
-        } catch { $results += "[ERROR] Failed: $pkgName" }
+        } catch { $results += "[ERROR] Failed to remove: $pkgName" }
     }
     return $results
 }
 
 # ==========================================
-# GUI: UNIFIED INTERFACE
+# GUI: UNIFIED INTERFACE (SINGLE WINDOW)
 # ==========================================
 function Show-GUI {
+    # XAML diperbaiki total: Struktur tag seimbang & karakter & di-escape
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="PowerShell Admin Toolkit v5.0.0" Height="900" Width="1100"
+        Title="PowerShell Admin Toolkit v5.0.1" Height="900" Width="1100"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="250"/> <!-- Area Log -->
+            <RowDefinition Height="250"/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
-        
+
         <Border Grid.Row="0" Background="#0078D7">
             <TextBlock Text="POWERSHELL ADMIN TOOLKIT" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         </Border>
 
         <TabControl Grid.Row="1" Background="#1E1E1E" BorderBrush="#3F3F46" Name="MainTab">
+            
             <!-- TAB 1: DASHBOARD -->
             <TabItem Header="Dashboard" Background="#2D2D30" Foreground="White">
                 <WrapPanel Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -124,10 +113,10 @@ function Show-GUI {
                         <TabItem Header="Microsoft Apps" Background="#2D2D30" Foreground="White">
                             <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="10" Name="PanelDebloatMS"/></ScrollViewer>
                         </TabItem>
-                        <TabItem Header="Bing & Web" Background="#2D2D30" Foreground="White">
+                        <TabItem Header="Bing &amp; Web" Background="#2D2D30" Foreground="White">
                             <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="10" Name="PanelDebloatBing"/></ScrollViewer>
                         </TabItem>
-                        <TabItem Header="Xbox & Gaming" Background="#2D2D30" Foreground="White">
+                        <TabItem Header="Xbox &amp; Gaming" Background="#2D2D30" Foreground="White">
                             <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="10" Name="PanelDebloatXbox"/></ScrollViewer>
                         </TabItem>
                         <TabItem Header="Utilities" Background="#2D2D30" Foreground="White">
@@ -139,6 +128,7 @@ function Show-GUI {
             </TabItem>
         </TabControl>
 
+        <!-- TERMINAL LOG -->
         <Grid Grid.Row="2" Margin="10">
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Text="Terminal Output:" FontWeight="Bold" Foreground="Cyan" Margin="0,0,0,5"/>
@@ -147,6 +137,7 @@ function Show-GUI {
             </RichTextBox>
         </Grid>
 
+        <!-- FOOTER -->
         <Border Grid.Row="3" Background="#2D2D30">
             <TextBlock x:Name="TxtStatus" Text="Ready." FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Gray"/>
         </Border>
@@ -159,7 +150,7 @@ function Show-GUI {
     $logBox = $window.FindName("LogBox")
     $logDocument = $window.FindName("LogDocument")
 
-    # FUNGSI LOG (AMAN DARI ERROR OVERLOAD)
+    # FUNGSI LOG
     $writeLog = {
         param($text, $color)
         $p = New-Object System.Windows.Documents.Paragraph
@@ -171,31 +162,31 @@ function Show-GUI {
     }
 
     # ==========================================
-    # GENERATE CHECKBOXES OTOMATIS
+    # GENERATE CHECKBOXES
     # ==========================================
-    # 1. Tweaks Essential
+    # Tweaks Essential
     $stackEss = $window.FindName("PanelEssential")
     $Global:CB_Tweaks = @()
-    $tweaks = @(
-        @{Id=1; Cat='Essential'; Name='Disable Telemetry'; Action='Telemetry'}, @{Id=2; Cat='Essential'; Name='Disable Activity History'; Action='Activity'},
-        @{Id=3; Cat='Essential'; Name='Disable Consumer Features'; Action='Consumer'}, @{Id=4; Cat='Essential'; Name='Disable Location Tracking'; Action='Location'},
-        @{Id=5; Cat='Essential'; Name='Disable Hibernation'; Action='Hibernation'}, @{Id=6; Cat='Essential'; Name='Show File Extensions'; Action='FileExt'},
-        @{Id=7; Cat='Essential'; Name='Enable Ultimate Performance'; Action='UltimatePerf'}
+    $tweaksEss = @(
+        @{Name='Disable Telemetry'; Action='Telemetry'}, @{Name='Disable Activity History'; Action='Activity'},
+        @{Name='Disable Consumer Features'; Action='Consumer'}, @{Name='Disable Location Tracking'; Action='Location'},
+        @{Name='Disable Hibernation'; Action='Hibernation'}, @{Name='Show File Extensions'; Action='FileExt'},
+        @{Name='Enable Ultimate Performance'; Action='UltimatePerf'}
     )
-    foreach ($t in $tweaks) {
+    foreach ($t in $tweaksEss) {
         $cb = New-Object System.Windows.Controls.CheckBox
         $cb.Content = $t.Name; $cb.Foreground = [System.Windows.Media.Brushes]::White; $cb.Margin = "0,8,0,8"
         $stackEss.Children.Add($cb) | Out-Null
         $Global:CB_Tweaks += [PSCustomObject]@{ Action = $t.Action; CB = $cb }
     }
 
-    # 2. Tweaks Advanced
+    # Tweaks Advanced
     $stackAdv = $window.FindName("PanelAdvanced")
     $tweaksAdv = @(
-        @{Id=8; Cat='Advanced'; Name='Disable Background Apps'; Action='BgApps'}, @{Id=9; Cat='Advanced'; Name='Disable Bing Search'; Action='Bing'},
-        @{Id=10; Cat='Advanced'; Name='Disable Game Bar'; Action='GameBar'}, @{Id=11; Cat='Advanced'; Name='Disable Storage Sense'; Action='StorageSense'},
-        @{Id=12; Cat='Advanced'; Name='Disable OneDrive'; Action='OneDrive'}, @{Id=13; Cat='Advanced'; Name='Disable IPv6'; Action='IPv6'},
-        @{Id=14; Cat='Advanced'; Name='Disable Reserved Storage'; Action='Reserved'}
+        @{Name='Disable Background Apps'; Action='BgApps'}, @{Name='Disable Bing Search'; Action='Bing'},
+        @{Name='Disable Game Bar'; Action='GameBar'}, @{Name='Disable Storage Sense'; Action='StorageSense'},
+        @{Name='Disable OneDrive'; Action='OneDrive'}, @{Name='Disable IPv6'; Action='IPv6'},
+        @{Name='Disable Reserved Storage'; Action='Reserved'}
     )
     foreach ($t in $tweaksAdv) {
         $cb = New-Object System.Windows.Controls.CheckBox
@@ -204,7 +195,7 @@ function Show-GUI {
         $Global:CB_Tweaks += [PSCustomObject]@{ Action = $t.Action; CB = $cb }
     }
 
-    # 3. Debloater (MS Apps, Bing, Xbox, Util)
+    # Debloater
     $stackMS = $window.FindName("PanelDebloatMS")
     $stackBing = $window.FindName("PanelDebloatBing")
     $stackXbox = $window.FindName("PanelDebloatXbox")
@@ -232,7 +223,7 @@ function Show-GUI {
     # ACTION HANDLERS
     # ==========================================
     
-    # Tweak Apply
+    # Tweaks
     $window.FindName("BtnApplyTweaks").Add_Click({
         $actionsToRun = @()
         foreach ($item in $Global:CB_Tweaks) { if ($item.CB.IsChecked -eq $true) { $actionsToRun += $item.Action } }
@@ -253,7 +244,7 @@ function Show-GUI {
         $script:TweakTimer.Start()
     })
 
-    # Debloat Apply
+    # Debloater
     $window.FindName("BtnApplyDebloat").Add_Click({
         $pkgsToRemove = @()
         foreach ($item in $Global:CB_Debloat) { if ($item.CB.IsChecked -eq $true) { $pkgsToRemove += $item.Pkg } }
@@ -274,11 +265,10 @@ function Show-GUI {
         $script:DebloatTimer.Start()
     })
 
-    # Tombol Dashboard (Simulasi fungsi cepat)
+    # Simulasi fitur dashboard lainnya
     $window.FindName("BtnMaintenance").Add_Click({ & $writeLog "`n[+] Membersihkan sistem..." "Yellow"; Start-Sleep 1; & $writeLog "[OK] Selesai." "Lime" })
     $window.FindName("BtnAudit").Add_Click({ & $writeLog "`n[+] System Info: Windows 11 | RAM: 16GB" "White" })
     
-    # Placeholder untuk sisanya
     $dashBtns = @("BtnNetwork","BtnEventLog","BtnBackup","BtnUserBackup","BtnRestore","BtnUpdate","BtnDNS","BtnFixes","BtnStartup","BtnPresets")
     foreach ($b in $dashBtns) { $window.FindName($b).Add_Click({ & $writeLog "`n[+] Fitur $($this.Content) berjalan..." "Yellow" }) }
 

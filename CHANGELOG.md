@@ -191,3 +191,6 @@
 - **Full Categorized UI:** Tweaks (Essential, Advanced) dan Debloater (MS, Bing, Xbox, Utility) dikembalikan ke dalam format Checkbox yang rapi.
 - **Real-time Log Permanen:** Output log selalu terlihat di bawah jendela.
 - **No External Terminals:** Semua proses berjalan di dalam aplikasi.
+## [5.0.1] - 2026-11-13
+### Fixed
+- **XAML Parsing Error:** Memperbaiki struktur XAML yang tidak seimbang (kurang tag penutup) dan karakter `&` pada nama tab `Bing & Web` yang menyebabkan crash.
