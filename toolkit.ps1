@@ -146,7 +146,7 @@ function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="PowerShell Admin Toolkit v4.0.1" Height="850" Width="1050"
+        Title="PowerShell Admin Toolkit v4.0.2" Height="850" Width="1050"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions>
@@ -177,7 +177,7 @@ function Show-GUI {
         <!-- Area Log Terminal -->
         <Grid Grid.Row="2" Margin="10">
             <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Text="System Log &amp; Output:" FontWeight="Bold" Foreground="Cyan" Margin="0,0,0,5"/>
+            <TextBlock Grid.Row="0" Text="System Log and Output:" FontWeight="Bold" Foreground="Cyan" Margin="0,0,0,5"/>
             <RichTextBox Grid.Row="1" Name="LogBox" Background="#111111" Foreground="White" FontFamily="Consolas" FontSize="12" IsReadOnly="True" VerticalScrollBarVisibility="Auto" BorderBrush="#3F3F46">
                 <FlowDocument Name="LogDocument">
                     <Paragraph><Run Foreground="Gray">Ready...</Run></Paragraph>

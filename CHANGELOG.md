@@ -177,3 +177,6 @@
 ## [4.0.1] - 2026-11-13
 ### Fixed
 - **XAML Parsing Error:** Memperbaiki karakter `&` yang tidak di-escape menjadi `&amp;` pada teks tombol "Privasi & Performa" dan "System Log & Output", yang menyebabkan GUI gagal dimuat.
+## [4.0.2] - 2026-11-13
+### Fixed
+- **XAML Parsing Error Fixed (Final):** Memperbaiki teks `System Log & Output` dan `Privasi & Performa` menjadi format XML yang valid (`&amp;`). Error `An error occurred while parsing EntityName` telah diatasi total.
