@@ -7,7 +7,7 @@ Describe "Toolkit.ps1 Quality Tests" {
     It "Harus bebas dari Syntax Error" {
         $tokens = $null
         $errors = $null
-        $ast = [System.Management.Automation.Language.Parser]::ParseInput($scriptContent, [ref]$tokens, [ref]$errors)
+        $null = [System.Management.Automation.Language.Parser]::ParseInput($scriptContent, [ref]$tokens, [ref]$errors)
         $errors.Count | Should -Be 0
     }
 
