@@ -11,15 +11,15 @@ Describe "Toolkit.ps1 Quality Tests" {
         $errors.Count | Should -Be 0
     }
 
-    It "Harus memiliki fungsi Invoke-Maintenance" {
-        $scriptContent | Should -Match "function Invoke-Maintenance"
+    It "Harus memiliki fungsi Execute-Tweaks" {
+        $scriptContent | Should -Match "function Execute-Tweaks"
     }
 
-    It "Harus memiliki fungsi Invoke-SystemAudit" {
-        $scriptContent | Should -Match "function Invoke-SystemAudit"
+    It "Harus memiliki fungsi Execute-Debloat" {
+        $scriptContent | Should -Match "function Execute-Debloat"
     }
 
-    It "Harus memiliki fungsi Invoke-EventLogAnalyzer" {
-        $scriptContent | Should -Match "function Invoke-EventLogAnalyzer"
+    It "Harus memiliki fungsi Show-GUI" {
+        $scriptContent | Should -Match "function Show-GUI"
     }
 }
