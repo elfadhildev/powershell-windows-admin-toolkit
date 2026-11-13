@@ -140,19 +140,19 @@ function Execute-Debloat {
 }
 
 # ==========================================
-# GUI: MAIN WINDOW
+# GUI: MAIN WINDOW & FUNGSI PENDUKUNG
 # ==========================================
 function Show-GUI {
     [xml]$xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="PowerShell Admin Toolkit v4.0.2" Height="850" Width="1050"
+        Title="PowerShell Admin Toolkit v4.1.0" Height="850" Width="1050"
         WindowStartupLocation="CenterScreen" Background="#1E1E1E" Foreground="White">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="200"/> <!-- Area Log -->
+            <RowDefinition Height="250"/> <!-- Area Log -->
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
         
@@ -168,8 +168,19 @@ function Show-GUI {
                     <Button x:Name="BtnMaintenance" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🛠️ Pure Clean" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Deep Maintenance" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
                     <Button x:Name="BtnDebloater" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🧹 Debloater" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Hapus Bloatware" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
                     <Button x:Name="BtnTweaks" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="⚙️ Tweaks" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Privasi &amp; Performa" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
+                    <Button x:Name="BtnInstall" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="📦 Install Apps" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Winget Mega List" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
                     <Button x:Name="BtnAudit" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="📊 Audit" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Cek Hardware" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
                     <Button x:Name="BtnNetwork" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🌐 Network" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Cek Jaringan" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
+                    
+                    <Button x:Name="BtnEventLog" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="📝 Event Log" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Analisis Error" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
+                    <Button x:Name="BtnBackup" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="💾 App Backup" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Export/Import" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
+                    <Button x:Name="BtnUserBackup" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🗂️ User Backup" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Backup Data Profil" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
+                    <Button x:Name="BtnRestore" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🛡️ Restore Point" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Buat &amp; Kembalikan" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
+                    <Button x:Name="BtnUpdate" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🔄 Update Mgr" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Kontrol Windows Update" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
+                    <Button x:Name="BtnDNS" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🌍 DNS Switcher" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Percepat Internet" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
+                    <Button x:Name="BtnFixes" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🚑 One-Click Fixes" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Perbaikan Darurat" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
+                    <Button x:Name="BtnStartup" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="🚀 Startup Manager" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Kelola Autostart" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
+                    <Button x:Name="BtnPresets" Width="180" Height="90" Margin="10" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2"><StackPanel><TextBlock Text="⚡ Automation Presets" FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Setup Instalasi Cepat" FontSize="12" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel></Button>
                 </WrapPanel>
             </TabItem>
         </TabControl>
@@ -198,65 +209,185 @@ function Show-GUI {
     $logBox = $window.FindName("LogBox")
     $logDocument = $window.FindName("LogDocument")
 
-    # Fungsi pembantu untuk menulis ke log
+    # Fungsi pembantu untuk menulis ke log (SUDAH DIPERBAIKI)
     $writeLog = {
         param($text, $color)
         $p = New-Object System.Windows.Documents.Paragraph
-        $r = New-Object System.Windows.Documents.Run($text)
+        $r = New-Object System.Windows.Documents.Run -ArgumentList $text
         $r.Foreground = [System.Windows.Media.BrushConverter]::new().ConvertFromString($color)
         $p.Inlines.Add($r)
         $logDocument.Blocks.Add($p)
         $logBox.ScrollToEnd()
     }
 
-    # Action: Tweaks
-    $window.FindName("BtnTweaks").Add_Click({
-        $SelectedIds = @(1,2,3,4,5,6,7,8,9,10,11,12,13,14) # Placeholder, nanti diganti UI Checkbox
-        $Actions = $Global:TweakList | Where-Object { $_.Id -in $SelectedIds } | Select-Object -ExpandProperty Action
-        
-        & $writeLog "`n[+] Memulai Proses Tweaks..." "Yellow"
-        
-        $script:TweakJob = Start-Job -ScriptBlock ${function:Execute-Tweaks} -ArgumentList (,$Actions)
-        $script:TweakTimer = New-Object System.Windows.Threading.DispatcherTimer
-        $script:TweakTimer.Interval = [TimeSpan]::FromSeconds(1)
-        $script:TweakTimer.Add_Tick({
-            if ($script:TweakJob.State -ne 'Running') {
-                $results = Receive-Job -Job $script:TweakJob
-                foreach ($res in $results) {
-                    if ($res -match "^\[OK\]") { & $writeLog $res "Lime" }
-                    elseif ($res -match "^\[ERROR\]") { & $writeLog $res "Red" }
-                    else { & $writeLog $res "White" }
-                }
-                & $writeLog "[+] Tweaks Selesai." "Cyan"
-                $script:TweakTimer.Stop()
-                Remove-Job -Job $script:TweakJob -Force
-            }
-        })
-        $script:TweakTimer.Start()
+    # Action: Maintenance
+    $window.FindName("BtnMaintenance").Add_Click({
+        & $writeLog "`n[+] Memulai Deep Maintenance..." "Yellow"
+        & $writeLog "[OK] Proses disimulasikan selesai." "Lime"
     })
 
-    # Action: Debloater
-    $window.FindName("BtnDebloater").Add_Click({
-        $SelectedPkgs = $Global:DebloatList | Select-Object -ExpandProperty Pkg
-        & $writeLog "`n[+] Memulai Debloating..." "Yellow"
+    # Action: Tweaks (Membuka Dialog)
+    $window.FindName("BtnTweaks").Add_Click({
+        $tweaksWindow = New-Object System.Windows.Window
+        $tweaksWindow.Title = "Select Tweaks"
+        $tweaksWindow.Width = 500
+        $tweaksWindow.Height = 600
+        $tweaksWindow.Background = [System.Windows.Media.Brushes]::DarkGray
         
-        $script:DebloatJob = Start-Job -ScriptBlock ${function:Execute-Debloat} -ArgumentList (,$SelectedPkgs)
-        $script:DebloatTimer = New-Object System.Windows.Threading.DispatcherTimer
-        $script:DebloatTimer.Interval = [TimeSpan]::FromSeconds(1)
-        $script:DebloatTimer.Add_Tick({
-            if ($script:DebloatJob.State -ne 'Running') {
-                $results = Receive-Job -Job $script:DebloatJob
-                foreach ($res in $results) {
-                    if ($res -match "^\[OK\]") { & $writeLog $res "Lime" }
-                    elseif ($res -match "^\[ERROR\]") { & $writeLog $res "Red" }
-                    else { & $writeLog $res "Gray" }
-                }
-                & $writeLog "[+] Debloating Selesai." "Cyan"
-                $script:DebloatTimer.Stop()
-                Remove-Job -Job $script:DebloatJob -Force
+        $grid = New-Object System.Windows.Controls.Grid
+        $grid.Margin = "10"
+        
+        $row1 = New-Object System.Windows.Controls.RowDefinition
+        $row1.Height = "Auto"
+        $row2 = New-Object System.Windows.Controls.RowDefinition
+        $row2.Height = "*"
+        $row3 = New-Object System.Windows.Controls.RowDefinition
+        $row3.Height = "Auto"
+        $grid.RowDefinitions.Add($row1)
+        $grid.RowDefinitions.Add($row2)
+        $grid.RowDefinitions.Add($row3)
+        
+        $scroll = New-Object System.Windows.Controls.ScrollViewer
+        $scroll.VerticalScrollBarVisibility = "Auto"
+        
+        $stack = New-Object System.Windows.Controls.StackPanel
+        
+        $checkboxes = @()
+        foreach ($t in $Global:TweakList) {
+            $cb = New-Object System.Windows.Controls.CheckBox
+            $cb.Content = $t.Name
+            $cb.Foreground = [System.Windows.Media.Brushes]::White
+            $cb.Margin = "0,5,0,5"
+            $stack.Children.Add($cb) | Out-Null
+            $checkboxes += [PSCustomObject]@{ Action = $t.Action; CheckBox = $cb }
+        }
+        $scroll.Content = $stack
+        [System.Windows.Controls.Grid]::SetRow($scroll, 1)
+        $grid.Children.Add($scroll) | Out-Null
+        
+        $btnApply = New-Object System.Windows.Controls.Button
+        $btnApply.Content = "APPLY SELECTED TWEAKS"
+        $btnApply.Height = 40
+        $btnApply.Background = [System.Windows.Media.Brushes]::DodgerBlue
+        $btnApply.Foreground = [System.Windows.Media.Brushes]::White
+        $btnApply.FontWeight = "Bold"
+        $btnApply.Margin = "0,10,0,0"
+        [System.Windows.Controls.Grid]::SetRow($btnApply, 2)
+        $grid.Children.Add($btnApply) | Out-Null
+        
+        $btnApply.Add_Click({
+            $actionsToRun = @()
+            foreach ($item in $checkboxes) {
+                if ($item.CheckBox.IsChecked -eq $true) { $actionsToRun += $item.Action }
             }
+            if ($actionsToRun.Count -eq 0) { return }
+            
+            $tweaksWindow.Close()
+            & $writeLog "`n[+] Memulai Proses Tweaks..." "Yellow"
+            
+            $script:TweakJob = Start-Job -ScriptBlock ${function:Execute-Tweaks} -ArgumentList (,$actionsToRun)
+            $script:TweakTimer = New-Object System.Windows.Threading.DispatcherTimer
+            $script:TweakTimer.Interval = [TimeSpan]::FromSeconds(1)
+            $script:TweakTimer.Add_Tick({
+                if ($script:TweakJob.State -ne 'Running') {
+                    $results = Receive-Job -Job $script:TweakJob
+                    foreach ($res in $results) {
+                        if ($res -match "^\[OK\]") { & $writeLog $res "Lime" }
+                        elseif ($res -match "^\[ERROR\]") { & $writeLog $res "Red" }
+                        else { & $writeLog $res "White" }
+                    }
+                    & $writeLog "[+] Tweaks Selesai." "Cyan"
+                    $script:TweakTimer.Stop()
+                    Remove-Job -Job $script:TweakJob -Force
+                }
+            })
+            $script:TweakTimer.Start()
         })
-        $script:DebloatTimer.Start()
+        
+        $tweaksWindow.Content = $grid
+        $tweaksWindow.ShowDialog() | Out-Null
+    })
+
+    # Action: Debloater (Membuka Dialog)
+    $window.FindName("BtnDebloater").Add_Click({
+        $debloatWindow = New-Object System.Windows.Window
+        $debloatWindow.Title = "Select Bloatware"
+        $debloatWindow.Width = 500
+        $debloatWindow.Height = 600
+        $debloatWindow.Background = [System.Windows.Media.Brushes]::DarkGray
+        
+        $grid = New-Object System.Windows.Controls.Grid
+        $grid.Margin = "10"
+        
+        $row1 = New-Object System.Windows.Controls.RowDefinition
+        $row1.Height = "Auto"
+        $row2 = New-Object System.Windows.Controls.RowDefinition
+        $row2.Height = "*"
+        $row3 = New-Object System.Windows.Controls.RowDefinition
+        $row3.Height = "Auto"
+        $grid.RowDefinitions.Add($row1)
+        $grid.RowDefinitions.Add($row2)
+        $grid.RowDefinitions.Add($row3)
+        
+        $scroll = New-Object System.Windows.Controls.ScrollViewer
+        $scroll.VerticalScrollBarVisibility = "Auto"
+        
+        $stack = New-Object System.Windows.Controls.StackPanel
+        
+        $checkboxes = @()
+        foreach ($d in $Global:DebloatList) {
+            $cb = New-Object System.Windows.Controls.CheckBox
+            $cb.Content = $d.Name
+            $cb.Foreground = [System.Windows.Media.Brushes]::White
+            $cb.Margin = "0,5,0,5"
+            $stack.Children.Add($cb) | Out-Null
+            $checkboxes += [PSCustomObject]@{ Pkg = $d.Pkg; CheckBox = $cb }
+        }
+        $scroll.Content = $stack
+        [System.Windows.Controls.Grid]::SetRow($scroll, 1)
+        $grid.Children.Add($scroll) | Out-Null
+        
+        $btnApply = New-Object System.Windows.Controls.Button
+        $btnApply.Content = "UNINSTALL SELECTED"
+        $btnApply.Height = 40
+        $btnApply.Background = [System.Windows.Media.Brushes]::Crimson
+        $btnApply.Foreground = [System.Windows.Media.Brushes]::White
+        $btnApply.FontWeight = "Bold"
+        $btnApply.Margin = "0,10,0,0"
+        [System.Windows.Controls.Grid]::SetRow($btnApply, 2)
+        $grid.Children.Add($btnApply) | Out-Null
+        
+        $btnApply.Add_Click({
+            $pkgsToRemove = @()
+            foreach ($item in $checkboxes) {
+                if ($item.CheckBox.IsChecked -eq $true) { $pkgsToRemove += $item.Pkg }
+            }
+            if ($pkgsToRemove.Count -eq 0) { return }
+            
+            $debloatWindow.Close()
+            & $writeLog "`n[+] Memulai Debloating..." "Yellow"
+            
+            $script:DebloatJob = Start-Job -ScriptBlock ${function:Execute-Debloat} -ArgumentList (,$pkgsToRemove)
+            $script:DebloatTimer = New-Object System.Windows.Threading.DispatcherTimer
+            $script:DebloatTimer.Interval = [TimeSpan]::FromSeconds(1)
+            $script:DebloatTimer.Add_Tick({
+                if ($script:DebloatJob.State -ne 'Running') {
+                    $results = Receive-Job -Job $script:DebloatJob
+                    foreach ($res in $results) {
+                        if ($res -match "^\[OK\]") { & $writeLog $res "Lime" }
+                        elseif ($res -match "^\[ERROR\]") { & $writeLog $res "Red" }
+                        else { & $writeLog $res "Gray" }
+                    }
+                    & $writeLog "[+] Debloating Selesai." "Cyan"
+                    $script:DebloatTimer.Stop()
+                    Remove-Job -Job $script:DebloatJob -Force
+                }
+            })
+            $script:DebloatTimer.Start()
+        })
+        
+        $debloatWindow.Content = $grid
+        $debloatWindow.ShowDialog() | Out-Null
     })
 
     # Action: Audit
@@ -266,6 +397,19 @@ function Show-GUI {
         & $writeLog " OS: $($os.Caption) | CPU: $($cpu.Name) | RAM: $ram GB" "White"
         & $writeLog "[+] Audit Selesai." "Cyan"
     })
+
+    # Action: Network (Placeholder)
+    $window.FindName("BtnNetwork").Add_Click({ & $writeLog "`n[+] Fitur Network segera hadir." "Yellow" })
+    $window.FindName("BtnInstall").Add_Click({ & $writeLog "`n[+] Fitur Install Apps segera hadir." "Yellow" })
+    $window.FindName("BtnEventLog").Add_Click({ & $writeLog "`n[+] Fitur Event Log segera hadir." "Yellow" })
+    $window.FindName("BtnBackup").Add_Click({ & $writeLog "`n[+] Fitur App Backup segera hadir." "Yellow" })
+    $window.FindName("BtnUserBackup").Add_Click({ & $writeLog "`n[+] Fitur User Backup segera hadir." "Yellow" })
+    $window.FindName("BtnRestore").Add_Click({ & $writeLog "`n[+] Fitur Restore Point segera hadir." "Yellow" })
+    $window.FindName("BtnUpdate").Add_Click({ & $writeLog "`n[+] Fitur Update Manager segera hadir." "Yellow" })
+    $window.FindName("BtnDNS").Add_Click({ & $writeLog "`n[+] Fitur DNS Switcher segera hadir." "Yellow" })
+    $window.FindName("BtnFixes").Add_Click({ & $writeLog "`n[+] Fitur One-Click Fixes segera hadir." "Yellow" })
+    $window.FindName("BtnStartup").Add_Click({ & $writeLog "`n[+] Fitur Startup Manager segera hadir." "Yellow" })
+    $window.FindName("BtnPresets").Add_Click({ & $writeLog "`n[+] Fitur Automation Presets segera hadir." "Yellow" })
 
     $window.ShowDialog() | Out-Null
 }

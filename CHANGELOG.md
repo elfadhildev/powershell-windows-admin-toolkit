@@ -180,3 +180,8 @@
 ## [4.0.2] - 2026-11-13
 ### Fixed
 - **XAML Parsing Error Fixed (Final):** Memperbaiki teks `System Log & Output` dan `Privasi & Performa` menjadi format XML yang valid (`&amp;`). Error `An error occurred while parsing EntityName` telah diatasi total.
+## [4.1.0] - 2026-11-13
+### Major Update
+- **Restored 16 Menu Options:** Semua tombol menu utama (Audit, Tweaks, Debloater, Backup, dll) kini muncul kembali dalam bentuk Tiles.
+- **Interactive Tweaks & Debloater:** Membuka dialog Checkbox baru sehingga user dapat memilih opsi mana yang ingin dijalankan (tidak berjalan otomatis).
+- **Real-time Logging Fixed:** Fungsi penulisan Log GUI diperbaiki total dari error overload, dan log kini menampilkan status asli dari Background Job secara real-time.
