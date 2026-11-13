@@ -1,4 +1,3 @@
-# tests/Toolkit.Tests.ps1
 Describe "Toolkit.ps1 Quality Tests" {
     BeforeAll {
         $scriptPath = Join-Path $PSScriptRoot "..\toolkit.ps1"
