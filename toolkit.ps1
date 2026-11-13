@@ -144,16 +144,27 @@ function Execute-Maintenance {
                         Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
                     $after  = (Get-ChildItem $path -Recurse -Force -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
                     $freed  = [math]::Round((($before - $after) / 1MB), 2)
-                    Write-Output "[OK] $path — dibebaskan ~${freed} MB."
+                    Write-Output "[OK] $path â€” dibebaskan ~${freed} MB."
                 } catch { Write-Output "[WARN] Sebagian file tidak bisa dihapus: $($_.Exception.Message)" }
             } else { Write-Output "[INFO] Folder tidak ditemukan: $path" }
         }
     }
 
     if ($Actions -contains 'CleanMgr') {
-        Write-Output "[*] Menjalankan cleanmgr /sagerun:1..."
-        try { Start-Process cleanmgr.exe -ArgumentList '/sagerun:1' -NoNewWindow -Wait -ErrorAction Stop; Write-Output "[OK] Disk Cleanup selesai." }
-        catch { Write-Output "[WARN] cleanmgr gagal: $($_.Exception.Message)" }
+        Write-Output "[*] Mengonfigurasi preset Disk Cleanup secara otomatis..."
+        try {
+            $volCaches = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches"
+            Get-ChildItem $volCaches -ErrorAction SilentlyContinue | ForEach-Object {
+                if ($_.PSChildName -ne 'DownloadsFolder') {
+                    Set-ItemProperty -Path $_.PSPath -Name 'StateFlags0001' -Value 2 -Type DWord -ErrorAction SilentlyContinue
+                }
+            }
+            Write-Output "[*] Menjalankan cleanmgr /sagerun:1 (Silent Mode)..."
+            Start-Process cleanmgr.exe -ArgumentList '/sagerun:1 /d C:' -NoNewWindow -Wait -ErrorAction Stop
+            Write-Output "[OK] Disk Cleanup selesai."
+        } catch {
+            Write-Output "[WARN] cleanmgr gagal: $($_.Exception.Message)"
+        }
     }
     if ($Actions -contains 'DismCleanup') {
         Write-Output "[*] DISM Component Cleanup (5-10 menit)..."
@@ -176,11 +187,11 @@ function Execute-Maintenance {
             $part = Get-Partition -DriveLetter C -ErrorAction Stop
             $disk = Get-PhysicalDisk | Where-Object { $_.DeviceID -eq $part.DiskNumber }
             if ($disk.MediaType -eq 'SSD') {
-                Write-Output "[*] SSD — menjalankan ReTrim..."
+                Write-Output "[*] SSD â€” menjalankan ReTrim..."
                 Optimize-Volume -DriveLetter C -ReTrim -ErrorAction SilentlyContinue | Out-Null
                 Write-Output "[OK] ReTrim selesai."
             } else {
-                Write-Output "[*] HDD — menjalankan Defrag..."
+                Write-Output "[*] HDD â€” menjalankan Defrag..."
                 Optimize-Volume -DriveLetter C -Defrag -ErrorAction SilentlyContinue | Out-Null
                 Write-Output "[OK] Defrag selesai."
             }
@@ -211,7 +222,7 @@ function Execute-SystemAudit {
     Write-Output "`n[*] Driver Bermasalah:"
     $bad = Get-PnpDevice -PresentOnly | Where-Object { $_.Status -ne 'OK' }
     if ($bad) {
-        foreach ($d in $bad) { Write-Output ("   [{0}] {1} — {2}" -f $d.Class, $d.FriendlyName, $d.Status) }
+        foreach ($d in $bad) { Write-Output ("   [{0}] {1} â€” {2}" -f $d.Class, $d.FriendlyName, $d.Status) }
     } else { Write-Output "   [OK] Semua driver berstatus OK." }
 
     $report = "=== SYSTEM AUDIT $(Get-Date) ==="
@@ -265,9 +276,9 @@ function Execute-EventLogAnalyzer {
     foreach ($s in $summary) {
         switch -Wildcard ($s.Name) {
             '*DistributedCOM*'         { Write-Output "   [OK] DCOM 10016 = normal Windows, abaikan." }
-            '*Service Control Manager*' { Write-Output "   [!] SCM gagal start service — jalankan Repair System (SFC/DISM)." }
-            '*VSS*'                    { Write-Output "   [!] VSS gagal — jalankan Repair System atau cek disk." }
-            '*CAPI2*'                  { Write-Output "   [!] CAPI2 — reset Windows Update Cache." }
+            '*Service Control Manager*' { Write-Output "   [!] SCM gagal start service â€” jalankan Repair System (SFC/DISM)." }
+            '*VSS*'                    { Write-Output "   [!] VSS gagal â€” jalankan Repair System atau cek disk." }
+            '*CAPI2*'                  { Write-Output "   [!] CAPI2 â€” reset Windows Update Cache." }
         }
     }
     Write-Output "[DONE] Analisa event log selesai."
@@ -358,7 +369,7 @@ function Execute-RestorePointRestore {
     $ErrorActionPreference = 'SilentlyContinue'
     Write-Output "[*] Restoring ke restore point #$SequenceNumber (sistem akan restart)..."
     Restore-Computer -RestorePoint $SequenceNumber -Confirm:$false
-    Write-Output "[OK] Perintah restore dikirim — sistem akan restart."
+    Write-Output "[OK] Perintah restore dikirim â€” sistem akan restart."
     Write-Output "[DONE]"
 }
 
@@ -432,7 +443,7 @@ function Execute-OneClickFix {
             netsh winsock reset | Out-Null
             netsh int ip reset | Out-Null
             ipconfig /flushdns | Out-Null
-            Write-Output "[OK] Network reset — disarankan restart."
+            Write-Output "[OK] Network reset â€” disarankan restart."
         }
         'update' {
             Write-Output "[*] Reset Windows Update cache..."
@@ -524,7 +535,7 @@ function Execute-AppBackupImport {
 }
 
 function Show-MaintenanceDialog {
-    $win = New-DarkWindow -Title 'Pure Clean — Maintenance' -Width 540 -Height 560
+    $win = New-DarkWindow -Title 'Pure Clean â€” Maintenance' -Width 540 -Height 560
     $grid = New-Object System.Windows.Controls.Grid
     $grid.Margin = '15'
     for ($i=0; $i -lt 3; $i++) { $grid.RowDefinitions.Add((New-Object System.Windows.Controls.RowDefinition)) }
@@ -857,10 +868,10 @@ function Show-DnsSwitcherDialog {
     $combo.Width = 400
     $combo.Height = 30
     $opts = @(
-        @{Tag='cloudflare'; Label='Cloudflare (1.1.1.1) — cepat & privasi'},
-        @{Tag='google';     Label='Google (8.8.8.8) — stabil'},
-        @{Tag='quad9';      Label='Quad9 (9.9.9.9) — blokir malware'},
-        @{Tag='adguard';    Label='AdGuard (94.140.14.14) — blokir iklan'},
+        @{Tag='cloudflare'; Label='Cloudflare (1.1.1.1) â€” cepat & privasi'},
+        @{Tag='google';     Label='Google (8.8.8.8) â€” stabil'},
+        @{Tag='quad9';      Label='Quad9 (9.9.9.9) â€” blokir malware'},
+        @{Tag='adguard';    Label='AdGuard (94.140.14.14) â€” blokir iklan'},
         @{Tag='opendns';    Label='OpenDNS (208.67.222.222)'},
         @{Tag='cloudflare-malware'; Label='Cloudflare Malware (1.1.1.2)'},
         @{Tag='dhcp';       Label='Reset ke DHCP (otomatis)'}
@@ -909,7 +920,7 @@ function Show-OneClickFixesDialog {
     $opts = @(
         @{Tag='network'; Label='Reset Network Stack (Winsock + IP + DNS)'},
         @{Tag='update';  Label='Reset Windows Update Cache'},
-        @{Tag='repair';  Label='Repair System (SFC + DISM) — 10-25 menit'}
+        @{Tag='repair';  Label='Repair System (SFC + DISM) â€” 10-25 menit'}
     )
     foreach ($o in $opts) {
         $cb = New-DarkCheckBox -Text $o.Label -Tag $o.Tag
@@ -1099,40 +1110,40 @@ function Show-GUI {
         <ScrollViewer VerticalScrollBarVisibility="Auto">
           <WrapPanel Margin="20">
             <Button x:Name="BtnMaintenance" Width="180" Height="90" Margin="8" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2">
-              <StackPanel><TextBlock Text="🛠️ Pure Clean" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Deep Maintenance" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
+              <StackPanel><TextBlock Text="ðŸ› ï¸ Pure Clean" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Deep Maintenance" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
             </Button>
             <Button x:Name="BtnAudit" Width="180" Height="90" Margin="8" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2">
-              <StackPanel><TextBlock Text="📊 System Audit" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Cek Hardware &amp; OS" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
+              <StackPanel><TextBlock Text="ðŸ“Š System Audit" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Cek Hardware &amp; OS" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
             </Button>
             <Button x:Name="BtnNetwork" Width="180" Height="90" Margin="8" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2">
-              <StackPanel><TextBlock Text="🌐 Network" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Diagnostics" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
+              <StackPanel><TextBlock Text="ðŸŒ Network" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Diagnostics" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
             </Button>
             <Button x:Name="BtnEventLog" Width="180" Height="90" Margin="8" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2">
-              <StackPanel><TextBlock Text="📝 Event Log" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Analisis Error" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
+              <StackPanel><TextBlock Text="ðŸ“ Event Log" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Analisis Error" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
             </Button>
             <Button x:Name="BtnBackup" Width="180" Height="90" Margin="8" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2">
-              <StackPanel><TextBlock Text="📦 App Backup" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Export/Import" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
+              <StackPanel><TextBlock Text="ðŸ“¦ App Backup" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Export/Import" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
             </Button>
             <Button x:Name="BtnUserBackup" Width="180" Height="90" Margin="8" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2">
-              <StackPanel><TextBlock Text="🗂️ User Backup" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Backup Profil" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
+              <StackPanel><TextBlock Text="ðŸ—‚ï¸ User Backup" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Backup Profil" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
             </Button>
             <Button x:Name="BtnRestore" Width="180" Height="90" Margin="8" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2">
-              <StackPanel><TextBlock Text="🛡️ Restore Point" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Create &amp; Revert" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
+              <StackPanel><TextBlock Text="ðŸ›¡ï¸ Restore Point" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Create &amp; Revert" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
             </Button>
             <Button x:Name="BtnUpdate" Width="180" Height="90" Margin="8" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2">
-              <StackPanel><TextBlock Text="🔄 Update Mgr" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Kontrol Update" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
+              <StackPanel><TextBlock Text="ðŸ”„ Update Mgr" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Kontrol Update" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
             </Button>
             <Button x:Name="BtnDNS" Width="180" Height="90" Margin="8" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2">
-              <StackPanel><TextBlock Text="🌍 DNS Switcher" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Percepat Internet" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
+              <StackPanel><TextBlock Text="ðŸŒ DNS Switcher" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Percepat Internet" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
             </Button>
             <Button x:Name="BtnFixes" Width="180" Height="90" Margin="8" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2">
-              <StackPanel><TextBlock Text="🚑 One-Click Fixes" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Perbaikan Darurat" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
+              <StackPanel><TextBlock Text="ðŸš‘ One-Click Fixes" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Perbaikan Darurat" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
             </Button>
             <Button x:Name="BtnStartup" Width="180" Height="90" Margin="8" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2">
-              <StackPanel><TextBlock Text="🚀 Startup Mgr" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Kelola Autostart" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
+              <StackPanel><TextBlock Text="ðŸš€ Startup Mgr" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Kelola Autostart" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
             </Button>
             <Button x:Name="BtnPresets" Width="180" Height="90" Margin="8" Background="#2D2D30" BorderBrush="#3F3F46" BorderThickness="2">
-              <StackPanel><TextBlock Text="⚡ Presets" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Setup Instalasi" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
+              <StackPanel><TextBlock Text="âš¡ Presets" FontSize="15" FontWeight="Bold" HorizontalAlignment="Center"/><TextBlock Text="Setup Instalasi" FontSize="11" Foreground="Gray" HorizontalAlignment="Center"/></StackPanel>
             </Button>
           </WrapPanel>
         </ScrollViewer>
@@ -1196,7 +1207,7 @@ function Show-GUI {
     $window = [Windows.Markup.XamlReader]::Load($reader)
     $Global:LogBox = $window.FindName('LogBox')
     $Global:LogDocument = $window.FindName('LogDocument')
-    Add-Log "[*] Toolkit v6.0.0 loaded. Semua fitur aktif — pilih dari Dashboard." "#00FF7F"
+    Add-Log "[*] Toolkit v6.0.0 loaded. Semua fitur aktif â€” pilih dari Dashboard." "#00FF7F"
 
     $Global:CB_Tweaks = @()
     $tweaksEss = @(
